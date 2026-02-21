@@ -71,3 +71,36 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Autenticación con Supabase (multiempresa)
+
+El sistema usa **Supabase Auth** con arquitectura multiempresa (companies + users).
+
+### Configuración
+
+1. Crear proyecto en [Supabase](https://supabase.com) y copiar **URL** y **anon key** (Settings → API).
+2. Copiar `.env.example` a `.env` y completar:
+   ```env
+   VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+   VITE_SUPABASE_ANON_KEY=tu-anon-key
+   ```
+3. En el **SQL Editor** de Supabase, ejecutar en orden las migraciones en `supabase/migrations/`:
+   - `20250221000000_create_companies_and_users.sql`
+   - `20250221000001_trigger_on_auth_user_created.sql`
+4. (Opcional) En Authentication → Providers, configurar confirmación de email según necesites.
+5. En Authentication → URL Configuration, agregar la URL de tu app (ej. `http://localhost:5173`) en **Redirect URLs** para el flujo de recuperación de contraseña.
+
+### Flujos
+
+- **Registro**: crea usuario en Auth, empresa en `companies` (trial 14 días) y admin en `users` (trigger en DB).
+- **Login**: redirección a `/app/dashboard` si trial vigente o suscripción activa.
+- **Trial vencido**: el usuario sigue logueado pero ve una pantalla bloqueada con mensaje de contacto; no se elimina usuario ni empresa.
+- **Recuperación de contraseña**: flujo estándar de Supabase; redirección a `/login?recovery=ok`.
+
+### Instalación de dependencias
+
+Si aún no instalaste las dependencias (incl. Supabase):
+
+```sh
+npm i
+```

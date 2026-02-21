@@ -1,21 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Package, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export default function Register() {
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ company: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Auth integration goes here
+    setLoading(true);
+    const { error } = await signUp(form.email, form.password, form.company);
+    setLoading(false);
+    if (error) {
+      toast.error(error.message || "Error al crear la cuenta");
+      return;
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      toast.success("Cuenta creada. Redirigiendo…");
+      navigate("/app/dashboard", { replace: true });
+    } else {
+      toast.success("Revisá tu correo para confirmar la cuenta.");
+      navigate("/login?registered=1", { replace: true });
+    }
   };
 
   return (
@@ -23,7 +43,7 @@ export default function Register() {
       {/* Left panel */}
       <div className="hidden gradient-hero flex-col justify-between p-12 lg:flex lg:w-2/5">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
+          <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/20">
             <Package className="h-4 w-4 text-white" />
           </div>
           <span className="text-lg font-bold text-white">Stockly</span>
@@ -48,7 +68,7 @@ export default function Register() {
       <div className="flex flex-1 flex-col items-center justify-center bg-background px-8 py-12">
         <div className="w-full max-w-sm">
           <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg gradient-primary">
+            <div className="h-7 w-7 flex items-center justify-center rounded-lg gradient-primary">
               <Package className="h-3.5 w-3.5 text-white" />
             </div>
             <span className="font-bold text-foreground">Stockly</span>
@@ -72,6 +92,7 @@ export default function Register() {
                 value={form.company}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
             </div>
             <div className="space-y-1.5">
@@ -84,6 +105,8 @@ export default function Register() {
                 value={form.email}
                 onChange={handleChange}
                 required
+                autoComplete="email"
+                disabled={loading}
               />
             </div>
             <div className="space-y-1.5">
@@ -98,6 +121,8 @@ export default function Register() {
                   onChange={handleChange}
                   required
                   minLength={8}
+                  autoComplete="new-password"
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -108,8 +133,13 @@ export default function Register() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full gradient-primary shadow-primary text-primary-foreground" size="lg">
-              Crear cuenta — 14 días gratis
+            <Button
+              type="submit"
+              className="w-full gradient-primary shadow-primary text-primary-foreground"
+              size="lg"
+              disabled={loading}
+            >
+              {loading ? "Creando cuenta…" : "Crear cuenta — 14 días gratis"}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
               Al registrarte aceptás nuestros{" "}
