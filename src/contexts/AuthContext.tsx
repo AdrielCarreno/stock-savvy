@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import type { Company, UserProfile } from "@/types/database";
 
 type AuthState = {
@@ -43,22 +43,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isTrialExpired = computeTrialExpired(company);
 
   const fetchProfileAndCompany = useCallback(async (userId: string) => {
-    const { data: profileData, error: profileError } = await supabase
-      .from("users")
-      .select("*, companies(*)")
-      .eq("id", userId)
-      .single();
+    try {
+      const { data: profileData, error: profileError } = await (supabase as any)
+        .from("users")
+        .select("*, companies(*)")
+        .eq("id", userId)
+        .single();
 
-    if (profileError || !profileData) {
+      if (profileError || !profileData) {
+        setProfile(null);
+        setCompany(null);
+        return;
+      }
+
+      const companyRow = (profileData as { companies: Company | null }).companies ?? null;
+      const { companies: _, ...profileRow } = profileData as UserProfile & { companies: Company | null };
+      setProfile(profileRow as UserProfile);
+      setCompany(companyRow);
+    } catch {
       setProfile(null);
       setCompany(null);
-      return;
     }
-
-    const companyRow = (profileData as { companies: Company | null }).companies ?? null;
-    const { companies: _, ...profileRow } = profileData as UserProfile & { companies: Company | null };
-    setProfile(profileRow as UserProfile);
-    setCompany(companyRow);
   }, []);
 
   const refreshCompany = useCallback(async () => {
@@ -80,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    // Initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user?.id) {
