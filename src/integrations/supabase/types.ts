@@ -14,7 +14,179 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          plan_type: string
+          subscription_status: string
+          trial_end: string
+          trial_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          plan_type?: string
+          subscription_status?: string
+          trial_end?: string
+          trial_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          plan_type?: string
+          subscription_status?: string
+          trial_end?: string
+          trial_start?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          company_id: string
+          cost: number | null
+          created_at: string
+          current_stock: number
+          description: string | null
+          id: string
+          min_stock: number
+          name: string
+          price: number | null
+          sku: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          company_id: string
+          cost?: number | null
+          created_at?: string
+          current_stock?: number
+          description?: string | null
+          id?: string
+          min_stock?: number
+          name: string
+          price?: number | null
+          sku?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          company_id?: string
+          cost?: number | null
+          created_at?: string
+          current_stock?: number
+          description?: string | null
+          id?: string
+          min_stock?: number
+          name?: string
+          price?: number | null
+          sku?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_movements: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          reason: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity: number
+          reason?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          reason?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          company_id: string
+          created_at: string
+          email: string
+          id: string
+          role: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          email: string
+          id: string
+          role?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
