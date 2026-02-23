@@ -104,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
         options: {
           data: { company_name: companyName.trim() || "Mi Empresa" },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       return { error: error ?? null };
@@ -125,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login?recovery=ok`,
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
     return { error: error ?? null };
   }, []);
