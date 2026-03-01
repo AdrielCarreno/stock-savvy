@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function Register() {
@@ -28,14 +27,11 @@ export default function Register() {
       toast.error(error.message || "Error al crear la cuenta");
       return;
     }
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      toast.success("Cuenta creada. Redirigiendo…");
+    toast.success("¡Cuenta creada! Redirigiendo…");
+    // Small delay to let the auth state propagate
+    setTimeout(() => {
       navigate("/app/dashboard", { replace: true });
-    } else {
-      toast.success("Revisá tu correo para confirmar la cuenta.");
-      navigate("/login?registered=1", { replace: true });
-    }
+    }, 500);
   };
 
   return (
