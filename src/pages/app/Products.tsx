@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Warehouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
