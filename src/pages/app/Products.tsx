@@ -53,6 +53,7 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<Omit<Product, "id">>(emptyForm);
@@ -63,7 +64,8 @@ export default function Products() {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.sku.toLowerCase().includes(search.toLowerCase());
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
-    return matchSearch && matchCategory;
+    const matchWarehouse = filterWarehouse === "all" || p.warehouse === filterWarehouse;
+    return matchSearch && matchCategory && matchWarehouse;
   });
 
   const openCreate = () => {
