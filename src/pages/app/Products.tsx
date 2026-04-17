@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Warehouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ interface Product {
   name: string;
   sku: string;
   category: string;
+  warehouse: string;
   costPrice: number;
   salePrice: number;
   stock: number;
@@ -31,26 +32,28 @@ interface Product {
 }
 
 const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
+const WAREHOUSES = ["Principal", "Sucursal Norte", "Sucursal Sur", "Depósito Central"];
 
 const initialProducts: Product[] = [
-  { id: 1, name: "Aceite de girasol 1L", sku: "ACE-001", category: "Aceites", costPrice: 1200, salePrice: 1650, stock: 3, minStock: 20 },
-  { id: 2, name: "Harina 000 x 1kg", sku: "HAR-002", category: "Harinas", costPrice: 450, salePrice: 650, stock: 5, minStock: 15 },
-  { id: 3, name: "Arroz largo fino 1kg", sku: "ARR-003", category: "Granos", costPrice: 380, salePrice: 550, stock: 8, minStock: 25 },
-  { id: 4, name: "Azúcar blanca 1kg", sku: "AZU-001", category: "Azúcares", costPrice: 420, salePrice: 600, stock: 2, minStock: 20 },
-  { id: 5, name: "Leche entera 1L", sku: "LAC-001", category: "Lácteos", costPrice: 320, salePrice: 480, stock: 45, minStock: 10 },
-  { id: 6, name: "Coca-Cola 1.5L", sku: "BEB-001", category: "Bebidas", costPrice: 780, salePrice: 1100, stock: 32, minStock: 12 },
-  { id: 7, name: "Detergente 500ml", sku: "LIM-001", category: "Limpieza", costPrice: 560, salePrice: 820, stock: 28, minStock: 8 },
-  { id: 8, name: "Aceite de oliva 500ml", sku: "ACE-002", category: "Aceites", costPrice: 2200, salePrice: 3100, stock: 15, minStock: 6 },
+  { id: 1, name: "Aceite de girasol 1L", sku: "ACE-001", category: "Aceites", warehouse: "Principal", costPrice: 1200, salePrice: 1650, stock: 3, minStock: 20 },
+  { id: 2, name: "Harina 000 x 1kg", sku: "HAR-002", category: "Harinas", warehouse: "Depósito Central", costPrice: 450, salePrice: 650, stock: 5, minStock: 15 },
+  { id: 3, name: "Arroz largo fino 1kg", sku: "ARR-003", category: "Granos", warehouse: "Depósito Central", costPrice: 380, salePrice: 550, stock: 8, minStock: 25 },
+  { id: 4, name: "Azúcar blanca 1kg", sku: "AZU-001", category: "Azúcares", warehouse: "Sucursal Norte", costPrice: 420, salePrice: 600, stock: 2, minStock: 20 },
+  { id: 5, name: "Leche entera 1L", sku: "LAC-001", category: "Lácteos", warehouse: "Sucursal Sur", costPrice: 320, salePrice: 480, stock: 45, minStock: 10 },
+  { id: 6, name: "Coca-Cola 1.5L", sku: "BEB-001", category: "Bebidas", warehouse: "Principal", costPrice: 780, salePrice: 1100, stock: 32, minStock: 12 },
+  { id: 7, name: "Detergente 500ml", sku: "LIM-001", category: "Limpieza", warehouse: "Sucursal Norte", costPrice: 560, salePrice: 820, stock: 28, minStock: 8 },
+  { id: 8, name: "Aceite de oliva 500ml", sku: "ACE-002", category: "Aceites", warehouse: "Principal", costPrice: 2200, salePrice: 3100, stock: 15, minStock: 6 },
 ];
 
 const emptyForm: Omit<Product, "id"> = {
-  name: "", sku: "", category: "", costPrice: 0, salePrice: 0, stock: 0, minStock: 0,
+  name: "", sku: "", category: "", warehouse: "Principal", costPrice: 0, salePrice: 0, stock: 0, minStock: 0,
 };
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<Omit<Product, "id">>(emptyForm);
@@ -61,7 +64,8 @@ export default function Products() {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.sku.toLowerCase().includes(search.toLowerCase());
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
-    return matchSearch && matchCategory;
+    const matchWarehouse = filterWarehouse === "all" || p.warehouse === filterWarehouse;
+    return matchSearch && matchCategory && matchWarehouse;
   });
 
   const openCreate = () => {
@@ -149,6 +153,16 @@ export default function Products() {
             {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
+          <SelectTrigger className="w-full sm:w-48">
+            <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+            <SelectValue placeholder="Depósito" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los depósitos</SelectItem>
+            {WAREHOUSES.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -160,6 +174,7 @@ export default function Products() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Depósito</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stock</th>
@@ -170,7 +185,7 @@ export default function Products() {
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">No se encontraron productos</td>
+                  <td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">No se encontraron productos</td>
                 </tr>
               ) : (
                 filtered.map((p) => {
@@ -188,6 +203,12 @@ export default function Products() {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary" className="text-xs">{p.category}</Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Warehouse className="h-3 w-3" />
+                          {p.warehouse}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.costPrice)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.salePrice)}</td>
@@ -251,6 +272,17 @@ export default function Products() {
                 </SelectContent>
               </Select>
               {errors.category && <p className="text-xs text-destructive">{errors.category}</p>}
+            </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Depósito *</Label>
+              <Select value={form.warehouse} onValueChange={(v) => setForm({ ...form, warehouse: v })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar depósito..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {WAREHOUSES.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Precio costo *</Label>
