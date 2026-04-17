@@ -24,6 +24,7 @@ interface Product {
   name: string;
   sku: string;
   category: string;
+  warehouse: string;
   costPrice: number;
   salePrice: number;
   stock: number;
@@ -31,20 +32,21 @@ interface Product {
 }
 
 const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
+const WAREHOUSES = ["Principal", "Sucursal Norte", "Sucursal Sur", "Depósito Central"];
 
 const initialProducts: Product[] = [
-  { id: 1, name: "Aceite de girasol 1L", sku: "ACE-001", category: "Aceites", costPrice: 1200, salePrice: 1650, stock: 3, minStock: 20 },
-  { id: 2, name: "Harina 000 x 1kg", sku: "HAR-002", category: "Harinas", costPrice: 450, salePrice: 650, stock: 5, minStock: 15 },
-  { id: 3, name: "Arroz largo fino 1kg", sku: "ARR-003", category: "Granos", costPrice: 380, salePrice: 550, stock: 8, minStock: 25 },
-  { id: 4, name: "Azúcar blanca 1kg", sku: "AZU-001", category: "Azúcares", costPrice: 420, salePrice: 600, stock: 2, minStock: 20 },
-  { id: 5, name: "Leche entera 1L", sku: "LAC-001", category: "Lácteos", costPrice: 320, salePrice: 480, stock: 45, minStock: 10 },
-  { id: 6, name: "Coca-Cola 1.5L", sku: "BEB-001", category: "Bebidas", costPrice: 780, salePrice: 1100, stock: 32, minStock: 12 },
-  { id: 7, name: "Detergente 500ml", sku: "LIM-001", category: "Limpieza", costPrice: 560, salePrice: 820, stock: 28, minStock: 8 },
-  { id: 8, name: "Aceite de oliva 500ml", sku: "ACE-002", category: "Aceites", costPrice: 2200, salePrice: 3100, stock: 15, minStock: 6 },
+  { id: 1, name: "Aceite de girasol 1L", sku: "ACE-001", category: "Aceites", warehouse: "Principal", costPrice: 1200, salePrice: 1650, stock: 3, minStock: 20 },
+  { id: 2, name: "Harina 000 x 1kg", sku: "HAR-002", category: "Harinas", warehouse: "Depósito Central", costPrice: 450, salePrice: 650, stock: 5, minStock: 15 },
+  { id: 3, name: "Arroz largo fino 1kg", sku: "ARR-003", category: "Granos", warehouse: "Depósito Central", costPrice: 380, salePrice: 550, stock: 8, minStock: 25 },
+  { id: 4, name: "Azúcar blanca 1kg", sku: "AZU-001", category: "Azúcares", warehouse: "Sucursal Norte", costPrice: 420, salePrice: 600, stock: 2, minStock: 20 },
+  { id: 5, name: "Leche entera 1L", sku: "LAC-001", category: "Lácteos", warehouse: "Sucursal Sur", costPrice: 320, salePrice: 480, stock: 45, minStock: 10 },
+  { id: 6, name: "Coca-Cola 1.5L", sku: "BEB-001", category: "Bebidas", warehouse: "Principal", costPrice: 780, salePrice: 1100, stock: 32, minStock: 12 },
+  { id: 7, name: "Detergente 500ml", sku: "LIM-001", category: "Limpieza", warehouse: "Sucursal Norte", costPrice: 560, salePrice: 820, stock: 28, minStock: 8 },
+  { id: 8, name: "Aceite de oliva 500ml", sku: "ACE-002", category: "Aceites", warehouse: "Principal", costPrice: 2200, salePrice: 3100, stock: 15, minStock: 6 },
 ];
 
 const emptyForm: Omit<Product, "id"> = {
-  name: "", sku: "", category: "", costPrice: 0, salePrice: 0, stock: 0, minStock: 0,
+  name: "", sku: "", category: "", warehouse: "Principal", costPrice: 0, salePrice: 0, stock: 0, minStock: 0,
 };
 
 export default function Products() {
