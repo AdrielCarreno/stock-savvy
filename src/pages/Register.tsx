@@ -28,10 +28,10 @@ export default function Register() {
       return;
     }
     toast.success("¡Cuenta creada! Redirigiendo…");
-    // Small delay to let the auth state propagate
+    // Auth state propagates via onAuthStateChange; small delay then redirect
     setTimeout(() => {
       navigate("/app/dashboard", { replace: true });
-    }, 500);
+    }, 400);
   };
 
   return (
