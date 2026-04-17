@@ -29,10 +29,23 @@ export default function Register() {
       return;
     }
     toast.success("¡Cuenta creada! Redirigiendo…");
-    // Auth state propagates via onAuthStateChange; small delay then redirect
     setTimeout(() => {
       navigate("/app/dashboard", { replace: true });
     }, 400);
+  };
+
+  const handleGoogle = async () => {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setLoading(false);
+      toast.error(result.error.message || "Error al registrarte con Google");
+      return;
+    }
+    if (result.redirected) return;
+    navigate("/app/dashboard", { replace: true });
   };
 
   return (
