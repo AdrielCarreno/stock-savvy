@@ -34,6 +34,20 @@ export default function Login() {
     navigate(from?.startsWith("/app") ? from : "/app/dashboard", { replace: true });
   };
 
+  const handleGoogle = async () => {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setLoading(false);
+      toast.error(result.error.message || "Error al iniciar sesión con Google");
+      return;
+    }
+    if (result.redirected) return;
+    navigate(from?.startsWith("/app") ? from : "/app/dashboard", { replace: true });
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* Left panel */}
