@@ -204,6 +204,12 @@ export default function Products() {
                       <td className="px-4 py-3">
                         <Badge variant="secondary" className="text-xs">{p.category}</Badge>
                       </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Warehouse className="h-3 w-3" />
+                          {p.warehouse}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.costPrice)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.salePrice)}</td>
                       <td className="px-4 py-3 text-center">
