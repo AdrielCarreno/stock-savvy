@@ -273,6 +273,17 @@ export default function Products() {
               </Select>
               {errors.category && <p className="text-xs text-destructive">{errors.category}</p>}
             </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Depósito *</Label>
+              <Select value={form.warehouse} onValueChange={(v) => setForm({ ...form, warehouse: v })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar depósito..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {WAREHOUSES.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-1.5">
               <Label>Precio costo *</Label>
               <Input
