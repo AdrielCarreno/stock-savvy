@@ -28,10 +28,8 @@ export default function Register() {
       toast.error(error.message || "Error al crear la cuenta");
       return;
     }
-    toast.success("¡Cuenta creada! Redirigiendo…");
-    setTimeout(() => {
-      navigate("/app/dashboard", { replace: true });
-    }, 400);
+    toast.success("¡Cuenta creada! Revisá tu email para verificarla.");
+    navigate("/login?registered=1", { replace: true });
   };
 
   const handleGoogle = async () => {
