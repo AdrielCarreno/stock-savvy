@@ -27,7 +27,16 @@ export default function Login() {
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) {
-      toast.error(error.message || "Error al iniciar sesión");
+      const msg = error.message?.toLowerCase() || "";
+      if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+        toast.error("Tu email todavía no fue verificado. Revisá tu correo (incluí spam).");
+      } else if (msg.includes("invalid login") || msg.includes("invalid_credentials") || msg.includes("invalid credentials")) {
+        toast.error(
+          "Credenciales incorrectas. Si te registraste con Google, usá el botón 'Continuar con Google'."
+        );
+      } else {
+        toast.error(error.message || "Error al iniciar sesión");
+      }
       return;
     }
     toast.success("Sesión iniciada");

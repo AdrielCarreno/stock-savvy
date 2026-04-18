@@ -19,7 +19,11 @@ type AuthState = {
 };
 
 type AuthContextValue = AuthState & {
-  signUp: (email: string, password: string, companyName: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    companyName: string
+  ) => Promise<{ error: Error | null; data?: { user: unknown | null; session: unknown | null } | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
@@ -99,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(
     async (email: string, password: string, companyName: string) => {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -107,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      return { error: error ?? null };
+      return { error: error ?? null, data };
     },
     []
   );
