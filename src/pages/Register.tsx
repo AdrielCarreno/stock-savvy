@@ -22,13 +22,29 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signUp(form.email, form.password, form.company);
+    const { error, data } = await signUp(form.email, form.password, form.company);
     setLoading(false);
     if (error) {
-      toast.error(error.message || "Error al crear la cuenta");
+      const msg = error.message?.toLowerCase() || "";
+      if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+        toast.error("Ese email ya está registrado. Iniciá sesión o usá 'Olvidé mi contraseña'.");
+      } else if (msg.includes("password")) {
+        toast.error("La contraseña no cumple los requisitos. Usá al menos 8 caracteres seguros.");
+      } else {
+        toast.error(error.message || "Error al crear la cuenta");
+      }
       return;
     }
-    toast.success("¡Cuenta creada! Revisá tu email para verificarla.");
+    // Detectar user_repeated_signup: Supabase devuelve un user con identities vacío
+    const identities = (data?.user as { identities?: unknown[] } | null)?.identities;
+    if (data?.user && Array.isArray(identities) && identities.length === 0) {
+      toast.error(
+        "Ese email ya tiene una cuenta. Si te registraste con Google, iniciá sesión con Google."
+      );
+      navigate("/login", { replace: true });
+      return;
+    }
+    toast.success("¡Cuenta creada! Revisá tu email para verificarla antes de iniciar sesión.");
     navigate("/login?registered=1", { replace: true });
   };
 
