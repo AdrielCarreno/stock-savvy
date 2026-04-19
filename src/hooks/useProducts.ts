@@ -131,5 +131,5 @@ export function useProducts() {
     [fetchProducts]
   );
 
-  return { products, loading, refresh: fetchProducts, createProduct, updateProduct, deleteProduct };
+  return { products, loading, refresh: fetchProducts, createProduct, updateProduct, deleteProduct, bulkCreateProducts };
 }
