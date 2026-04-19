@@ -340,6 +340,12 @@ export default function Products() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ImportProductsDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        existingSkus={existingSkus}
+        onImport={bulkCreateProducts}
+      />
     </div>
   );
 }
