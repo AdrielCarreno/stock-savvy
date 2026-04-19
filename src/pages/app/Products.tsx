@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload } from "lucide-react";
+import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -39,15 +40,21 @@ const emptyForm: ProductInput = {
 };
 
 export default function Products() {
-  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductInput>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const existingSkus = useMemo(
+    () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
+    [products]
+  );
 
   const filtered = products.filter((p) => {
     const matchSearch =
@@ -128,10 +135,16 @@ export default function Products() {
           <h2 className="text-lg font-semibold">Productos</h2>
           <p className="text-sm text-muted-foreground">{products.length} productos registrados</p>
         </div>
-        <Button className="gap-2 gradient-primary shadow-primary text-primary-foreground" onClick={openCreate}>
-          <Plus className="h-4 w-4" />
-          Nuevo producto
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" />
+            Importar
+          </Button>
+          <Button className="gap-2 gradient-primary shadow-primary text-primary-foreground" onClick={openCreate}>
+            <Plus className="h-4 w-4" />
+            Nuevo producto
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -327,6 +340,12 @@ export default function Products() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ImportProductsDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        existingSkus={existingSkus}
+        onImport={bulkCreateProducts}
+      />
     </div>
   );
 }
