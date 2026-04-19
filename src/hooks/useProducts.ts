@@ -85,6 +85,38 @@ export function useProducts() {
     [fetchProducts]
   );
 
+  const bulkCreateProducts = useCallback(
+    async (inputs: ProductInput[]): Promise<{ success: number; failed: number }> => {
+      if (!companyId) return { success: 0, failed: inputs.length };
+      const CHUNK = 200;
+      let success = 0;
+      let failed = 0;
+      for (let i = 0; i < inputs.length; i += CHUNK) {
+        const chunk = inputs.slice(i, i + CHUNK).map((input) => ({
+          company_id: companyId,
+          name: input.name,
+          sku: input.sku,
+          category: input.category,
+          unit: input.unit ?? "unidad",
+          current_stock: input.current_stock,
+          min_stock: input.min_stock,
+          price: input.price,
+          cost: input.cost,
+          description: input.description ?? null,
+        }));
+        const { error, data } = await supabase.from("products").insert(chunk).select("id");
+        if (error) {
+          failed += chunk.length;
+        } else {
+          success += data?.length ?? chunk.length;
+        }
+      }
+      await fetchProducts();
+      return { success, failed };
+    },
+    [companyId, fetchProducts]
+  );
+
   const deleteProduct = useCallback(
     async (id: string) => {
       const { error } = await supabase.from("products").delete().eq("id", id);
