@@ -1,20 +1,11 @@
-import { AlertTriangle, Package, ArrowRight } from "lucide-react";
+import { AlertTriangle, Package, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const lowStockProducts = [
-  { id: 1, name: "Aceite de girasol 1L", sku: "ACE-001", stock: 3, minStock: 20, category: "Aceites", costPrice: 1200, salePrice: 1650 },
-  { id: 2, name: "Harina 000 x 1kg", sku: "HAR-002", stock: 5, minStock: 15, category: "Harinas", costPrice: 450, salePrice: 650 },
-  { id: 3, name: "Arroz largo fino 1kg", sku: "ARR-003", stock: 8, minStock: 25, category: "Granos", costPrice: 380, salePrice: 550 },
-  { id: 4, name: "Azúcar blanca 1kg", sku: "AZU-001", stock: 2, minStock: 20, category: "Azúcares", costPrice: 420, salePrice: 600 },
-];
-
-const formatCurrency = (n: number) =>
-  new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
+import { useProducts } from "@/hooks/useProducts";
 
 function StockBar({ stock, min }: { stock: number; min: number }) {
-  const pct = Math.min(100, (stock / min) * 100);
+  const pct = min === 0 ? 100 : Math.min(100, (stock / min) * 100);
   const color = pct <= 25 ? "bg-destructive" : pct <= 60 ? "bg-warning" : "bg-success";
   return (
     <div className="flex items-center gap-2">
@@ -27,9 +18,19 @@ function StockBar({ stock, min }: { stock: number; min: number }) {
 }
 
 export default function LowStock() {
+  const { products, loading } = useProducts();
+  const lowStockProducts = products.filter((p) => p.current_stock <= p.min_stock && p.min_stock > 0);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5 animate-fade-in">
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold">Alertas de Bajo Stock</h2>
@@ -43,13 +44,12 @@ export default function LowStock() {
         </Link>
       </div>
 
-      {/* Alert banner */}
       {lowStockProducts.length > 0 && (
         <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning-light p-4">
           <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-warning">
-              {lowStockProducts.length} productos por debajo del stock mínimo
+              {lowStockProducts.length} {lowStockProducts.length === 1 ? "producto" : "productos"} por debajo del stock mínimo
             </p>
             <p className="text-xs text-warning/80 mt-1">
               Revisá el listado y registrá las entradas necesarias para evitar faltantes.
@@ -58,10 +58,9 @@ export default function LowStock() {
         </div>
       )}
 
-      {/* Cards grid */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {lowStockProducts.map((p) => {
-          const stockPct = Math.min(100, (p.stock / p.minStock) * 100);
+          const stockPct = p.min_stock === 0 ? 100 : Math.min(100, (p.current_stock / p.min_stock) * 100);
           const urgency = stockPct <= 25 ? "critical" : "warning";
           return (
             <div
@@ -82,24 +81,24 @@ export default function LowStock() {
                 </Badge>
               </div>
               <h3 className="mb-1 font-semibold text-foreground">{p.name}</h3>
-              <code className="text-xs text-muted-foreground">{p.sku}</code>
-              <Badge variant="secondary" className="ml-2 text-xs">{p.category}</Badge>
+              {p.sku && <code className="text-xs text-muted-foreground">{p.sku}</code>}
+              {p.category && <Badge variant="secondary" className="ml-2 text-xs">{p.category}</Badge>}
 
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Stock actual</span>
                   <span className={`font-bold ${urgency === "critical" ? "text-destructive" : "text-warning"}`}>
-                    {p.stock} unidades
+                    {p.current_stock} unidades
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Stock mínimo</span>
-                  <span className="text-foreground">{p.minStock} unidades</span>
+                  <span className="text-foreground">{p.min_stock} unidades</span>
                 </div>
-                <StockBar stock={p.stock} min={p.minStock} />
+                <StockBar stock={p.current_stock} min={p.min_stock} />
                 <div className="flex items-center justify-between text-sm pt-1 border-t border-border">
                   <span className="text-muted-foreground">Faltan reponer</span>
-                  <span className="font-semibold text-foreground">{Math.max(0, p.minStock - p.stock)} ud.</span>
+                  <span className="font-semibold text-foreground">{Math.max(0, p.min_stock - p.current_stock)} ud.</span>
                 </div>
               </div>
 
@@ -120,7 +119,9 @@ export default function LowStock() {
             <Package className="h-7 w-7 text-success" />
           </div>
           <h3 className="mb-2 font-semibold text-foreground">¡Todo bien por aquí!</h3>
-          <p className="text-sm text-muted-foreground">Ningún producto está por debajo del stock mínimo.</p>
+          <p className="text-sm text-muted-foreground">
+            {products.length === 0 ? "Aún no tenés productos cargados." : "Ningún producto está por debajo del stock mínimo."}
+          </p>
         </div>
       )}
     </div>
