@@ -76,24 +76,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user?.id, fetchProfileAndCompany]);
 
   useEffect(() => {
+    let initialized = false;
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Synchronous state updates only — no awaits here to avoid blocking
+      // navigation and other auth events.
       setUser(session?.user ?? null);
+
       if (session?.user?.id) {
-        await fetchProfileAndCompany(session.user.id);
+        // Fire-and-forget: don't block UI/navigation on profile fetch.
+        void fetchProfileAndCompany(session.user.id);
       } else {
         setProfile(null);
         setCompany(null);
       }
-      setLoading(false);
+
+      // Only flip the initial loading flag once — subsequent auth changes
+      // (sign in / sign out) should not put the whole app back into "loading".
+      if (!initialized) {
+        initialized = true;
+        setLoading(false);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user?.id) {
-        fetchProfileAndCompany(session.user.id).finally(() => setLoading(false));
-      } else {
+        void fetchProfileAndCompany(session.user.id);
+      }
+      if (!initialized) {
+        initialized = true;
         setLoading(false);
       }
     });
