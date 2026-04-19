@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -8,20 +9,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-
-const data = [
-  { date: "19 Ene", entradas: 45, salidas: 30 },
-  { date: "22 Ene", entradas: 20, salidas: 55 },
-  { date: "25 Ene", entradas: 80, salidas: 40 },
-  { date: "28 Ene", entradas: 35, salidas: 60 },
-  { date: "31 Ene", entradas: 60, salidas: 25 },
-  { date: "03 Feb", entradas: 90, salidas: 45 },
-  { date: "06 Feb", entradas: 40, salidas: 70 },
-  { date: "09 Feb", entradas: 55, salidas: 35 },
-  { date: "12 Feb", entradas: 75, salidas: 50 },
-  { date: "15 Feb", entradas: 30, salidas: 65 },
-  { date: "17 Feb", entradas: 95, salidas: 40 },
-];
+import { useStockMovements } from "@/hooks/useStockMovements";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -42,6 +30,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function StockChart() {
+  const { movements } = useStockMovements();
+
+  const data = useMemo(() => {
+    const now = new Date();
+    const days: { date: string; key: string; entradas: number; salidas: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const date = d.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
+      days.push({ date, key, entradas: 0, salidas: 0 });
+    }
+    const map = new Map(days.map((d) => [d.key, d]));
+    movements.forEach((m) => {
+      const key = new Date(m.created_at).toISOString().slice(0, 10);
+      const bucket = map.get(key);
+      if (bucket) {
+        if (m.type === "entrada") bucket.entradas += m.quantity;
+        else bucket.salidas += m.quantity;
+      }
+    });
+    return days;
+  }, [movements]);
+
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card">
       <div className="mb-4 flex items-center justify-between">
@@ -51,29 +62,30 @@ export function StockChart() {
         </div>
       </div>
       <ResponsiveContainer width="100%" height={240}>
-        <BarChart data={data} barSize={14} barGap={4}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 13% 91%)" vertical={false} />
+        <BarChart data={data} barSize={8} barGap={2}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: "hsl(220 9% 52%)" }}
+            tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
             axisLine={false}
             tickLine={false}
+            interval={4}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "hsl(220 9% 52%)" }}
+            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
             axisLine={false}
             tickLine={false}
             width={30}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(220 14% 93%)", radius: 4 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(var(--muted))", radius: 4 }} />
           <Legend
             iconType="circle"
             iconSize={8}
             wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }}
-            formatter={(value) => <span style={{ color: "hsl(220 9% 52%)" }} className="capitalize">{value}</span>}
+            formatter={(value) => <span className="capitalize text-muted-foreground">{value}</span>}
           />
-          <Bar dataKey="entradas" fill="hsl(221 83% 53%)" radius={[3, 3, 0, 0]} name="entradas" />
-          <Bar dataKey="salidas" fill="hsl(168 84% 42%)" radius={[3, 3, 0, 0]} name="salidas" />
+          <Bar dataKey="entradas" fill="hsl(var(--success))" radius={[3, 3, 0, 0]} name="entradas" />
+          <Bar dataKey="salidas" fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} name="salidas" />
         </BarChart>
       </ResponsiveContainer>
     </div>
