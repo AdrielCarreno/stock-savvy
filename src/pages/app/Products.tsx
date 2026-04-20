@@ -43,8 +43,11 @@ const emptyForm: ProductInput = {
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
+  const { warehouses } = useWarehouses();
+  const { stock: productStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -58,12 +61,33 @@ export default function Products() {
     [products]
   );
 
+  // Map: productId -> quantity in selected warehouse
+  const stockByProductInWarehouse = useMemo(() => {
+    const map = new Map<string, number>();
+    if (filterWarehouse === "all") return map;
+    productStock
+      .filter((s) => s.warehouse_id === filterWarehouse)
+      .forEach((s) => map.set(s.product_id, s.quantity));
+    return map;
+  }, [productStock, filterWarehouse]);
+
+  // Set of productIds present in selected warehouse (qty > 0)
+  const productsInWarehouse = useMemo(() => {
+    if (filterWarehouse === "all") return null;
+    const set = new Set<string>();
+    productStock
+      .filter((s) => s.warehouse_id === filterWarehouse && s.quantity > 0)
+      .forEach((s) => set.add(s.product_id));
+    return set;
+  }, [productStock, filterWarehouse]);
+
   const filtered = products.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.sku?.toLowerCase().includes(search.toLowerCase()) ?? false);
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
-    return matchSearch && matchCategory;
+    const matchWarehouse = !productsInWarehouse || productsInWarehouse.has(p.id);
+    return matchSearch && matchCategory && matchWarehouse;
   });
 
   const openCreate = () => {
