@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse } from "lucide-react";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProducts, type ProductInput } from "@/hooks/useProducts";
+import { useWarehouses } from "@/hooks/useWarehouses";
+import { useProductStock } from "@/hooks/useProductStock";
 import type { Product } from "@/types/database";
 
 const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
@@ -41,8 +43,11 @@ const emptyForm: ProductInput = {
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
+  const { warehouses } = useWarehouses();
+  const { stock: productStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -56,12 +61,33 @@ export default function Products() {
     [products]
   );
 
+  // Map: productId -> quantity in selected warehouse
+  const stockByProductInWarehouse = useMemo(() => {
+    const map = new Map<string, number>();
+    if (filterWarehouse === "all") return map;
+    productStock
+      .filter((s) => s.warehouse_id === filterWarehouse)
+      .forEach((s) => map.set(s.product_id, s.quantity));
+    return map;
+  }, [productStock, filterWarehouse]);
+
+  // Set of productIds present in selected warehouse (qty > 0)
+  const productsInWarehouse = useMemo(() => {
+    if (filterWarehouse === "all") return null;
+    const set = new Set<string>();
+    productStock
+      .filter((s) => s.warehouse_id === filterWarehouse && s.quantity > 0)
+      .forEach((s) => set.add(s.product_id));
+    return set;
+  }, [productStock, filterWarehouse]);
+
   const filtered = products.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.sku?.toLowerCase().includes(search.toLowerCase()) ?? false);
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
-    return matchSearch && matchCategory;
+    const matchWarehouse = !productsInWarehouse || productsInWarehouse.has(p.id);
+    return matchSearch && matchCategory && matchWarehouse;
   });
 
   const openCreate = () => {
@@ -167,6 +193,20 @@ export default function Products() {
             {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
+          <SelectTrigger className="w-full sm:w-48">
+            <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+            <SelectValue placeholder="Depósito" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los depósitos</SelectItem>
+            {warehouses.map((w) => (
+              <SelectItem key={w.id} value={w.id}>
+                {w.name}{w.is_default ? " (Principal)" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
@@ -179,7 +219,9 @@ export default function Products() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stock</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {filterWarehouse === "all" ? "Stock" : "Stock depósito"}
+                </th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Mín.</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Acciones</th>
               </tr>
@@ -215,7 +257,13 @@ export default function Products() {
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
+                        {filterWarehouse === "all" ? (
+                          <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
+                        ) : (
+                          <span className="font-bold text-foreground">
+                            {stockByProductInWarehouse.get(p.id) ?? 0}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-center text-muted-foreground">{p.min_stock}</td>
                       <td className="px-4 py-3 text-right">
