@@ -232,37 +232,184 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Pricing */}
+{/* Pricing */}
       <section id="pricing" className="py-20 px-4">
-        <div className="container max-w-lg text-center">
-          <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precio</Badge>
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Un solo plan, sin sorpresas</h2>
-          <p className="mb-10 text-muted-foreground">Todo incluido. Sin límites de productos.</p>
-          <div className="rounded-2xl border-2 border-primary bg-card p-8 shadow-elevated">
-            <div className="mb-2 text-sm font-medium text-muted-foreground">Plan único</div>
-            <div className="mb-1 text-5xl font-bold text-foreground">$35.000</div>
-            <div className="mb-6 text-sm text-muted-foreground">ARS / mes</div>
-            <div className="mb-8 flex flex-col gap-3">
-              {[
-                "Productos ilimitados",
-                "Movimientos ilimitados",
-                "Dashboard en tiempo real",
-                "Alertas de bajo stock",
-                "Historial completo",
-                "Soporte por email",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-3 text-sm text-foreground">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                  {item}
+        <div className="container max-w-6xl">
+          <div className="mb-12 text-center">
+            <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precio</Badge>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Planes para cada etapa de tu negocio</h2>
+            <p className="text-muted-foreground">Elegí el que mejor se adapte a tus necesidades. Podés cambiar en cualquier momento.</p>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {/* Básico */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-foreground">Básico</h3>
+                <p className="text-sm text-muted-foreground">Para empezar</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-foreground">$27.600</span>
+                <span className="text-sm text-muted-foreground">/mes</span>
+              </div>
+              <div className="mb-6 space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Operaciones:</span> 0 a 200
                 </div>
-              ))}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Usuarios:</span> 1–2
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Depósitos:</span> 1
+                </div>
+              </div>
+              <div className="mb-6 space-y-2">
+                {[
+                  "Dashboard",
+                  "Importación Excel",
+                  "Alertas",
+                  "Facturación",
+                  "Soporte básico",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                    {item}
+                  </div>
+                ))}
+                {["Sin integraciones", "Sin IA"].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <X className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link to="/register">
+                <Button variant="outline" className="w-full">Elegir Básico</Button>
+              </Link>
             </div>
-            <Link to="/register">
-              <Button size="lg" className="w-full gradient-primary shadow-primary text-primary-foreground">
-                Empezar 14 días gratis
-              </Button>
-            </Link>
-            <p className="mt-4 text-xs text-muted-foreground">Sin tarjeta de crédito para la prueba</p>
+
+            {/* Premium - Destacado */}
+            <div className="relative rounded-2xl border-2 border-primary bg-card p-6 shadow-elevated">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
+              </div>
+              <div className="mb-4 pt-2">
+                <h3 className="text-lg font-semibold text-primary">Premium</h3>
+                <p className="text-sm text-muted-foreground">Para crecer</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-foreground">$48.700</span>
+                <span className="text-sm text-muted-foreground">/mes</span>
+              </div>
+              <div className="mb-6 space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Operaciones:</span> 200 a 500
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Usuarios:</span> 3–5
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Depósitos:</span> hasta 3
+                </div>
+              </div>
+              <div className="mb-6 space-y-2">
+                {[
+                  "Dashboard",
+                  "Importación Excel",
+                  "Alertas",
+                  "Facturación",
+                  "Integraciones",
+                  "IA básica (predicción, sugerencias)",
+                  "Soporte mejorado",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link to="/register">
+                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">Elegir Premium</Button>
+              </Link>
+            </div>
+
+            {/* Empresarial */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-foreground">Empresarial</h3>
+                <p className="text-sm text-muted-foreground">Para equipos grandes</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-foreground">$76.800</span>
+                <span className="text-sm text-muted-foreground">/mes</span>
+              </div>
+              <div className="mb-6 space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Operaciones:</span> 500 a 1000
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Usuarios:</span> 7–10
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Depósitos:</span> 4+
+                </div>
+              </div>
+              <div className="mb-6 space-y-2">
+                {[
+                  "Todo lo de Premium",
+                  "IA avanzada",
+                  "Automatizaciones",
+                  "Soporte prioritario",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link to="/register">
+                <Button variant="outline" className="w-full">Elegir Empresarial</Button>
+              </Link>
+            </div>
+
+            {/* Custom */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-foreground">Custom</h3>
+                <p className="text-sm text-muted-foreground">A tu medida</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-foreground">Consultar</span>
+              </div>
+              <div className="mb-6 space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Precio:</span> A medida
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">IA:</span> Personalizada
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="text-foreground font-medium">Integraciones:</span> Específicas
+                </div>
+              </div>
+              <div className="mb-6 space-y-2">
+                {[
+                  "Precio a medida",
+                  "IA personalizada",
+                  "Integraciones específicas",
+                  "Grandes volúmenes",
+                  "Soporte dedicado",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <a href="mailto:hola@stockly.app?subject=Consulta%20plan%20Custom">
+                <Button variant="outline" className="w-full">Contactar ventas</Button>
+              </a>
+            </div>
           </div>
         </div>
       </section>
