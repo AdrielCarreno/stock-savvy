@@ -193,6 +193,20 @@ export default function Products() {
             {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
+          <SelectTrigger className="w-full sm:w-48">
+            <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+            <SelectValue placeholder="Depósito" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los depósitos</SelectItem>
+            {warehouses.map((w) => (
+              <SelectItem key={w.id} value={w.id}>
+                {w.name}{w.is_default ? " (Principal)" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
