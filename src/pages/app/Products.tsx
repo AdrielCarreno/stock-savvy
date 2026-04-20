@@ -257,7 +257,13 @@ export default function Products() {
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
+                        {filterWarehouse === "all" ? (
+                          <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
+                        ) : (
+                          <span className="font-bold text-foreground">
+                            {stockByProductInWarehouse.get(p.id) ?? 0}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-center text-muted-foreground">{p.min_stock}</td>
                       <td className="px-4 py-3 text-right">
