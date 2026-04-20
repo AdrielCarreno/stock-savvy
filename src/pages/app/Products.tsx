@@ -30,6 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProducts, type ProductInput } from "@/hooks/useProducts";
+import { useWarehouses } from "@/hooks/useWarehouses";
+import { useProductStock } from "@/hooks/useProductStock";
 import type { Product } from "@/types/database";
 
 const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
