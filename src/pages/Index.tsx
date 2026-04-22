@@ -47,7 +47,7 @@ const steps = [
 const faqs = [
   {
     q: "¿Necesito instalar algo?",
-    a: "No. Stockly es 100% web. Funciona desde cualquier computadora con internet, sin instalaciones.",
+    a: "No. OneStock es 100% web. Funciona desde cualquier computadora con internet, sin instalaciones.",
   },
   {
     q: "¿Cuántos usuarios puedo tener?",
@@ -80,7 +80,7 @@ export default function Index() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary shadow-primary">
               <Package className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold text-foreground">Stockly</span>
+            <span className="text-lg font-bold text-foreground">OneStock</span>
           </Link>
 
           {/* Desktop nav */}
@@ -406,7 +406,7 @@ export default function Index() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:hola@stockly.app?subject=Consulta%20plan%20Custom">
+              <a href="mailto:hola@onestock.app?subject=Consulta%20plan%20Custom">
                 <Button variant="outline" className="w-full">Contactar ventas</Button>
               </a>
             </div>
@@ -447,9 +447,9 @@ export default function Index() {
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">¿Tenés dudas?</h2>
           <p className="mb-8 text-white/70">Escribinos y te respondemos en menos de 24 horas.</p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <a href="mailto:hola@stockly.app">
+            <a href="mailto:hola@onestock.app">
               <Button size="lg" className="h-12 bg-white px-8 text-primary hover:bg-white/90">
-                hola@stockly.app
+                hola@onestock.app
               </Button>
             </a>
             <Link to="/register">
@@ -468,9 +468,9 @@ export default function Index() {
             <div className="flex h-6 w-6 items-center justify-center rounded gradient-primary">
               <Package className="h-3 w-3 text-white" />
             </div>
-            <span className="font-semibold text-foreground">Stockly</span>
+            <span className="font-semibold text-foreground">OneStock</span>
           </div>
-          <p>© 2025 Stockly. Todos los derechos reservados.</p>
+          <p>© 2025 OneStock. Todos los derechos reservados.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-foreground">Privacidad</a>
             <a href="#" className="hover:text-foreground">Términos</a>

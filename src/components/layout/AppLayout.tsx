@@ -10,12 +10,14 @@ const pageTitles: Record<string, string> = {
   "/app/products": "Productos",
   "/app/movements": "Movimientos de Stock",
   "/app/low-stock": "Alertas de Bajo Stock",
+  "/app/integrations": "Integraciones",
+  "/app/arca": "Integración con ARCA",
 };
 
 export function AppLayout() {
   const location = useLocation();
   const { isTrialExpired } = useAuth();
-  const title = pageTitles[location.pathname] ?? "Stockly";
+  const title = pageTitles[location.pathname] ?? "OneStock";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
