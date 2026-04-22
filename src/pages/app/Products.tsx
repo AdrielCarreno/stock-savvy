@@ -34,24 +34,25 @@ import { useWarehouses } from "@/hooks/useWarehouses";
 import { useProductStock } from "@/hooks/useProductStock";
 import type { Product } from "@/types/database";
 
-const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
+type ProductFormState = ProductInput & { warehouse_id?: string };
 
-const emptyForm: ProductInput = {
+const emptyForm: ProductFormState = {
   name: "", sku: "", category: "", unit: "unidad",
   current_stock: 0, min_stock: 0, price: 0, cost: 0,
+  warehouse_id: undefined,
 };
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
   const { warehouses } = useWarehouses();
-  const { stock: productStock } = useProductStock();
+  const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
-  const [form, setForm] = useState<ProductInput>(emptyForm);
+  const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -60,6 +61,15 @@ export default function Products() {
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
     [products]
   );
+
+  // Categorías reales derivadas de los productos del usuario
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.category && p.category.trim()) set.add(p.category.trim());
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
+  }, [products]);
 
   // Map: productId -> quantity in selected warehouse
   const stockByProductInWarehouse = useMemo(() => {
@@ -90,9 +100,14 @@ export default function Products() {
     return matchSearch && matchCategory && matchWarehouse;
   });
 
+  const defaultWarehouseId = useMemo(
+    () => warehouses.find((w) => w.is_default)?.id ?? warehouses[0]?.id,
+    [warehouses]
+  );
+
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, warehouse_id: defaultWarehouseId });
     setErrors({});
     setDialogOpen(true);
   };
@@ -109,6 +124,7 @@ export default function Products() {
       price: p.price,
       cost: p.cost,
       description: p.description,
+      warehouse_id: undefined,
     });
     setErrors({});
     setDialogOpen(true);
@@ -121,6 +137,9 @@ export default function Products() {
     if ((form.min_stock ?? 0) < 0) errs.min_stock = "No puede ser negativo";
     if ((form.price ?? 0) < 0) errs.price = "No puede ser negativo";
     if ((form.cost ?? 0) < 0) errs.cost = "No puede ser negativo";
+    if (!editing && warehouses.length > 0 && !form.warehouse_id) {
+      errs.warehouse_id = "Seleccioná un depósito";
+    }
     const skuTrim = form.sku?.trim() || null;
     if (skuTrim) {
       const exists = products.some((p) => p.sku === skuTrim && p.id !== editing?.id);
@@ -133,16 +152,20 @@ export default function Products() {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setSaving(true);
+    const { warehouse_id, ...rest } = form;
     const payload: ProductInput = {
-      ...form,
+      ...rest,
       sku: form.sku?.trim() || null,
-      category: form.category || null,
+      category: form.category?.trim() || null,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
-      : await createProduct(payload);
+      : await createProduct(payload, warehouse_id);
     setSaving(false);
-    if (!error) setDialogOpen(false);
+    if (!error) {
+      setDialogOpen(false);
+      await refreshStock();
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -190,7 +213,13 @@ export default function Products() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas las categorías</SelectItem>
-            {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            {categories.length === 0 ? (
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                No hay categorías cargadas
+              </div>
+            ) : (
+              categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)
+            )}
           </SelectContent>
         </Select>
         <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
@@ -312,14 +341,15 @@ export default function Products() {
             </div>
             <div className="space-y-1.5">
               <Label>Categoría</Label>
-              <Select value={form.category ?? ""} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <Input
+                value={form.category ?? ""}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="Ej: Bebidas, Limpieza..."
+                list="product-categories-list"
+              />
+              <datalist id="product-categories-list">
+                {categories.map((c) => <option key={c} value={c} />)}
+              </datalist>
             </div>
             <div className="space-y-1.5">
               <Label>Precio costo</Label>
@@ -361,6 +391,31 @@ export default function Products() {
               />
               {errors.min_stock && <p className="text-xs text-destructive">{errors.min_stock}</p>}
             </div>
+            {!editing && warehouses.length > 0 && (
+              <div className="col-span-2 space-y-1.5">
+                <Label>Depósito *</Label>
+                <Select
+                  value={form.warehouse_id ?? ""}
+                  onValueChange={(v) => setForm({ ...form, warehouse_id: v })}
+                >
+                  <SelectTrigger>
+                    <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Seleccionar depósito..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouses.map((w) => (
+                      <SelectItem key={w.id} value={w.id}>
+                        {w.name}{w.is_default ? " (Principal)" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.warehouse_id && <p className="text-xs text-destructive">{errors.warehouse_id}</p>}
+                <p className="text-xs text-muted-foreground">
+                  El stock inicial se asignará a este depósito.
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>Cancelar</Button>

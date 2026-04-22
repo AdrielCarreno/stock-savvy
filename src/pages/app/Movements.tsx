@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2 } from "lucide-react";
+import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +21,30 @@ import {
 } from "@/components/ui/select";
 import { useProducts } from "@/hooks/useProducts";
 import { useStockMovements } from "@/hooks/useStockMovements";
+import { toast } from "sonner";
+
+type SaleType = "mayorista" | "minorista";
 
 export default function Movements() {
   const { products } = useProducts();
   const { movements, loading, createMovement } = useStockMovements();
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({ productId: "", type: "entrada" as "entrada" | "salida", quantity: 1, note: "" });
+  const [form, setForm] = useState<{
+    productId: string;
+    type: "entrada" | "salida";
+    quantity: number;
+    note: string;
+    saleType: SaleType;
+    movementDate: string;
+  }>({
+    productId: "",
+    type: "entrada",
+    quantity: 1,
+    note: "",
+    saleType: "minorista",
+    movementDate: new Date().toISOString().slice(0, 16),
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
@@ -43,7 +60,7 @@ export default function Movements() {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     let entradasHoy = 0, salidasHoy = 0, entradas7 = 0, salidas7 = 0;
     movements.forEach((m) => {
-      const d = new Date(m.created_at);
+      const d = new Date(m.movement_date);
       if (d >= startOfDay) {
         if (m.type === "entrada") entradasHoy++;
         else salidasHoy++;
@@ -60,8 +77,19 @@ export default function Movements() {
     const errs: Record<string, string> = {};
     if (!form.productId) errs.productId = "Seleccioná un producto";
     if (form.quantity < 1) errs.quantity = "La cantidad debe ser mayor a 0";
+    if (!form.movementDate) errs.movementDate = "Fecha requerida";
     return errs;
   };
+
+  const resetForm = () =>
+    setForm({
+      productId: "",
+      type: "entrada",
+      quantity: 1,
+      note: "",
+      saleType: "minorista",
+      movementDate: new Date().toISOString().slice(0, 16),
+    });
 
   const handleSave = async () => {
     const errs = validate();
@@ -72,17 +100,26 @@ export default function Movements() {
       type: form.type,
       quantity: form.quantity,
       reason: form.note || undefined,
+      sale_type: form.saleType,
+      movement_date: new Date(form.movementDate).toISOString(),
     });
     setSaving(false);
     if (!error) {
       setDialogOpen(false);
-      setForm({ productId: "", type: "entrada", quantity: 1, note: "" });
+      resetForm();
       setErrors({});
     }
   };
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" });
+
+  const formatDateOnly = (iso: string) =>
+    new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+  const handleDownloadInvoice = () => {
+    toast.info("La descarga de factura electrónica estará disponible próximamente");
+  };
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -93,7 +130,7 @@ export default function Movements() {
         </div>
         <Button
           className="gap-2 gradient-primary shadow-primary text-primary-foreground"
-          onClick={() => { setErrors({}); setDialogOpen(true); }}
+          onClick={() => { setErrors({}); resetForm(); setDialogOpen(true); }}
           disabled={products.length === 0}
         >
           <Plus className="h-4 w-4" />
@@ -131,18 +168,21 @@ export default function Movements() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tipo</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cantidad</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nota</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha mov.</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Registrado</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Factura</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando movimientos...
                 </td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
                   {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos"}
                 </td></tr>
               ) : (
@@ -164,9 +204,30 @@ export default function Movements() {
                         )}
                       </Badge>
                     </td>
+                    <td className="px-4 py-3">
+                      {m.sale_type ? (
+                        <Badge variant="outline" className="capitalize text-xs">
+                          {m.sale_type}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-center font-bold text-foreground">{m.quantity}</td>
                     <td className="px-4 py-3 text-muted-foreground">{m.reason ?? "—"}</td>
-                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDate(m.created_at)}</td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDateOnly(m.movement_date)}</td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{formatDate(m.created_at)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={handleDownloadInvoice}
+                        title="Descargar factura electrónica"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -218,15 +279,38 @@ export default function Movements() {
                 ))}
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Tipo de venta *</Label>
+                <Select value={form.saleType} onValueChange={(v) => setForm({ ...form, saleType: v as SaleType })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="minorista">Minorista</SelectItem>
+                    <SelectItem value="mayorista">Mayorista</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Cantidad *</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={form.quantity}
+                  onChange={(e) => setForm({ ...form, quantity: Math.max(1, Number(e.target.value)) })}
+                />
+                {errors.quantity && <p className="text-xs text-destructive">{errors.quantity}</p>}
+              </div>
+            </div>
             <div className="space-y-1.5">
-              <Label>Cantidad *</Label>
+              <Label>Fecha del movimiento *</Label>
               <Input
-                type="number"
-                min={1}
-                value={form.quantity}
-                onChange={(e) => setForm({ ...form, quantity: Math.max(1, Number(e.target.value)) })}
+                type="datetime-local"
+                value={form.movementDate}
+                onChange={(e) => setForm({ ...form, movementDate: e.target.value })}
               />
-              {errors.quantity && <p className="text-xs text-destructive">{errors.quantity}</p>}
+              {errors.movementDate && <p className="text-xs text-destructive">{errors.movementDate}</p>}
             </div>
             <div className="space-y-1.5">
               <Label>Nota <span className="text-muted-foreground">(opcional)</span></Label>

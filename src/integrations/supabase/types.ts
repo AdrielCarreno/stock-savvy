@@ -157,9 +157,11 @@ export type Database = {
           company_id: string
           created_at: string
           id: string
+          movement_date: string
           product_id: string
           quantity: number
           reason: string | null
+          sale_type: string | null
           type: string
           user_id: string
         }
@@ -167,9 +169,11 @@ export type Database = {
           company_id: string
           created_at?: string
           id?: string
+          movement_date?: string
           product_id: string
           quantity: number
           reason?: string | null
+          sale_type?: string | null
           type: string
           user_id: string
         }
@@ -177,9 +181,11 @@ export type Database = {
           company_id?: string
           created_at?: string
           id?: string
+          movement_date?: string
           product_id?: string
           quantity?: number
           reason?: string | null
+          sale_type?: string | null
           type?: string
           user_id?: string
         }
