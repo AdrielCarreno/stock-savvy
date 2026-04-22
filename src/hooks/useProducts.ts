@@ -43,24 +43,56 @@ export function useProducts() {
   }, [companyId, fetchProducts]);
 
   const createProduct = useCallback(
-    async (input: ProductInput) => {
+    async (input: ProductInput, warehouseId?: string | null) => {
       if (!companyId) return { error: new Error("Sin empresa asociada") };
-      const { error } = await supabase.from("products").insert({
-        company_id: companyId,
-        name: input.name,
-        sku: input.sku,
-        category: input.category,
-        unit: input.unit ?? "unidad",
-        current_stock: input.current_stock,
-        min_stock: input.min_stock,
-        price: input.price,
-        cost: input.cost,
-        description: input.description ?? null,
-      });
-      if (error) {
-        toast.error("Error al crear producto: " + error.message);
-        return { error };
+      const { data, error } = await supabase
+        .from("products")
+        .insert({
+          company_id: companyId,
+          name: input.name,
+          sku: input.sku,
+          category: input.category,
+          unit: input.unit ?? "unidad",
+          current_stock: input.current_stock,
+          min_stock: input.min_stock,
+          price: input.price,
+          cost: input.cost,
+          description: input.description ?? null,
+        })
+        .select("id")
+        .maybeSingle();
+      if (error || !data) {
+        toast.error("Error al crear producto: " + (error?.message ?? "desconocido"));
+        return { error: error ?? new Error("insert failed") };
       }
+
+      // Si el usuario eligió un depósito distinto al default, mover el stock allí.
+      if (warehouseId) {
+        // El trigger create_default_product_stock ya insertó stock en el default.
+        // Si el elegido coincide con el default, no hacemos nada.
+        const { data: defaultWh } = await supabase
+          .from("warehouses")
+          .select("id")
+          .eq("company_id", companyId)
+          .eq("is_default", true)
+          .maybeSingle();
+
+        if (defaultWh && defaultWh.id !== warehouseId) {
+          // Borrar stock del default y crear en el elegido
+          await supabase
+            .from("product_stock")
+            .delete()
+            .eq("product_id", data.id)
+            .eq("warehouse_id", defaultWh.id);
+          await supabase.from("product_stock").insert({
+            company_id: companyId,
+            product_id: data.id,
+            warehouse_id: warehouseId,
+            quantity: input.current_stock,
+          });
+        }
+      }
+
       toast.success("Producto creado");
       await fetchProducts();
       return { error: null };
