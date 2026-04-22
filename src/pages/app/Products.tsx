@@ -100,9 +100,14 @@ export default function Products() {
     return matchSearch && matchCategory && matchWarehouse;
   });
 
+  const defaultWarehouseId = useMemo(
+    () => warehouses.find((w) => w.is_default)?.id ?? warehouses[0]?.id,
+    [warehouses]
+  );
+
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, warehouse_id: defaultWarehouseId });
     setErrors({});
     setDialogOpen(true);
   };
@@ -119,6 +124,7 @@ export default function Products() {
       price: p.price,
       cost: p.cost,
       description: p.description,
+      warehouse_id: undefined,
     });
     setErrors({});
     setDialogOpen(true);
@@ -131,6 +137,9 @@ export default function Products() {
     if ((form.min_stock ?? 0) < 0) errs.min_stock = "No puede ser negativo";
     if ((form.price ?? 0) < 0) errs.price = "No puede ser negativo";
     if ((form.cost ?? 0) < 0) errs.cost = "No puede ser negativo";
+    if (!editing && warehouses.length > 0 && !form.warehouse_id) {
+      errs.warehouse_id = "Seleccioná un depósito";
+    }
     const skuTrim = form.sku?.trim() || null;
     if (skuTrim) {
       const exists = products.some((p) => p.sku === skuTrim && p.id !== editing?.id);
@@ -143,16 +152,20 @@ export default function Products() {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setSaving(true);
+    const { warehouse_id, ...rest } = form;
     const payload: ProductInput = {
-      ...form,
+      ...rest,
       sku: form.sku?.trim() || null,
-      category: form.category || null,
+      category: form.category?.trim() || null,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
-      : await createProduct(payload);
+      : await createProduct(payload, warehouse_id);
     setSaving(false);
-    if (!error) setDialogOpen(false);
+    if (!error) {
+      setDialogOpen(false);
+      await refreshStock();
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -378,6 +391,31 @@ export default function Products() {
               />
               {errors.min_stock && <p className="text-xs text-destructive">{errors.min_stock}</p>}
             </div>
+            {!editing && warehouses.length > 0 && (
+              <div className="col-span-2 space-y-1.5">
+                <Label>Depósito *</Label>
+                <Select
+                  value={form.warehouse_id ?? ""}
+                  onValueChange={(v) => setForm({ ...form, warehouse_id: v })}
+                >
+                  <SelectTrigger>
+                    <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Seleccionar depósito..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouses.map((w) => (
+                      <SelectItem key={w.id} value={w.id}>
+                        {w.name}{w.is_default ? " (Principal)" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.warehouse_id && <p className="text-xs text-destructive">{errors.warehouse_id}</p>}
+                <p className="text-xs text-muted-foreground">
+                  El stock inicial se asignará a este depósito.
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>Cancelar</Button>
