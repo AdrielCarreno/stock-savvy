@@ -200,7 +200,13 @@ export default function Products() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas las categorías</SelectItem>
-            {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            {categories.length === 0 ? (
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                No hay categorías cargadas
+              </div>
+            ) : (
+              categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)
+            )}
           </SelectContent>
         </Select>
         <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
@@ -322,14 +328,15 @@ export default function Products() {
             </div>
             <div className="space-y-1.5">
               <Label>Categoría</Label>
-              <Select value={form.category ?? ""} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <Input
+                value={form.category ?? ""}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="Ej: Bebidas, Limpieza..."
+                list="product-categories-list"
+              />
+              <datalist id="product-categories-list">
+                {categories.map((c) => <option key={c} value={c} />)}
+              </datalist>
             </div>
             <div className="space-y-1.5">
               <Label>Precio costo</Label>
