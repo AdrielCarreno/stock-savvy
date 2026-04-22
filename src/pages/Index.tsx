@@ -478,6 +478,9 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Prueba social en vivo */}
+      <LiveSocialProof />
     </div>
   );
 }
