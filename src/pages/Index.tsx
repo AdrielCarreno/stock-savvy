@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LiveSocialProof } from "@/components/landing/LiveSocialProof";
 
 const features = [
   {
@@ -477,6 +478,9 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Prueba social en vivo */}
+      <LiveSocialProof />
     </div>
   );
 }
