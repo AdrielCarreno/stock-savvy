@@ -10,6 +10,8 @@ const pageTitles: Record<string, string> = {
   "/app/products": "Productos",
   "/app/movements": "Movimientos de Stock",
   "/app/low-stock": "Alertas de Bajo Stock",
+  "/app/integrations": "Integraciones",
+  "/app/arca": "Integración con ARCA",
 };
 
 export function AppLayout() {
