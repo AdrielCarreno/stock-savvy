@@ -10,6 +10,8 @@ export type MovementWithProduct = {
   quantity: number;
   reason: string | null;
   created_at: string;
+  movement_date: string;
+  sale_type: "mayorista" | "minorista" | null;
   user_id: string;
   product_name: string;
   product_sku: string | null;
@@ -26,9 +28,9 @@ export function useStockMovements() {
     setLoading(true);
     const { data, error } = await supabase
       .from("stock_movements")
-      .select("id, product_id, type, quantity, reason, created_at, user_id, products(name, sku)")
+      .select("id, product_id, type, quantity, reason, created_at, movement_date, sale_type, user_id, products(name, sku)")
       .eq("company_id", companyId)
-      .order("created_at", { ascending: false })
+      .order("movement_date", { ascending: false })
       .limit(500);
     if (error) {
       toast.error("Error al cargar movimientos: " + error.message);
@@ -40,6 +42,8 @@ export function useStockMovements() {
         quantity: m.quantity,
         reason: m.reason,
         created_at: m.created_at,
+        movement_date: m.movement_date ?? m.created_at,
+        sale_type: m.sale_type ?? null,
         user_id: m.user_id,
         product_name: m.products?.name ?? "Producto eliminado",
         product_sku: m.products?.sku ?? null,
@@ -59,6 +63,8 @@ export function useStockMovements() {
       type: "entrada" | "salida";
       quantity: number;
       reason?: string;
+      sale_type?: "mayorista" | "minorista" | null;
+      movement_date?: string;
     }) => {
       if (!companyId || !user?.id) return { error: new Error("No autenticado") };
 
@@ -91,6 +97,8 @@ export function useStockMovements() {
         type: input.type,
         quantity: input.quantity,
         reason: input.reason ?? null,
+        sale_type: input.sale_type ?? null,
+        movement_date: input.movement_date ?? new Date().toISOString(),
       });
       if (mErr) {
         toast.error("Error al registrar movimiento: " + mErr.message);

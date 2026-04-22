@@ -34,24 +34,25 @@ import { useWarehouses } from "@/hooks/useWarehouses";
 import { useProductStock } from "@/hooks/useProductStock";
 import type { Product } from "@/types/database";
 
-const CATEGORIES = ["Aceites", "Harinas", "Granos", "Azúcares", "Lácteos", "Bebidas", "Limpieza", "Otros"];
+type ProductFormState = ProductInput & { warehouse_id?: string };
 
-const emptyForm: ProductInput = {
+const emptyForm: ProductFormState = {
   name: "", sku: "", category: "", unit: "unidad",
   current_stock: 0, min_stock: 0, price: 0, cost: 0,
+  warehouse_id: undefined,
 };
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
   const { warehouses } = useWarehouses();
-  const { stock: productStock } = useProductStock();
+  const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterWarehouse, setFilterWarehouse] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
-  const [form, setForm] = useState<ProductInput>(emptyForm);
+  const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -60,6 +61,15 @@ export default function Products() {
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
     [products]
   );
+
+  // Categorías reales derivadas de los productos del usuario
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.category && p.category.trim()) set.add(p.category.trim());
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
+  }, [products]);
 
   // Map: productId -> quantity in selected warehouse
   const stockByProductInWarehouse = useMemo(() => {
