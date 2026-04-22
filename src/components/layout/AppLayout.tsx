@@ -15,7 +15,7 @@ const pageTitles: Record<string, string> = {
 export function AppLayout() {
   const location = useLocation();
   const { isTrialExpired } = useAuth();
-  const title = pageTitles[location.pathname] ?? "Stockly";
+  const title = pageTitles[location.pathname] ?? "OneStock";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

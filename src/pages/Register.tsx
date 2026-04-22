@@ -70,7 +70,7 @@ export default function Register() {
           <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/20">
             <Package className="h-4 w-4 text-white" />
           </div>
-          <span className="text-lg font-bold text-white">Stockly</span>
+          <span className="text-lg font-bold text-white">OneStock</span>
         </Link>
         <div>
           <div className="mb-8 space-y-3">
@@ -95,7 +95,7 @@ export default function Register() {
             <div className="h-7 w-7 flex items-center justify-center rounded-lg gradient-primary">
               <Package className="h-3.5 w-3.5 text-white" />
             </div>
-            <span className="font-bold text-foreground">Stockly</span>
+            <span className="font-bold text-foreground">OneStock</span>
           </Link>
 
           <h1 className="mb-2 text-2xl font-bold">Creá tu cuenta gratis</h1>

@@ -30,7 +30,7 @@ export function AppSidebar() {
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg gradient-primary">
           <Package className="h-3.5 w-3.5 text-white" />
         </div>
-        {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">Stockly</span>}
+        {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">OneStock</span>}
       </div>
 
       {/* Nav */}

@@ -28,7 +28,7 @@ export function TrialExpiredScreen() {
           </h2>
           <p className="text-sm text-muted-foreground">
             {company?.name
-              ? `Para seguir usando Stockly con "${company.name}" necesitás activar tu suscripción.`
+              ? `Para seguir usando OneStock con "${company.name}" necesitás activar tu suscripción.`
               : "Contactanos para activar tu suscripción."}
           </p>
           <p className="text-sm font-medium text-foreground">
@@ -41,7 +41,7 @@ export function TrialExpiredScreen() {
             variant="default"
             className="gradient-primary shadow-primary text-primary-foreground"
           >
-            <a href="mailto:ventas@stockly.com?subject=Activar suscripción">
+            <a href="mailto:ventas@onestock.com?subject=Activar suscripción">
               Contactar ventas
             </a>
           </Button>
