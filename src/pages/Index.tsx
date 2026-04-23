@@ -252,9 +252,12 @@ export default function Index() {
                 <h3 className="text-xl font-semibold text-primary">Inicial</h3>
                 <p className="text-sm text-muted-foreground">El plan ideal para arrancar a controlar tu stock</p>
               </div>
-              <div className="mb-6">
+              <div className="mb-3">
                 <span className="text-4xl font-bold text-foreground">$34.500</span>
                 <span className="text-sm text-muted-foreground">/mes</span>
+              </div>
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-light px-3 py-1 text-xs font-medium text-accent">
+                🎁 14 días gratis · sin tarjeta de crédito
               </div>
               <div className="mb-6 space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
