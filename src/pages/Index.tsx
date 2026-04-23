@@ -238,76 +238,30 @@ export default function Index() {
         <div className="container max-w-6xl">
           <div className="mb-12 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precio</Badge>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Planes para cada etapa de tu negocio</h2>
-            <p className="text-muted-foreground">Elegí el que mejor se adapte a tus necesidades. Podés cambiar en cualquier momento.</p>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Un plan simple para empezar</h2>
+            <p className="text-muted-foreground">Estamos en MVP: te ofrecemos un único plan claro y un esquema a medida si tu operación lo necesita.</p>
           </div>
-          
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {/* Básico */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-foreground">Básico</h3>
-                <p className="text-sm text-muted-foreground">Para empezar</p>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">$27.600</span>
-                <span className="text-sm text-muted-foreground">/mes</span>
-              </div>
-              <div className="mb-6 space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Operaciones:</span> 0 a 200
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Usuarios:</span> 1–2
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Depósitos:</span> 1
-                </div>
-              </div>
-              <div className="mb-6 space-y-2">
-                {[
-                  "Dashboard",
-                  "Importación Excel",
-                  "Alertas",
-                  "Facturación",
-                  "Soporte básico",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                    {item}
-                  </div>
-                ))}
-                {["Sin integraciones", "Sin IA"].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <X className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <Link to="/register">
-                <Button variant="outline" className="w-full">Elegir Básico</Button>
-              </Link>
-            </div>
 
-            {/* Premium - Destacado */}
-            <div className="relative rounded-2xl border-2 border-primary bg-card p-6 shadow-elevated">
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+            {/* Inicial - Destacado */}
+            <div className="relative rounded-2xl border-2 border-primary bg-card p-8 shadow-elevated">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
               </div>
               <div className="mb-4 pt-2">
-                <h3 className="text-lg font-semibold text-primary">Premium</h3>
-                <p className="text-sm text-muted-foreground">Para crecer</p>
+                <h3 className="text-xl font-semibold text-primary">Inicial</h3>
+                <p className="text-sm text-muted-foreground">El plan ideal para arrancar a controlar tu stock</p>
               </div>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">$48.700</span>
+                <span className="text-4xl font-bold text-foreground">$34.500</span>
                 <span className="text-sm text-muted-foreground">/mes</span>
               </div>
               <div className="mb-6 space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Operaciones:</span> 200 a 500
+                  <span className="text-foreground font-medium">Operaciones:</span> hasta 700
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Usuarios:</span> 3–5
+                  <span className="text-foreground font-medium">Usuarios:</span> hasta 3
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <span className="text-foreground font-medium">Depósitos:</span> hasta 3
@@ -315,69 +269,31 @@ export default function Index() {
               </div>
               <div className="mb-6 space-y-2">
                 {[
-                  "Dashboard",
-                  "Importación Excel",
-                  "Alertas",
-                  "Facturación",
-                  "Integraciones",
-                  "IA básica (predicción, sugerencias)",
-                  "Soporte mejorado",
+                  "Migración de datos a cargo nuestro (si lo deseás)",
+                  "Dashboard en tiempo real",
+                  "Importación desde Excel",
+                  "Alertas de stock",
+                  "Facturación electrónica",
+                  "Soporte exclusivo por WhatsApp, email e Instagram",
+                  "Integración con Mercado Libre (próximamente Shopify, TiendaNube y Empretienda)",
+                  "Integración con ARCA",
                 ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                    {item}
+                  <div key={item} className="flex items-start gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
               <Link to="/register">
-                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">Elegir Premium</Button>
-              </Link>
-            </div>
-
-            {/* Empresarial */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-foreground">Empresarial</h3>
-                <p className="text-sm text-muted-foreground">Para equipos grandes</p>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">$76.800</span>
-                <span className="text-sm text-muted-foreground">/mes</span>
-              </div>
-              <div className="mb-6 space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Operaciones:</span> 500 a 1000
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Usuarios:</span> 7–10
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Depósitos:</span> 4+
-                </div>
-              </div>
-              <div className="mb-6 space-y-2">
-                {[
-                  "Todo lo de Premium",
-                  "IA avanzada",
-                  "Automatizaciones",
-                  "Soporte prioritario",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <Link to="/register">
-                <Button variant="outline" className="w-full">Elegir Empresarial</Button>
+                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">Comenzar con Inicial</Button>
               </Link>
             </div>
 
             {/* Custom */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-elevated">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-foreground">Custom</h3>
-                <p className="text-sm text-muted-foreground">A tu medida</p>
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-card transition-all hover:shadow-elevated">
+              <div className="mb-4 pt-2">
+                <h3 className="text-xl font-semibold text-foreground">Custom</h3>
+                <p className="text-sm text-muted-foreground">A tu medida, para necesidades específicas</p>
               </div>
               <div className="mb-6">
                 <span className="text-4xl font-bold text-foreground">Consultar</span>
@@ -401,9 +317,9 @@ export default function Index() {
                   "Grandes volúmenes",
                   "Soporte dedicado",
                 ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                    {item}
+                  <div key={item} className="flex items-start gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
