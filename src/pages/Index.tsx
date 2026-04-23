@@ -48,11 +48,11 @@ const steps = [
 const faqs = [
   {
     q: "¿Necesito instalar algo?",
-    a: "No. OneStock es 100% web. Funciona desde cualquier computadora con internet, sin instalaciones.",
+    a: "No. OneStock es 100% web y funciona desde cualquier computadora con internet, sin instalaciones. Además, si tu empresa lo desea, ofrecemos capacitación y migración de datos sin costo adicional para que arranques sin fricción.",
   },
   {
     q: "¿Cuántos usuarios puedo tener?",
-    a: "En el plan actual, 1 administrador por empresa. Próximamente habilitaremos múltiples usuarios.",
+    a: "El plan Inicial incluye hasta 3 usuarios por empresa, ideal para equipos pequeños que necesitan trabajar en paralelo sobre el mismo inventario.",
   },
   {
     q: "¿Qué pasa cuando termina el período de prueba?",
@@ -60,7 +60,7 @@ const faqs = [
   },
   {
     q: "¿Puedo manejar múltiples depósitos?",
-    a: "El MVP incluye 1 depósito por empresa. Los múltiples depósitos están en el roadmap.",
+    a: "Sí. El plan Inicial te permite gestionar hasta 3 depósitos en simultáneo desde la misma cuenta.",
   },
   {
     q: "¿Mis datos están seguros?",
