@@ -1,23 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, X } from "lucide-react";
+import { CheckCircle2, CalendarCheck, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type PlanType = "Básico" | "Premium" | "Empresarial";
+type EventKind = "subscription" | "consultation";
 
 type ProofEvent = {
   id: string;
+  kind: EventKind;
   company: string;
   city: string;
-  plan: PlanType;
   minutesAgo: number;
 };
 
 // Nombres de empresas ficticias (rubros variados, estilo argentino)
 const COMPANIES = [
+  "Compuaccess",
+  "Martínez Construcciones",
   "Ferretería Mark",
   "Distribuidora La Estrella",
   "Almacén Don Pepe",
-  "Kiosco Central",
   "Pinturería El Sol",
   "Bazar Norte",
   "Librería San Martín",
@@ -27,10 +28,8 @@ const COMPANIES = [
   "Electrodomésticos Andes",
   "Distribuidora Patagónica",
   "Comercial Río de la Plata",
-  "Almacén La Esquina",
   "Ferretería Industrial Sur",
   "Mayorista El Trébol",
-  "Bodegón Don Carlos",
   "Textil Buenos Aires",
   "Distribuidora Norte Grande",
   "Comercial San Lorenzo",
@@ -43,21 +42,14 @@ const COMPANIES = [
 const CITIES = [
   "Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata", "Mar del Plata",
   "Tucumán", "Salta", "Neuquén", "Bahía Blanca", "San Juan", "Santa Fe",
-  "Corrientes", "Posadas", "Resistencia",
+  "Corrientes", "Posadas", "Resistencia", "Río Negro", "Chubut",
 ];
 
-// Distribución ponderada: Premium se muestra más (es el plan a destacar)
-const PLAN_POOL: PlanType[] = [
-  "Básico", "Básico",
-  "Premium", "Premium", "Premium", "Premium",
-  "Empresarial",
+// Distribución ponderada: las suscripciones al plan Inicial son lo más frecuente
+const KIND_POOL: EventKind[] = [
+  "subscription", "subscription", "subscription", "subscription", "subscription",
+  "consultation", "consultation",
 ];
-
-const PLAN_COLORS: Record<PlanType, string> = {
-  "Básico": "bg-emerald-500/15 text-emerald-500",
-  "Premium": "bg-primary/15 text-primary",
-  "Empresarial": "bg-violet-500/15 text-violet-500",
-};
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -66,9 +58,9 @@ function pick<T>(arr: T[]): T {
 function buildEvent(): ProofEvent {
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    kind: pick(KIND_POOL),
     company: pick(COMPANIES),
     city: pick(CITIES),
-    plan: pick(PLAN_POOL),
     minutesAgo: Math.floor(Math.random() * 28) + 1,
   };
 }
@@ -120,6 +112,12 @@ export function LiveSocialProof() {
 
   if (dismissed || !current) return null;
 
+  const isSubscription = current.kind === "subscription";
+  const Icon = isSubscription ? CheckCircle2 : CalendarCheck;
+  const iconWrapperClass = isSubscription
+    ? "bg-primary/15 text-primary"
+    : "bg-accent/15 text-accent";
+
   return (
     <div
       role="status"
@@ -133,13 +131,17 @@ export function LiveSocialProof() {
       )}
     >
       <div className="flex items-start gap-3 rounded-xl border border-border bg-card/95 backdrop-blur p-3 pr-8 shadow-lg relative">
-        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", PLAN_COLORS[current.plan])}>
-          <CheckCircle2 className="h-4 w-4" />
+        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", iconWrapperClass)}>
+          <Icon className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-foreground leading-snug">
-            <span className="font-semibold">{current.company}</span>, de {current.city}, acaba de suscribirse al plan{" "}
-            <span className="font-semibold">{current.plan}</span>
+            <span className="font-semibold">{current.company}</span>, de {current.city},{" "}
+            {isSubscription ? (
+              <>se suscribió al <span className="font-semibold">plan Inicial</span></>
+            ) : (
+              <>agendó una <span className="font-semibold">consulta personalizada</span></>
+            )}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             hace {current.minutesAgo} min · verificado
