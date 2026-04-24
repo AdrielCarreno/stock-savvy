@@ -37,7 +37,7 @@ import type { Product } from "@/types/database";
 type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
-  name: "", sku: "", category: "", unit: "unidad",
+  name: "", sku: "", category: "", client: "", unit: "unidad",
   current_stock: 0, min_stock: 0, price: 0, cost: 0,
   warehouse_id: undefined,
 };
@@ -67,6 +67,15 @@ export default function Products() {
     const set = new Set<string>();
     products.forEach((p) => {
       if (p.category && p.category.trim()) set.add(p.category.trim());
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
+  }, [products]);
+
+  // Clientes reales derivados de los productos del usuario
+  const clients = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.client && p.client.trim()) set.add(p.client.trim());
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
   }, [products]);
@@ -118,6 +127,7 @@ export default function Products() {
       name: p.name,
       sku: p.sku,
       category: p.category,
+      client: p.client,
       unit: p.unit,
       current_stock: p.current_stock,
       min_stock: p.min_stock,
@@ -157,6 +167,7 @@ export default function Products() {
       ...rest,
       sku: form.sku?.trim() || null,
       category: form.category?.trim() || null,
+      client: form.client?.trim() || null,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
