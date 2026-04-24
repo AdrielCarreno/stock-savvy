@@ -3,6 +3,7 @@ import { Package, TrendingDown, DollarSign, ArrowLeftRight, AlertTriangle, Arrow
 import { Link } from "react-router-dom";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { StockChart } from "@/components/dashboard/StockChart";
+import { ClientsChart } from "@/components/dashboard/ClientsChart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/useProducts";
@@ -126,6 +127,10 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <ClientsChart />
       </div>
     </div>
   );

@@ -63,6 +63,7 @@ export interface Database {
           sku: string | null;
           description: string | null;
           category: string | null;
+          client: string | null;
           unit: string;
           current_stock: number;
           min_stock: number;
@@ -78,6 +79,7 @@ export interface Database {
           sku?: string | null;
           description?: string | null;
           category?: string | null;
+          client?: string | null;
           unit?: string;
           current_stock?: number;
           min_stock?: number;
@@ -93,6 +95,7 @@ export interface Database {
           sku?: string | null;
           description?: string | null;
           category?: string | null;
+          client?: string | null;
           unit?: string;
           current_stock?: number;
           min_stock?: number;

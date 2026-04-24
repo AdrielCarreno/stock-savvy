@@ -37,7 +37,7 @@ import type { Product } from "@/types/database";
 type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
-  name: "", sku: "", category: "", unit: "unidad",
+  name: "", sku: "", category: "", client: "", unit: "unidad",
   current_stock: 0, min_stock: 0, price: 0, cost: 0,
   warehouse_id: undefined,
 };
@@ -67,6 +67,15 @@ export default function Products() {
     const set = new Set<string>();
     products.forEach((p) => {
       if (p.category && p.category.trim()) set.add(p.category.trim());
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
+  }, [products]);
+
+  // Clientes reales derivados de los productos del usuario
+  const clients = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.client && p.client.trim()) set.add(p.client.trim());
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
   }, [products]);
@@ -118,6 +127,7 @@ export default function Products() {
       name: p.name,
       sku: p.sku,
       category: p.category,
+      client: p.client,
       unit: p.unit,
       current_stock: p.current_stock,
       min_stock: p.min_stock,
@@ -157,6 +167,7 @@ export default function Products() {
       ...rest,
       sku: form.sku?.trim() || null,
       category: form.category?.trim() || null,
+      client: form.client?.trim() || null,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
@@ -246,6 +257,7 @@ export default function Products() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -257,12 +269,12 @@ export default function Products() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando productos...
                 </td></tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
                     {products.length === 0 ? "Aún no tenés productos. Creá el primero con el botón de arriba." : "No se encontraron productos"}
                   </td>
                 </tr>
@@ -282,6 +294,9 @@ export default function Products() {
                       </td>
                       <td className="px-4 py-3">
                         {p.category ? <Badge variant="secondary" className="text-xs">{p.category}</Badge> : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {p.client ? <span className="text-sm text-foreground">{p.client}</span> : <span className="text-muted-foreground text-xs">—</span>}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
@@ -350,6 +365,19 @@ export default function Products() {
               <datalist id="product-categories-list">
                 {categories.map((c) => <option key={c} value={c} />)}
               </datalist>
+            </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Cliente</Label>
+              <Input
+                value={form.client ?? ""}
+                onChange={(e) => setForm({ ...form, client: e.target.value })}
+                placeholder="Ej: Supermercado Norte"
+                list="product-clients-list"
+              />
+              <datalist id="product-clients-list">
+                {clients.map((c) => <option key={c} value={c} />)}
+              </datalist>
+              <p className="text-xs text-muted-foreground">A quién le pertenece esta mercadería (opcional).</p>
             </div>
             <div className="space-y-1.5">
               <Label>Precio costo</Label>
