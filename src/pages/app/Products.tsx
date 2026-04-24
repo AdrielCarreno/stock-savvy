@@ -366,6 +366,19 @@ export default function Products() {
                 {categories.map((c) => <option key={c} value={c} />)}
               </datalist>
             </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Cliente</Label>
+              <Input
+                value={form.client ?? ""}
+                onChange={(e) => setForm({ ...form, client: e.target.value })}
+                placeholder="Ej: Supermercado Norte"
+                list="product-clients-list"
+              />
+              <datalist id="product-clients-list">
+                {clients.map((c) => <option key={c} value={c} />)}
+              </datalist>
+              <p className="text-xs text-muted-foreground">A quién le pertenece esta mercadería (opcional).</p>
+            </div>
             <div className="space-y-1.5">
               <Label>Precio costo</Label>
               <Input
