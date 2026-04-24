@@ -41,10 +41,10 @@ export default function Integrations() {
   const [connected] = useState<Set<string>>(new Set());
 
   const handleIntegrate = (platform: EcommercePlatform) => {
-    toast({
-      title: `${platform.name} - Próximamente`,
-      description: "La integración estará disponible muy pronto.",
-    });
+    const message = encodeURIComponent(
+      `Hola, soy ... y quiero integrar Onestock con ${platform.name}`
+    );
+    window.open(`https://wa.me/5493516516785?text=${message}`, "_blank");
   };
 
   return (
@@ -105,7 +105,12 @@ export default function Integrations() {
       <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6 text-center">
         <p className="text-sm text-muted-foreground">
           ¿Necesitás integrar otra plataforma?{" "}
-          <a href="mailto:hola@onestock.app?subject=Solicitud de integración" className="font-medium text-primary hover:underline">
+          <a
+            href="https://wa.me/5493516516785?text=Hola%2C%20soy%20...%20y%20quiero%20integrar%20Onestock%20con%20"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary hover:underline"
+          >
             Contactanos
           </a>
         </p>

@@ -7,10 +7,10 @@ export default function Arca() {
   const { toast } = useToast();
 
   const handleConnect = () => {
-    toast({
-      title: "Integración con ARCA - Próximamente",
-      description: "Estamos trabajando para habilitar esta conexión muy pronto.",
-    });
+    const message = encodeURIComponent(
+      "Hola, soy ... y quiero conectar Onestock con Arca"
+    );
+    window.open(`https://wa.me/5493516516785?text=${message}`, "_blank");
   };
 
   const features = [
