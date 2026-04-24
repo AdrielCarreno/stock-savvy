@@ -8,6 +8,7 @@ export type ProductInput = {
   name: string;
   sku: string | null;
   category: string | null;
+  client?: string | null;
   unit?: string;
   current_stock: number;
   min_stock: number;
@@ -52,6 +53,7 @@ export function useProducts() {
           name: input.name,
           sku: input.sku,
           category: input.category,
+          client: input.client ?? null,
           unit: input.unit ?? "unidad",
           current_stock: input.current_stock,
           min_stock: input.min_stock,
@@ -129,6 +131,7 @@ export function useProducts() {
           name: input.name,
           sku: input.sku,
           category: input.category,
+          client: input.client ?? null,
           unit: input.unit ?? "unidad",
           current_stock: input.current_stock,
           min_stock: input.min_stock,

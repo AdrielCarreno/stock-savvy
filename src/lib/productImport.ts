@@ -42,6 +42,8 @@ const HEADER_MAP: Record<string, keyof ProductInput> = {
   descripcion: "description",
   descripción: "description",
   description: "description",
+  cliente: "client",
+  client: "client",
 };
 
 const normalize = (s: string) =>
@@ -67,6 +69,7 @@ export async function parseFile(file: File): Promise<ParseResult> {
       name: "",
       sku: null,
       category: null,
+      client: null,
       unit: "unidad",
       current_stock: 0,
       min_stock: 0,
@@ -82,6 +85,7 @@ export async function parseFile(file: File): Promise<ParseResult> {
       if (field === "name") data.name = String(val ?? "");
       else if (field === "sku") data.sku = val ? String(val).toUpperCase() : null;
       else if (field === "category") data.category = val ? String(val) : null;
+      else if (field === "client") data.client = val ? String(val) : null;
       else if (field === "unit") data.unit = val ? String(val) : "unidad";
       else if (field === "description") data.description = val ? String(val) : null;
       else if (field === "current_stock") data.current_stock = Math.max(0, Math.floor(toNumber(val) ?? 0));
@@ -117,6 +121,7 @@ export function downloadTemplate() {
       nombre: "Aceite Girasol 1.5L",
       sku: "ACE-001",
       categoria: "Aceites",
+      cliente: "Supermercado Norte",
       unidad: "unidad",
       stock: 24,
       stock_minimo: 10,
@@ -128,6 +133,7 @@ export function downloadTemplate() {
       nombre: "Harina 000 1kg",
       sku: "HAR-001",
       categoria: "Harinas",
+      cliente: "Panadería Don Juan",
       unidad: "unidad",
       stock: 50,
       stock_minimo: 15,
