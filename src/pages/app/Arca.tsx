@@ -1,10 +1,9 @@
 import { Landmark, Clock, FileText, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import logoArca from "@/assets/logo-arca.webp";
 
 export default function Arca() {
-  const { toast } = useToast();
 
   const handleConnect = () => {
     const message = encodeURIComponent(
@@ -37,8 +36,8 @@ export default function Arca() {
         <div className="gradient-primary p-6 text-white">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
-                <Landmark className="h-7 w-7 text-white" />
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white">
+                <img src={logoArca} alt="Logo de ARCA" className="h-full w-full object-contain" loading="lazy" />
               </div>
               <div>
                 <div className="flex items-center gap-2">

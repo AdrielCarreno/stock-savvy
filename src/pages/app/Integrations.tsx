@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Plug, ShoppingBag, Store, ShoppingCart, Check } from "lucide-react";
+import { Plug, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import logoMercadoLibre from "@/assets/logo-mercadolibre.png";
+import logoTiendaNube from "@/assets/logo-tiendanube.png";
+import logoShopify from "@/assets/logo-shopify.png";
 
 interface EcommercePlatform {
   id: string;
   name: string;
   description: string;
-  icon: typeof Plug;
-  color: string;
+  logo: string;
+  bgColor: string;
 }
 
 const platforms: EcommercePlatform[] = [
@@ -17,27 +19,26 @@ const platforms: EcommercePlatform[] = [
     id: "mercadolibre",
     name: "Mercado Libre",
     description: "Sincronizá tu inventario y publicaciones con el marketplace más grande de Latinoamérica.",
-    icon: ShoppingCart,
-    color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+    logo: logoMercadoLibre,
+    bgColor: "bg-[#FFE600]",
   },
   {
     id: "tiendanube",
     name: "Tienda Nube",
     description: "Conectá tu tienda online y mantené el stock unificado en tiempo real.",
-    icon: Store,
-    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    logo: logoTiendaNube,
+    bgColor: "bg-[#1E5FCE]",
   },
   {
     id: "shopify",
     name: "Shopify",
     description: "Integrá tu tienda Shopify para gestionar productos, pedidos y stock desde OneStock.",
-    icon: ShoppingBag,
-    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    logo: logoShopify,
+    bgColor: "bg-white dark:bg-white",
   },
 ];
 
 export default function Integrations() {
-  const { toast } = useToast();
   const [connected] = useState<Set<string>>(new Set());
 
   const handleIntegrate = (platform: EcommercePlatform) => {
@@ -65,7 +66,6 @@ export default function Integrations() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {platforms.map((platform) => {
-          const Icon = platform.icon;
           const isConnected = connected.has(platform.id);
           return (
             <div
@@ -73,8 +73,13 @@ export default function Integrations() {
               className="flex flex-col rounded-xl border border-border bg-card p-5 shadow-card transition-shadow hover:shadow-md"
             >
               <div className="flex items-start justify-between">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${platform.color}`}>
-                  <Icon className="h-6 w-6" />
+                <div className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-border ${platform.bgColor}`}>
+                  <img
+                    src={platform.logo}
+                    alt={`Logo de ${platform.name}`}
+                    className="h-full w-full object-contain p-1"
+                    loading="lazy"
+                  />
                 </div>
                 {isConnected ? (
                   <Badge className="bg-success-light text-success border-success/20">
