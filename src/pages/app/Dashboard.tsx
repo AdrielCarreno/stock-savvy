@@ -50,8 +50,14 @@ export default function Dashboard() {
               Período de prueba: <span className="font-semibold">{trialDaysLeft} {trialDaysLeft === 1 ? "día restante" : "días restantes"}</span>
             </p>
           </div>
-          <Button size="sm" className="gradient-primary shadow-primary text-primary-foreground">
-            Activar plan
+          <Button asChild size="sm" className="gradient-primary shadow-primary text-primary-foreground">
+            <a
+              href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Activar plan
+            </a>
           </Button>
         </div>
       )}

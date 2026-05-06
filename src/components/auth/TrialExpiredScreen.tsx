@@ -41,8 +41,12 @@ export function TrialExpiredScreen() {
             variant="default"
             className="gradient-primary shadow-primary text-primary-foreground"
           >
-            <a href="mailto:ventas@onestock.com?subject=Activar suscripción">
-              Contactar ventas
+            <a
+              href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Suscribirse al plan
             </a>
           </Button>
           <Button variant="outline" onClick={handleLogout} className="gap-2">
