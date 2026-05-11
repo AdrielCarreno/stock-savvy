@@ -43,14 +43,14 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 animate-fade-in">
       {trialDaysLeft !== null && (
-        <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary-light px-4 py-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary-light px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-primary" />
             <p className="text-sm font-medium text-primary">
               Período de prueba: <span className="font-semibold">{trialDaysLeft} {trialDaysLeft === 1 ? "día restante" : "días restantes"}</span>
             </p>
           </div>
-          <Button asChild size="sm" className="gradient-primary shadow-primary text-primary-foreground">
+          <Button asChild size="sm" className="w-full sm:w-auto gradient-primary shadow-primary text-primary-foreground">
             <a
               href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3"
               target="_blank"
