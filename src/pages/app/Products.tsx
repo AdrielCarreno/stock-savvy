@@ -249,7 +249,8 @@ export default function Products() {
         </Select>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+      {/* Vista tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -327,6 +328,59 @@ export default function Products() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Vista tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando productos...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            {products.length === 0 ? "Aún no tenés productos. Tocá el botón + para crear el primero." : "No se encontraron productos"}
+          </div>
+        ) : (
+          filtered.map((p) => {
+            const isLow = p.current_stock <= p.min_stock;
+            const stockShown = filterWarehouse === "all" ? p.current_stock : (stockByProductInWarehouse.get(p.id) ?? 0);
+            return (
+              <div key={p.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      {isLow && <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
+                      <p className="truncate font-semibold text-foreground">{p.name}</p>
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      {p.sku && <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{p.sku}</code>}
+                      {p.category && <Badge variant="secondary" className="text-[10px] py-0">{p.category}</Badge>}
+                    </div>
+                    {p.client && <p className="mt-1 text-xs text-muted-foreground truncate">Cliente: {p.client}</p>}
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-lg font-bold leading-none ${isLow ? "text-warning" : "text-foreground"}`}>{stockShown}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">mín. {p.min_stock}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
+                  <div className="text-xs">
+                    <span className="text-muted-foreground">Venta: </span>
+                    <span className="font-semibold text-foreground">{formatCurrency(p.price)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive" onClick={() => setDeleteId(p.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

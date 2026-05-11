@@ -25,7 +25,7 @@ export function AppSidebar() {
 
   return (
     <aside
-      className={`relative flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ${
+      className={`relative hidden md:flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ${
         collapsed ? "w-14" : "w-56"
       }`}
     >

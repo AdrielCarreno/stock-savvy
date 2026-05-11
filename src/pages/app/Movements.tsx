@@ -160,7 +160,8 @@ export default function Movements() {
         <Input placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+      {/* Vista tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -234,6 +235,52 @@ export default function Movements() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Vista tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando movimientos...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            {movements.length === 0 ? "Aún no hay movimientos. Tocá el botón + para registrar el primero." : "No hay movimientos"}
+          </div>
+        ) : (
+          filtered.map((m) => (
+            <div key={m.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-foreground">{m.product_name}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <Badge className={m.type === "entrada"
+                      ? "bg-success-light text-success border-success/20 text-[10px] py-0"
+                      : "bg-destructive/10 text-destructive border-destructive/20 text-[10px] py-0"
+                    }>
+                      {m.type === "entrada" ? <><ArrowDownCircle className="mr-1 h-3 w-3" />Entrada</> : <><ArrowUpCircle className="mr-1 h-3 w-3" />Salida</>}
+                    </Badge>
+                    {m.sale_type && (
+                      <Badge variant="outline" className="capitalize text-[10px] py-0">{m.sale_type}</Badge>
+                    )}
+                    {m.product_sku && <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{m.product_sku}</code>}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold leading-none text-foreground">{m.quantity}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">unid.</p>
+                </div>
+              </div>
+              <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">
+                <span>{formatDateOnly(m.movement_date)}</span>
+                <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={handleDownloadInvoice}>
+                  <Download className="h-3 w-3" />Factura
+                </Button>
+              </div>
+              {m.reason && <p className="mt-1 text-xs text-muted-foreground">{m.reason}</p>}
+            </div>
+          ))
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
