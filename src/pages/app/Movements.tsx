@@ -96,6 +96,7 @@ export default function Movements() {
       quantity: 1,
       note: "",
       saleType: "minorista",
+      logistics: "",
       movementDate: new Date().toISOString().slice(0, 16),
     });
 
@@ -109,6 +110,7 @@ export default function Movements() {
       quantity: form.quantity,
       reason: form.note || undefined,
       sale_type: form.saleType,
+      logistics: form.logistics.trim() || null,
       movement_date: new Date(form.movementDate).toISOString(),
     });
     setSaving(false);
