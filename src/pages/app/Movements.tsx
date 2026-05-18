@@ -387,6 +387,14 @@ export default function Movements() {
               {errors.movementDate && <p className="text-xs text-destructive">{errors.movementDate}</p>}
             </div>
             <div className="space-y-1.5">
+              <Label>Logística <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                placeholder="Ej: Andreani, OCA, Cadete propio..."
+                value={form.logistics}
+                onChange={(e) => setForm({ ...form, logistics: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label>Nota <span className="text-muted-foreground">(opcional)</span></Label>
               <Textarea
                 placeholder="Ej: Compra a proveedor, Pedido #1024..."
