@@ -19,6 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useProducts } from "@/hooks/useProducts";
 import { useStockMovements } from "@/hooks/useStockMovements";
 import { toast } from "sonner";
@@ -36,6 +42,7 @@ export default function Movements() {
     quantity: number;
     note: string;
     saleType: SaleType;
+    logistics: string;
     movementDate: string;
   }>({
     productId: "",
@@ -43,6 +50,7 @@ export default function Movements() {
     quantity: 1,
     note: "",
     saleType: "minorista",
+    logistics: "",
     movementDate: new Date().toISOString().slice(0, 16),
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -88,6 +96,7 @@ export default function Movements() {
       quantity: 1,
       note: "",
       saleType: "minorista",
+      logistics: "",
       movementDate: new Date().toISOString().slice(0, 16),
     });
 
@@ -101,6 +110,7 @@ export default function Movements() {
       quantity: form.quantity,
       reason: form.note || undefined,
       sale_type: form.saleType,
+      logistics: form.logistics.trim() || null,
       movement_date: new Date(form.movementDate).toISOString(),
     });
     setSaving(false);
@@ -117,8 +127,8 @@ export default function Movements() {
   const formatDateOnly = (iso: string) =>
     new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
-  const handleDownloadInvoice = () => {
-    toast.info("La descarga de factura electrónica estará disponible próximamente");
+  const handleDownloadDocument = (docType: "factura" | "remito") => {
+    toast.info(`La descarga de ${docType} estará disponible próximamente`);
   };
 
   return (
@@ -171,19 +181,20 @@ export default function Movements() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tipo</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cantidad</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Logística</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nota</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha mov.</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Registrado</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Factura</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Factura/Remito</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando movimientos...
                 </td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
                   {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos"}
                 </td></tr>
               ) : (
@@ -215,19 +226,26 @@ export default function Movements() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center font-bold text-foreground">{m.quantity}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{m.logistics ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{m.reason ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDateOnly(m.movement_date)}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{formatDate(m.created_at)}</td>
                     <td className="px-4 py-3 text-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={handleDownloadInvoice}
-                        title="Descargar factura electrónica"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" title="Descargar documento">
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>
+                            Factura
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>
+                            Remito
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))
@@ -273,10 +291,19 @@ export default function Movements() {
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">
                 <span>{formatDateOnly(m.movement_date)}</span>
-                <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={handleDownloadInvoice}>
-                  <Download className="h-3 w-3" />Factura
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">
+                      <Download className="h-3 w-3" />Factura/Remito
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>Factura</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>Remito</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
+              {m.logistics && <p className="mt-1 text-xs text-muted-foreground"><span className="font-medium">Logística:</span> {m.logistics}</p>}
               {m.reason && <p className="mt-1 text-xs text-muted-foreground">{m.reason}</p>}
             </div>
           ))
@@ -358,6 +385,14 @@ export default function Movements() {
                 onChange={(e) => setForm({ ...form, movementDate: e.target.value })}
               />
               {errors.movementDate && <p className="text-xs text-destructive">{errors.movementDate}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Logística <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                placeholder="Ej: Andreani, OCA, Cadete propio..."
+                value={form.logistics}
+                onChange={(e) => setForm({ ...form, logistics: e.target.value })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Nota <span className="text-muted-foreground">(opcional)</span></Label>

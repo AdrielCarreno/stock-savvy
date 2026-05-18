@@ -160,6 +160,7 @@ export type Database = {
           company_id: string
           created_at: string
           id: string
+          logistics: string | null
           movement_date: string
           product_id: string
           quantity: number
@@ -172,6 +173,7 @@ export type Database = {
           company_id: string
           created_at?: string
           id?: string
+          logistics?: string | null
           movement_date?: string
           product_id: string
           quantity: number
@@ -184,6 +186,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           id?: string
+          logistics?: string | null
           movement_date?: string
           product_id?: string
           quantity?: number
