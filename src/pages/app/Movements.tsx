@@ -19,6 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useProducts } from "@/hooks/useProducts";
 import { useStockMovements } from "@/hooks/useStockMovements";
 import { toast } from "sonner";
@@ -36,6 +42,7 @@ export default function Movements() {
     quantity: number;
     note: string;
     saleType: SaleType;
+    logistics: string;
     movementDate: string;
   }>({
     productId: "",
@@ -43,6 +50,7 @@ export default function Movements() {
     quantity: 1,
     note: "",
     saleType: "minorista",
+    logistics: "",
     movementDate: new Date().toISOString().slice(0, 16),
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,8 +125,8 @@ export default function Movements() {
   const formatDateOnly = (iso: string) =>
     new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
-  const handleDownloadInvoice = () => {
-    toast.info("La descarga de factura electrónica estará disponible próximamente");
+  const handleDownloadDocument = (docType: "factura" | "remito") => {
+    toast.info(`La descarga de ${docType} estará disponible próximamente`);
   };
 
   return (
