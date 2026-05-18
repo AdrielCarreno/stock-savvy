@@ -12,6 +12,7 @@ export type MovementWithProduct = {
   created_at: string;
   movement_date: string;
   sale_type: "mayorista" | "minorista" | null;
+  logistics: string | null;
   user_id: string;
   product_name: string;
   product_sku: string | null;
@@ -28,7 +29,7 @@ export function useStockMovements() {
     setLoading(true);
     const { data, error } = await supabase
       .from("stock_movements")
-      .select("id, product_id, type, quantity, reason, created_at, movement_date, sale_type, user_id, products(name, sku)")
+      .select("id, product_id, type, quantity, reason, created_at, movement_date, sale_type, logistics, user_id, products(name, sku)")
       .eq("company_id", companyId)
       .order("movement_date", { ascending: false })
       .limit(500);
@@ -44,6 +45,7 @@ export function useStockMovements() {
         created_at: m.created_at,
         movement_date: m.movement_date ?? m.created_at,
         sale_type: m.sale_type ?? null,
+        logistics: m.logistics ?? null,
         user_id: m.user_id,
         product_name: m.products?.name ?? "Producto eliminado",
         product_sku: m.products?.sku ?? null,
@@ -64,6 +66,7 @@ export function useStockMovements() {
       quantity: number;
       reason?: string;
       sale_type?: "mayorista" | "minorista" | null;
+      logistics?: string | null;
       movement_date?: string;
     }) => {
       if (!companyId || !user?.id) return { error: new Error("No autenticado") };
@@ -98,6 +101,7 @@ export function useStockMovements() {
         quantity: input.quantity,
         reason: input.reason ?? null,
         sale_type: input.sale_type ?? null,
+        logistics: input.logistics ?? null,
         movement_date: input.movement_date ?? new Date().toISOString(),
       });
       if (mErr) {
