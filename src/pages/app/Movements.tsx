@@ -127,6 +127,9 @@ export default function Movements() {
   const formatDateOnly = (iso: string) =>
     new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
+  const formatCurrency = (n: number) =>
+    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
+
   const handleDownloadDocument = (docType: "factura" | "remito") => {
     toast.info(`La descarga de ${docType} estará disponible próximamente`);
   };
