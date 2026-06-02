@@ -230,6 +230,9 @@ export default function Movements() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center font-bold text-foreground">{m.quantity}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-foreground whitespace-nowrap">
+                      {m.value > 0 ? formatCurrency(m.value) : <span className="text-muted-foreground text-xs">—</span>}
+                    </td>
                     <td className="px-4 py-3 text-muted-foreground">{m.logistics ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{m.reason ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDateOnly(m.movement_date)}</td>
