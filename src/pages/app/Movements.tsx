@@ -294,6 +294,9 @@ export default function Movements() {
                 <div className="text-right">
                   <p className="text-lg font-bold leading-none text-foreground">{m.quantity}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">unid.</p>
+                  {m.value > 0 && (
+                    <p className="mt-1 text-xs font-semibold text-foreground">{formatCurrency(m.value)}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">
