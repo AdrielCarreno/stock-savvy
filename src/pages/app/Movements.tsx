@@ -194,11 +194,11 @@ export default function Movements() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando movimientos...
                 </td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos"}
                 </td></tr>
               ) : (
