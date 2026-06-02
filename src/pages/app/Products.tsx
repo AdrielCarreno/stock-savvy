@@ -107,6 +107,26 @@ export default function Products() {
     return set;
   }, [productStock, filterWarehouse]);
 
+  // Map: productId -> array of warehouse names (where qty > 0, or default if none)
+  const warehouseNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    warehouses.forEach((w) => map.set(w.id, w.name));
+    return map;
+  }, [warehouses]);
+
+  const warehousesByProduct = useMemo(() => {
+    const map = new Map<string, string[]>();
+    productStock.forEach((s) => {
+      if (s.quantity <= 0) return;
+      const name = warehouseNameById.get(s.warehouse_id);
+      if (!name) return;
+      const arr = map.get(s.product_id) ?? [];
+      if (!arr.includes(name)) arr.push(name);
+      map.set(s.product_id, arr);
+    });
+    return map;
+  }, [productStock, warehouseNameById]);
+
   const filtered = products.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
