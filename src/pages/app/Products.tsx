@@ -462,9 +462,17 @@ export default function Products() {
           filtered.map((p) => {
             const isLow = p.current_stock <= p.min_stock;
             const stockShown = filterWarehouse === "all" ? p.current_stock : (stockByProductInWarehouse.get(p.id) ?? 0);
+            const whNames = warehousesByProduct.get(p.id) ?? [];
+            const selected = selectedIds.has(p.id);
             return (
-              <div key={p.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
-                <div className="flex items-start justify-between gap-2">
+              <div key={p.id} className={`rounded-xl border p-3 shadow-card ${selected ? "border-primary bg-primary-light/30" : "border-border bg-card"}`}>
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    checked={selected}
+                    onCheckedChange={() => toggleSelect(p.id)}
+                    className="mt-1"
+                    aria-label={`Seleccionar ${p.name}`}
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       {isLow && <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
@@ -473,6 +481,11 @@ export default function Products() {
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       {p.sku && <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{p.sku}</code>}
                       {p.category && <Badge variant="secondary" className="text-[10px] py-0">{p.category}</Badge>}
+                      {whNames.map((n) => (
+                        <Badge key={n} variant="outline" className="text-[10px] py-0 gap-1">
+                          <Warehouse className="h-3 w-3" />{n}
+                        </Badge>
+                      ))}
                     </div>
                     {p.client && <p className="mt-1 text-xs text-muted-foreground truncate">Cliente: {p.client}</p>}
                   </div>
