@@ -16,6 +16,9 @@ export type MovementWithProduct = {
   user_id: string;
   product_name: string;
   product_sku: string | null;
+  product_price: number | null;
+  product_cost: number | null;
+  value: number;
 };
 
 export function useStockMovements() {
