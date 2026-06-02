@@ -44,7 +44,7 @@ const emptyForm: ProductFormState = {
 };
 
 export default function Products() {
-  const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
+  const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts, bulkDeleteProducts, bulkUpdateProducts } = useProducts();
   const { warehouses } = useWarehouses();
   const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
@@ -57,6 +57,12 @@ export default function Products() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkForm, setBulkForm] = useState<{ category: string; client: string; min_stock: string; price: string }>({
+    category: "", client: "", min_stock: "", price: "",
+  });
 
   const existingSkus = useMemo(
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
