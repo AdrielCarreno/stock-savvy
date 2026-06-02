@@ -662,6 +662,78 @@ export default function Products() {
         existingSkus={existingSkus}
         onImport={bulkCreateProducts}
       />
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar {selectedIds.size} producto(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminarán los productos seleccionados y sus movimientos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Eliminar todos
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={bulkEditOpen} onOpenChange={setBulkEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar {selectedIds.size} producto(s)</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground">
+            Sólo se actualizarán los campos que completes. Los vacíos no se tocan.
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Categoría</Label>
+              <Input
+                value={bulkForm.category}
+                onChange={(e) => setBulkForm({ ...bulkForm, category: e.target.value })}
+                placeholder="Ej: Bebidas"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cliente</Label>
+              <Input
+                value={bulkForm.client}
+                onChange={(e) => setBulkForm({ ...bulkForm, client: e.target.value })}
+                placeholder="Ej: Supermercado Norte"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Stock mínimo</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={bulkForm.min_stock}
+                  onChange={(e) => setBulkForm({ ...bulkForm, min_stock: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Precio venta</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={bulkForm.price}
+                  onChange={(e) => setBulkForm({ ...bulkForm, price: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancelar</Button>
+            <Button onClick={handleBulkEdit} className="gradient-primary shadow-primary text-primary-foreground">
+              Aplicar a {selectedIds.size}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
