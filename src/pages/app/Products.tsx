@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +44,7 @@ const emptyForm: ProductFormState = {
 };
 
 export default function Products() {
-  const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProducts();
+  const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts, bulkDeleteProducts, bulkUpdateProducts } = useProducts();
   const { warehouses } = useWarehouses();
   const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
@@ -56,6 +57,12 @@ export default function Products() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkForm, setBulkForm] = useState<{ category: string; client: string; min_stock: string; price: string }>({
+    category: "", client: "", min_stock: "", price: "",
+  });
 
   const existingSkus = useMemo(
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
@@ -99,6 +106,26 @@ export default function Products() {
       .forEach((s) => set.add(s.product_id));
     return set;
   }, [productStock, filterWarehouse]);
+
+  // Map: productId -> array of warehouse names (where qty > 0, or default if none)
+  const warehouseNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    warehouses.forEach((w) => map.set(w.id, w.name));
+    return map;
+  }, [warehouses]);
+
+  const warehousesByProduct = useMemo(() => {
+    const map = new Map<string, string[]>();
+    productStock.forEach((s) => {
+      if (s.quantity <= 0) return;
+      const name = warehouseNameById.get(s.warehouse_id);
+      if (!name) return;
+      const arr = map.get(s.product_id) ?? [];
+      if (!arr.includes(name)) arr.push(name);
+      map.set(s.product_id, arr);
+    });
+    return map;
+  }, [productStock, warehouseNameById]);
 
   const filtered = products.filter((p) => {
     const matchSearch =
@@ -185,6 +212,48 @@ export default function Products() {
     setDeleteId(null);
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length && filtered.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((p) => p.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkDelete = async () => {
+    await bulkDeleteProducts(Array.from(selectedIds));
+    setBulkDeleteOpen(false);
+    clearSelection();
+    await refreshStock();
+  };
+
+  const handleBulkEdit = async () => {
+    const patch: Partial<ProductInput> = {};
+    if (bulkForm.category.trim()) patch.category = bulkForm.category.trim();
+    if (bulkForm.client.trim()) patch.client = bulkForm.client.trim();
+    if (bulkForm.min_stock !== "") patch.min_stock = Math.max(0, Number(bulkForm.min_stock));
+    if (bulkForm.price !== "") patch.price = Math.max(0, Number(bulkForm.price));
+    if (Object.keys(patch).length === 0) {
+      setBulkEditOpen(false);
+      return;
+    }
+    await bulkUpdateProducts(Array.from(selectedIds), patch);
+    setBulkEditOpen(false);
+    setBulkForm({ category: "", client: "", min_stock: "", price: "" });
+    clearSelection();
+  };
+
   const formatCurrency = (n: number | null) =>
     n == null ? "—" : new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
@@ -249,16 +318,44 @@ export default function Products() {
         </Select>
       </div>
 
+      {/* Barra de acciones masivas */}
+      {selectedIds.size > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary-light/40 px-4 py-2 text-sm">
+          <div className="flex items-center gap-2 text-foreground">
+            <span className="font-semibold">{selectedIds.size}</span> seleccionado(s)
+            <Button variant="ghost" size="sm" className="h-7 gap-1" onClick={clearSelection}>
+              <X className="h-3.5 w-3.5" /> Limpiar
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setBulkEditOpen(true)}>
+              <Edit2 className="h-3.5 w-3.5" />Editar seleccionados
+            </Button>
+            <Button variant="destructive" size="sm" className="gap-2" onClick={() => setBulkDeleteOpen(true)}>
+              <Trash2 className="h-3.5 w-3.5" />Eliminar seleccionados
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Vista tabla (desktop) */}
       <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">
+                <th className="px-3 py-3 w-10">
+                  <Checkbox
+                    checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Seleccionar todos"
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Depósito</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -270,20 +367,28 @@ export default function Products() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando productos...
                 </td></tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                     {products.length === 0 ? "Aún no tenés productos. Creá el primero con el botón de arriba." : "No se encontraron productos"}
                   </td>
                 </tr>
               ) : (
                 filtered.map((p) => {
                   const isLow = p.current_stock <= p.min_stock;
+                  const whNames = warehousesByProduct.get(p.id) ?? [];
                   return (
                     <tr key={p.id} className="transition-colors hover:bg-muted/30">
+                      <td className="px-3 py-3">
+                        <Checkbox
+                          checked={selectedIds.has(p.id)}
+                          onCheckedChange={() => toggleSelect(p.id)}
+                          aria-label={`Seleccionar ${p.name}`}
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {isLow && <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
@@ -298,6 +403,19 @@ export default function Products() {
                       </td>
                       <td className="px-4 py-3">
                         {p.client ? <span className="text-sm text-foreground">{p.client}</span> : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {whNames.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {whNames.map((n) => (
+                              <Badge key={n} variant="outline" className="text-[10px] gap-1">
+                                <Warehouse className="h-3 w-3" />{n}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
@@ -344,9 +462,17 @@ export default function Products() {
           filtered.map((p) => {
             const isLow = p.current_stock <= p.min_stock;
             const stockShown = filterWarehouse === "all" ? p.current_stock : (stockByProductInWarehouse.get(p.id) ?? 0);
+            const whNames = warehousesByProduct.get(p.id) ?? [];
+            const selected = selectedIds.has(p.id);
             return (
-              <div key={p.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
-                <div className="flex items-start justify-between gap-2">
+              <div key={p.id} className={`rounded-xl border p-3 shadow-card ${selected ? "border-primary bg-primary-light/30" : "border-border bg-card"}`}>
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    checked={selected}
+                    onCheckedChange={() => toggleSelect(p.id)}
+                    className="mt-1"
+                    aria-label={`Seleccionar ${p.name}`}
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       {isLow && <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
@@ -355,6 +481,11 @@ export default function Products() {
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       {p.sku && <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{p.sku}</code>}
                       {p.category && <Badge variant="secondary" className="text-[10px] py-0">{p.category}</Badge>}
+                      {whNames.map((n) => (
+                        <Badge key={n} variant="outline" className="text-[10px] py-0 gap-1">
+                          <Warehouse className="h-3 w-3" />{n}
+                        </Badge>
+                      ))}
                     </div>
                     {p.client && <p className="mt-1 text-xs text-muted-foreground truncate">Cliente: {p.client}</p>}
                   </div>
@@ -531,6 +662,78 @@ export default function Products() {
         existingSkus={existingSkus}
         onImport={bulkCreateProducts}
       />
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar {selectedIds.size} producto(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminarán los productos seleccionados y sus movimientos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Eliminar todos
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={bulkEditOpen} onOpenChange={setBulkEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar {selectedIds.size} producto(s)</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground">
+            Sólo se actualizarán los campos que completes. Los vacíos no se tocan.
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Categoría</Label>
+              <Input
+                value={bulkForm.category}
+                onChange={(e) => setBulkForm({ ...bulkForm, category: e.target.value })}
+                placeholder="Ej: Bebidas"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cliente</Label>
+              <Input
+                value={bulkForm.client}
+                onChange={(e) => setBulkForm({ ...bulkForm, client: e.target.value })}
+                placeholder="Ej: Supermercado Norte"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Stock mínimo</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={bulkForm.min_stock}
+                  onChange={(e) => setBulkForm({ ...bulkForm, min_stock: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Precio venta</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={bulkForm.price}
+                  onChange={(e) => setBulkForm({ ...bulkForm, price: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancelar</Button>
+            <Button onClick={handleBulkEdit} className="gradient-primary shadow-primary text-primary-foreground">
+              Aplicar a {selectedIds.size}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

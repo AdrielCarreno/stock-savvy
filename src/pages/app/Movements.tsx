@@ -127,6 +127,9 @@ export default function Movements() {
   const formatDateOnly = (iso: string) =>
     new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
+  const formatCurrency = (n: number) =>
+    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
+
   const handleDownloadDocument = (docType: "factura" | "remito") => {
     toast.info(`La descarga de ${docType} estará disponible próximamente`);
   };
@@ -181,6 +184,7 @@ export default function Movements() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tipo</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cantidad</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">Valor ($)</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Logística</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nota</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha mov.</th>
@@ -190,11 +194,11 @@ export default function Movements() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando movimientos...
                 </td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos"}
                 </td></tr>
               ) : (
@@ -226,6 +230,9 @@ export default function Movements() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center font-bold text-foreground">{m.quantity}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-foreground whitespace-nowrap">
+                      {m.value > 0 ? formatCurrency(m.value) : <span className="text-muted-foreground text-xs">—</span>}
+                    </td>
                     <td className="px-4 py-3 text-muted-foreground">{m.logistics ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground">{m.reason ?? "—"}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDateOnly(m.movement_date)}</td>
@@ -287,6 +294,9 @@ export default function Movements() {
                 <div className="text-right">
                   <p className="text-lg font-bold leading-none text-foreground">{m.quantity}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">unid.</p>
+                  {m.value > 0 && (
+                    <p className="mt-1 text-xs font-semibold text-foreground">{formatCurrency(m.value)}</p>
+                  )}
                 </div>
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">

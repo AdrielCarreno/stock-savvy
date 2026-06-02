@@ -253,8 +253,7 @@ export default function Index() {
                 <p className="text-sm text-muted-foreground">El plan ideal para arrancar a controlar tu stock</p>
               </div>
               <div className="mb-3">
-                <span className="text-4xl font-bold text-foreground">$34.500</span>
-                <span className="text-sm text-muted-foreground">/mes</span>
+                <span className="text-4xl font-bold text-foreground">Consultar ventas</span>
               </div>
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-light px-3 py-1 text-xs font-medium text-accent">
                 🎁 14 días gratis · sin tarjeta de crédito
@@ -287,9 +286,15 @@ export default function Index() {
                   </div>
                 ))}
               </div>
-              <Link to="/register">
-                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">Comenzar con Inicial</Button>
-              </Link>
+              <a
+                href="https://wa.me/5493516516785?text=Hola%2C%20quiero%20consultar%20por%20el%20plan%20Inicial%20de%20OneStock"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">
+                  Consultar ventas
+                </Button>
+              </a>
             </div>
 
             {/* Custom */}

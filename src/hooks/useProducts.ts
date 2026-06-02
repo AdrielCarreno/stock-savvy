@@ -166,5 +166,36 @@ export function useProducts() {
     [fetchProducts]
   );
 
-  return { products, loading, refresh: fetchProducts, createProduct, updateProduct, deleteProduct, bulkCreateProducts };
+  const bulkDeleteProducts = useCallback(
+    async (ids: string[]) => {
+      if (ids.length === 0) return { error: null };
+      const { error } = await supabase.from("products").delete().in("id", ids);
+      if (error) {
+        toast.error("Error al eliminar: " + error.message);
+        return { error };
+      }
+      toast.success(`${ids.length} producto(s) eliminado(s)`);
+      await fetchProducts();
+      return { error: null };
+    },
+    [fetchProducts]
+  );
+
+  const bulkUpdateProducts = useCallback(
+    async (ids: string[], patch: Partial<ProductInput>) => {
+      if (ids.length === 0) return { error: null };
+      const { error } = await supabase.from("products").update(patch).in("id", ids);
+      if (error) {
+        toast.error("Error al actualizar: " + error.message);
+        return { error };
+      }
+      toast.success(`${ids.length} producto(s) actualizado(s)`);
+      await fetchProducts();
+      return { error: null };
+    },
+    [fetchProducts]
+  );
+
+  return { products, loading, refresh: fetchProducts, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, bulkUpdateProducts, bulkCreateProducts };
 }
+

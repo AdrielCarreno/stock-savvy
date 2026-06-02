@@ -16,6 +16,9 @@ export type MovementWithProduct = {
   user_id: string;
   product_name: string;
   product_sku: string | null;
+  product_price: number | null;
+  product_cost: number | null;
+  value: number;
 };
 
 export function useStockMovements() {
@@ -29,27 +32,35 @@ export function useStockMovements() {
     setLoading(true);
     const { data, error } = await supabase
       .from("stock_movements")
-      .select("id, product_id, type, quantity, reason, created_at, movement_date, sale_type, logistics, user_id, products(name, sku)")
+      .select("id, product_id, type, quantity, reason, created_at, movement_date, sale_type, logistics, user_id, products(name, sku, price, cost)")
       .eq("company_id", companyId)
       .order("movement_date", { ascending: false })
       .limit(500);
     if (error) {
       toast.error("Error al cargar movimientos: " + error.message);
     } else {
-      const mapped = (data ?? []).map((m: any) => ({
-        id: m.id,
-        product_id: m.product_id,
-        type: m.type,
-        quantity: m.quantity,
-        reason: m.reason,
-        created_at: m.created_at,
-        movement_date: m.movement_date ?? m.created_at,
-        sale_type: m.sale_type ?? null,
-        logistics: m.logistics ?? null,
-        user_id: m.user_id,
-        product_name: m.products?.name ?? "Producto eliminado",
-        product_sku: m.products?.sku ?? null,
-      }));
+      const mapped = (data ?? []).map((m: any) => {
+        const price = m.products?.price ?? null;
+        const cost = m.products?.cost ?? null;
+        const unit = m.type === "entrada" ? (cost ?? price ?? 0) : (price ?? cost ?? 0);
+        return {
+          id: m.id,
+          product_id: m.product_id,
+          type: m.type,
+          quantity: m.quantity,
+          reason: m.reason,
+          created_at: m.created_at,
+          movement_date: m.movement_date ?? m.created_at,
+          sale_type: m.sale_type ?? null,
+          logistics: m.logistics ?? null,
+          user_id: m.user_id,
+          product_name: m.products?.name ?? "Producto eliminado",
+          product_sku: m.products?.sku ?? null,
+          product_price: price,
+          product_cost: cost,
+          value: Number(unit) * m.quantity,
+        };
+      });
       setMovements(mapped);
     }
     setLoading(false);
