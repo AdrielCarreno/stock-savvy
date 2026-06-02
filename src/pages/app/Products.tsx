@@ -318,16 +318,44 @@ export default function Products() {
         </Select>
       </div>
 
+      {/* Barra de acciones masivas */}
+      {selectedIds.size > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary-light/40 px-4 py-2 text-sm">
+          <div className="flex items-center gap-2 text-foreground">
+            <span className="font-semibold">{selectedIds.size}</span> seleccionado(s)
+            <Button variant="ghost" size="sm" className="h-7 gap-1" onClick={clearSelection}>
+              <X className="h-3.5 w-3.5" /> Limpiar
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setBulkEditOpen(true)}>
+              <Edit2 className="h-3.5 w-3.5" />Editar seleccionados
+            </Button>
+            <Button variant="destructive" size="sm" className="gap-2" onClick={() => setBulkDeleteOpen(true)}>
+              <Trash2 className="h-3.5 w-3.5" />Eliminar seleccionados
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Vista tabla (desktop) */}
       <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">
+                <th className="px-3 py-3 w-10">
+                  <Checkbox
+                    checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Seleccionar todos"
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Depósito</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -339,20 +367,28 @@ export default function Products() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                   <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando productos...
                 </td></tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
                     {products.length === 0 ? "Aún no tenés productos. Creá el primero con el botón de arriba." : "No se encontraron productos"}
                   </td>
                 </tr>
               ) : (
                 filtered.map((p) => {
                   const isLow = p.current_stock <= p.min_stock;
+                  const whNames = warehousesByProduct.get(p.id) ?? [];
                   return (
                     <tr key={p.id} className="transition-colors hover:bg-muted/30">
+                      <td className="px-3 py-3">
+                        <Checkbox
+                          checked={selectedIds.has(p.id)}
+                          onCheckedChange={() => toggleSelect(p.id)}
+                          aria-label={`Seleccionar ${p.name}`}
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {isLow && <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" />}
@@ -367,6 +403,19 @@ export default function Products() {
                       </td>
                       <td className="px-4 py-3">
                         {p.client ? <span className="text-sm text-foreground">{p.client}</span> : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {whNames.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {whNames.map((n) => (
+                              <Badge key={n} variant="outline" className="text-[10px] gap-1">
+                                <Warehouse className="h-3 w-3" />{n}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
                       <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
