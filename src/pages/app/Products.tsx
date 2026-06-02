@@ -212,6 +212,48 @@ export default function Products() {
     setDeleteId(null);
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length && filtered.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((p) => p.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkDelete = async () => {
+    await bulkDeleteProducts(Array.from(selectedIds));
+    setBulkDeleteOpen(false);
+    clearSelection();
+    await refreshStock();
+  };
+
+  const handleBulkEdit = async () => {
+    const patch: Partial<ProductInput> = {};
+    if (bulkForm.category.trim()) patch.category = bulkForm.category.trim();
+    if (bulkForm.client.trim()) patch.client = bulkForm.client.trim();
+    if (bulkForm.min_stock !== "") patch.min_stock = Math.max(0, Number(bulkForm.min_stock));
+    if (bulkForm.price !== "") patch.price = Math.max(0, Number(bulkForm.price));
+    if (Object.keys(patch).length === 0) {
+      setBulkEditOpen(false);
+      return;
+    }
+    await bulkUpdateProducts(Array.from(selectedIds), patch);
+    setBulkEditOpen(false);
+    setBulkForm({ category: "", client: "", min_stock: "", price: "" });
+    clearSelection();
+  };
+
   const formatCurrency = (n: number | null) =>
     n == null ? "—" : new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
