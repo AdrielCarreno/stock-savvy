@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, CalendarCheck, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,97 +12,67 @@ type ProofEvent = {
   minutesAgo: number;
 };
 
-// Nombres de empresas ficticias (rubros variados, estilo argentino)
-const COMPANIES = [
-  "Compuaccess",
-  "Martínez Construcciones",
-  "Ferretería Mark",
-  "Distribuidora La Estrella",
-  "Almacén Don Pepe",
-  "Pinturería El Sol",
-  "Bazar Norte",
-  "Librería San Martín",
-  "Importadora del Plata",
-  "Mayorista La Económica",
-  "Repuestos García",
-  "Electrodomésticos Andes",
-  "Distribuidora Patagónica",
-  "Comercial Río de la Plata",
-  "Ferretería Industrial Sur",
-  "Mayorista El Trébol",
-  "Textil Buenos Aires",
-  "Distribuidora Norte Grande",
-  "Comercial San Lorenzo",
-  "Insumos Médicos Vida",
-  "Papelera Litoral",
-  "Frigorífico Las Pampas",
-  "Distribuidora Cuyo",
+// Set fijo de 7 clientes reales/representativos que arrancaron a usar OneStock.
+// 4 de Córdoba (entre los inventados) + Compuaccess y Drinkmarket (también de Córdoba)
+// + 1 de Mendoza.
+const CLIENTS: { company: string; city: string }[] = [
+  { company: "Compuaccess", city: "Córdoba" },
+  { company: "Distribuidora de bebidas Drinkmarket", city: "Córdoba" },
+  { company: "Ferretería Industrial Belgrano", city: "Córdoba" },
+  { company: "Distribuidora Mayorista La Cañada", city: "Córdoba" },
+  { company: "Pinturería Nueva Córdoba", city: "Córdoba" },
+  { company: "Almacén Sierras Chicas", city: "Córdoba" },
+  { company: "Bodega y Distribuidora Los Andes", city: "Mendoza" },
 ];
 
-const CITIES = [
-  "Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata", "Mar del Plata",
-  "Tucumán", "Salta", "Neuquén", "Bahía Blanca", "San Juan", "Santa Fe",
-  "Corrientes", "Posadas", "Resistencia", "Río Negro", "Chubut",
+// 5 suscripciones / 2 consultas, asignadas de forma estable.
+const KINDS: EventKind[] = [
+  "subscription",
+  "subscription",
+  "consultation",
+  "subscription",
+  "subscription",
+  "subscription",
+  "consultation",
 ];
 
-// Distribución ponderada: las suscripciones al plan Inicial son lo más frecuente
-const KIND_POOL: EventKind[] = [
-  "subscription", "subscription", "subscription", "subscription", "subscription",
-  "consultation", "consultation",
-];
-
-function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+function buildEvents(): ProofEvent[] {
+  return CLIENTS.map((c, i) => ({
+    id: `${i}-${c.company}`,
+    kind: KINDS[i],
+    company: c.company,
+    city: c.city,
+    minutesAgo: 3 + i * 4, // 3, 7, 11, 15, 19, 23, 27
+  }));
 }
 
-function buildEvent(): ProofEvent {
-  return {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    kind: pick(KIND_POOL),
-    company: pick(COMPANIES),
-    city: pick(CITIES),
-    minutesAgo: Math.floor(Math.random() * 28) + 1,
-  };
-}
-
-const POLL_INTERVAL_MS = 35_000; // ~35s entre notificaciones
+const POLL_INTERVAL_MS = 35_000;
 const VISIBLE_DURATION_MS = 6_500;
 const INITIAL_DELAY_MS = 4_000;
 
 export function LiveSocialProof() {
-  const initialQueue = useMemo(
-    () => Array.from({ length: 12 }, () => buildEvent()),
-    []
-  );
-
-  const [queue, setQueue] = useState<ProofEvent[]>(initialQueue);
+  const [index, setIndex] = useState(0);
   const [current, setCurrent] = useState<ProofEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     if (dismissed) return;
-
-    let showTimer: ReturnType<typeof setTimeout>;
+    const events = buildEvents();
+    let i = 0;
     let hideTimer: ReturnType<typeof setTimeout>;
     let cycleTimer: ReturnType<typeof setTimeout>;
 
     const showNext = () => {
-      setQueue((prev) => {
-        const next = prev.length > 0 ? prev : Array.from({ length: 8 }, () => buildEvent());
-        const [head, ...rest] = next;
-        setCurrent(head);
-        setVisible(true);
-
-        hideTimer = setTimeout(() => setVisible(false), VISIBLE_DURATION_MS);
-        cycleTimer = setTimeout(showNext, POLL_INTERVAL_MS);
-
-        return rest;
-      });
+      setCurrent(events[i % events.length]);
+      setIndex(i);
+      setVisible(true);
+      i += 1;
+      hideTimer = setTimeout(() => setVisible(false), VISIBLE_DURATION_MS);
+      cycleTimer = setTimeout(showNext, POLL_INTERVAL_MS);
     };
 
-    showTimer = setTimeout(showNext, INITIAL_DELAY_MS);
-
+    const showTimer = setTimeout(showNext, INITIAL_DELAY_MS);
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
