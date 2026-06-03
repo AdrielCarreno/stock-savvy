@@ -291,7 +291,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_company_is_active: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
