@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X, WarehouseIcon } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { Button } from "@/components/ui/button";
