@@ -235,106 +235,141 @@ export default function Index() {
 
       {/* Pricing */}
       <section id="pricing" className="py-20 px-4">
-        <div className="container max-w-6xl">
+        <div className="container max-w-7xl">
           <div className="mb-12 text-center">
-            <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precio</Badge>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Un plan simple para empezar</h2>
-            <p className="text-muted-foreground">Estamos en MVP: te ofrecemos un único plan claro y un esquema a medida si tu operación lo necesita.</p>
+            <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precios</Badge>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Elegí el plan que mejor se adapta a tu operación</h2>
+            <p className="text-muted-foreground">Precios en pesos argentinos. 14 días gratis sin tarjeta de crédito.</p>
           </div>
 
-          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
-            {/* Inicial - Destacado */}
-            <div className="relative rounded-2xl border-2 border-primary bg-card p-8 shadow-elevated">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
-              </div>
-              <div className="mb-4 pt-2">
-                <h3 className="text-xl font-semibold text-primary">Inicial</h3>
-                <p className="text-sm text-muted-foreground">El plan ideal para arrancar a controlar tu stock</p>
-              </div>
-              <div className="mb-3">
-                <span className="text-4xl font-bold text-foreground">Consultar ventas</span>
-              </div>
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-light px-3 py-1 text-xs font-medium text-accent">
-                🎁 14 días gratis · sin tarjeta de crédito
-              </div>
-              <div className="mb-6 space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Operaciones:</span> hasta 700
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Usuarios:</span> hasta 3
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Depósitos:</span> hasta 3
-                </div>
-              </div>
-              <div className="mb-6 space-y-2">
-                {[
-                  "Migración de datos a cargo nuestro (si lo deseás)",
-                  "Dashboard en tiempo real",
-                  "Importación desde Excel",
-                  "Alertas de stock",
-                  "Facturación electrónica",
-                  "Soporte exclusivo por WhatsApp, email e Instagram",
-                  "Integración con Mercado Libre (próximamente Shopify, TiendaNube y Empretienda)",
-                  "Integración con ARCA",
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-              <a
-                href="https://wa.me/5493516516785?text=Hola%2C%20quiero%20consultar%20por%20el%20plan%20Inicial%20de%20OneStock"
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                name: "Básico",
+                price: "$27.800",
+                highlight: false,
+                desc: "Ideal para arrancar a controlar tu stock",
+                features: [
+                  { label: "Operaciones", value: "Básico" },
+                  { label: "Usuarios", value: "1 a 2" },
+                  { label: "Depósitos", value: "1" },
+                  { label: "Dashboard analítico de ingresos y egresos", value: true },
+                  { label: "Integraciones", value: false },
+                  { label: "Importaciones desde Excel", value: true },
+                  { label: "Alertas de stock", value: true },
+                  { label: "Funciones de IA", value: false },
+                  { label: "Soporte", value: true },
+                  { label: "Factura electrónica y remitos", value: true },
+                ],
+              },
+              {
+                name: "Premium",
+                price: "$46.800",
+                highlight: true,
+                desc: "Para equipos que necesitan más potencia",
+                features: [
+                  { label: "Operaciones", value: "Premium" },
+                  { label: "Usuarios", value: "3 a 5" },
+                  { label: "Depósitos", value: "Hasta 3" },
+                  { label: "Dashboard analítico de ingresos y egresos", value: true },
+                  { label: "Integraciones", value: true },
+                  { label: "Importaciones desde Excel", value: true },
+                  { label: "Alertas de stock", value: true },
+                  { label: "Funciones de IA", value: true },
+                  { label: "Soporte", value: true },
+                  { label: "Factura electrónica y remitos", value: true },
+                ],
+              },
+              {
+                name: "Empresa",
+                price: "$72.300",
+                highlight: false,
+                desc: "Para operaciones que escalan",
+                features: [
+                  { label: "Operaciones", value: "Empresa" },
+                  { label: "Usuarios", value: "7 a 10" },
+                  { label: "Depósitos", value: "+4" },
+                  { label: "Dashboard analítico de ingresos y egresos", value: true },
+                  { label: "Integraciones", value: true },
+                  { label: "Importaciones desde Excel", value: true },
+                  { label: "Alertas de stock", value: true },
+                  { label: "Funciones de IA", value: true },
+                  { label: "Soporte", value: true },
+                  { label: "Factura electrónica y remitos", value: true },
+                ],
+              },
+              {
+                name: "A medida",
+                price: "Consultar ventas",
+                highlight: false,
+                custom: true,
+                desc: "Software a medida, ecommerce, logística y más",
+                features: [
+                  { label: "Operaciones", value: "A medida" },
+                  { label: "Usuarios", value: "A medida" },
+                  { label: "Depósitos", value: "A medida" },
+                  { label: "Dashboard analítico personalizado", value: true },
+                  { label: "Integraciones específicas", value: true },
+                  { label: "Importaciones a medida", value: true },
+                  { label: "Alertas de stock", value: true },
+                  { label: "IA personalizada", value: true },
+                  { label: "Soporte dedicado", value: true },
+                  { label: "Factura electrónica y remitos", value: true },
+                ],
+              },
+            ].map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl border bg-card p-6 shadow-card transition-all hover:shadow-elevated ${
+                  plan.highlight ? "border-2 border-primary shadow-elevated" : "border-border"
+                }`}
               >
-                <Button className="w-full gradient-primary shadow-primary text-primary-foreground">
-                  Consultar ventas
-                </Button>
-              </a>
-            </div>
-
-            {/* Custom */}
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-card transition-all hover:shadow-elevated">
-              <div className="mb-4 pt-2">
-                <h3 className="text-xl font-semibold text-foreground">Custom</h3>
-                <p className="text-sm text-muted-foreground">A tu medida, para necesidades específicas</p>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">Consultar</span>
-              </div>
-              <div className="mb-6 space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Precio:</span> A medida
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">IA:</span> Personalizada
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="text-foreground font-medium">Integraciones:</span> Específicas
-                </div>
-              </div>
-              <div className="mb-6 space-y-2">
-                {[
-                  "Precio a medida",
-                  "IA personalizada",
-                  "Integraciones específicas",
-                  "Grandes volúmenes",
-                  "Soporte dedicado",
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-                    <span>{item}</span>
+                {plan.highlight && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
                   </div>
-                ))}
+                )}
+                <div className="mb-3 pt-2">
+                  <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
+                </div>
+                <div className="mb-4">
+                  <span className={`font-bold text-foreground ${plan.custom ? "text-2xl" : "text-3xl"}`}>{plan.price}</span>
+                  {!plan.custom && <span className="text-sm text-muted-foreground"> /mes</span>}
+                </div>
+                <div className="mb-6 space-y-2">
+                  {plan.features.map((f) => (
+                    <div key={f.label} className="flex items-start gap-2 text-sm">
+                      {typeof f.value === "boolean" ? (
+                        f.value ? (
+                          <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                        ) : (
+                          <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
+                        )
+                      ) : (
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                      )}
+                      <span className={typeof f.value === "boolean" && !f.value ? "text-muted-foreground/60" : "text-foreground"}>
+                        {f.label}
+                        {typeof f.value === "string" && <span className="text-muted-foreground">: {f.value}</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href={`https://wa.me/5493516516785?text=${encodeURIComponent(`Hola, quiero consultar por el plan ${plan.name} de OneStock`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
+                    variant={plan.highlight ? "default" : "outline"}
+                  >
+                    {plan.custom ? "Consultar ventas" : "Contratar"}
+                  </Button>
+                </a>
               </div>
-              <a href="mailto:hola@onestock.app?subject=Consulta%20plan%20Custom">
-                <Button variant="outline" className="w-full">Contactar ventas</Button>
-              </a>
-            </div>
+            ))}
           </div>
         </div>
       </section>
