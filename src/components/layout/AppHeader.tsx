@@ -20,10 +20,22 @@ export function AppHeader({ title }: AppHeaderProps) {
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
       <h1 className="text-base font-semibold text-foreground">{title}</h1>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          aria-label="Notificaciones"
+        >
           <Bell className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          aria-label="Configuración de negocio"
+          title="Configuración de negocio"
+          onClick={() => navigate("/app/settings")}
+        >
           <Settings className="h-4 w-4" />
         </Button>
         <div className="mx-2 h-5 w-px bg-border" />

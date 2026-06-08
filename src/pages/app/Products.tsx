@@ -45,7 +45,7 @@ const emptyForm: ProductFormState = {
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts, bulkDeleteProducts, bulkUpdateProducts } = useProducts();
-  const { warehouses } = useWarehouses();
+  const { warehouses, createWarehouse } = useWarehouses();
   const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -63,6 +63,9 @@ export default function Products() {
   const [bulkForm, setBulkForm] = useState<{ category: string; client: string; min_stock: string; price: string }>({
     category: "", client: "", min_stock: "", price: "",
   });
+  const [warehouseDialogOpen, setWarehouseDialogOpen] = useState(false);
+  const [newWarehouseName, setNewWarehouseName] = useState("");
+  const [savingWarehouse, setSavingWarehouse] = useState(false);
 
   const existingSkus = useMemo(
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
@@ -302,20 +305,31 @@ export default function Products() {
             )}
           </SelectContent>
         </Select>
-        <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
-          <SelectTrigger className="w-full sm:w-48">
-            <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
-            <SelectValue placeholder="Depósito" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los depósitos</SelectItem>
-            {warehouses.map((w) => (
-              <SelectItem key={w.id} value={w.id}>
-                {w.name}{w.is_default ? " (Principal)" : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
+            <SelectTrigger className="w-full sm:w-48">
+              <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+              <SelectValue placeholder="Depósito" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los depósitos</SelectItem>
+              {warehouses.map((w) => (
+                <SelectItem key={w.id} value={w.id}>
+                  {w.name}{w.is_default ? " (Principal)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            className="gap-2 whitespace-nowrap"
+            onClick={() => { setNewWarehouseName(""); setWarehouseDialogOpen(true); }}
+            title="Crear nuevo depósito"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Nuevo depósito</span>
+          </Button>
+        </div>
       </div>
 
       {/* Barra de acciones masivas */}
@@ -730,6 +744,49 @@ export default function Products() {
             <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancelar</Button>
             <Button onClick={handleBulkEdit} className="gradient-primary shadow-primary text-primary-foreground">
               Aplicar a {selectedIds.size}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={warehouseDialogOpen} onOpenChange={setWarehouseDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Nuevo depósito</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Nombre del depósito *</Label>
+              <Input
+                autoFocus
+                value={newWarehouseName}
+                onChange={(e) => setNewWarehouseName(e.target.value)}
+                placeholder="Ej: Sucursal Centro, Depósito Norte..."
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Podrás asignar productos y stock a este depósito una vez creado.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWarehouseDialogOpen(false)} disabled={savingWarehouse}>
+              Cancelar
+            </Button>
+            <Button
+              className="gradient-primary shadow-primary text-primary-foreground"
+              disabled={savingWarehouse || !newWarehouseName.trim()}
+              onClick={async () => {
+                setSavingWarehouse(true);
+                const { error } = await createWarehouse(newWarehouseName);
+                setSavingWarehouse(false);
+                if (!error) {
+                  setWarehouseDialogOpen(false);
+                  setNewWarehouseName("");
+                }
+              }}
+            >
+              {savingWarehouse && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Crear depósito
             </Button>
           </DialogFooter>
         </DialogContent>

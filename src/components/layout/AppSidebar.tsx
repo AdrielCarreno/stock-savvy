@@ -4,7 +4,7 @@ import {
   ArrowLeftRight, 
   AlertTriangle,
   Plug,
-  Landmark,
+  Settings,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -17,7 +17,7 @@ const navItems = [
   { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
   { title: "Bajo Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "ARCA", url: "/app/arca", icon: Landmark },
+  { title: "Configuración", url: "/app/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
