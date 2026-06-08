@@ -748,6 +748,49 @@ export default function Products() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={warehouseDialogOpen} onOpenChange={setWarehouseDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Nuevo depósito</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Nombre del depósito *</Label>
+              <Input
+                autoFocus
+                value={newWarehouseName}
+                onChange={(e) => setNewWarehouseName(e.target.value)}
+                placeholder="Ej: Sucursal Centro, Depósito Norte..."
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Podrás asignar productos y stock a este depósito una vez creado.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWarehouseDialogOpen(false)} disabled={savingWarehouse}>
+              Cancelar
+            </Button>
+            <Button
+              className="gradient-primary shadow-primary text-primary-foreground"
+              disabled={savingWarehouse || !newWarehouseName.trim()}
+              onClick={async () => {
+                setSavingWarehouse(true);
+                const { error } = await createWarehouse(newWarehouseName);
+                setSavingWarehouse(false);
+                if (!error) {
+                  setWarehouseDialogOpen(false);
+                  setNewWarehouseName("");
+                }
+              }}
+            >
+              {savingWarehouse && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Crear depósito
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
