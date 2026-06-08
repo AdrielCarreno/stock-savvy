@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X, WarehouseIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ const emptyForm: ProductFormState = {
 
 export default function Products() {
   const { products, loading, createProduct, updateProduct, deleteProduct, bulkCreateProducts, bulkDeleteProducts, bulkUpdateProducts } = useProducts();
-  const { warehouses } = useWarehouses();
+  const { warehouses, createWarehouse } = useWarehouses();
   const { stock: productStock, refresh: refreshStock } = useProductStock();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -63,6 +63,9 @@ export default function Products() {
   const [bulkForm, setBulkForm] = useState<{ category: string; client: string; min_stock: string; price: string }>({
     category: "", client: "", min_stock: "", price: "",
   });
+  const [warehouseDialogOpen, setWarehouseDialogOpen] = useState(false);
+  const [newWarehouseName, setNewWarehouseName] = useState("");
+  const [savingWarehouse, setSavingWarehouse] = useState(false);
 
   const existingSkus = useMemo(
     () => new Set(products.map((p) => p.sku).filter((s): s is string => !!s)),
@@ -302,20 +305,31 @@ export default function Products() {
             )}
           </SelectContent>
         </Select>
-        <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
-          <SelectTrigger className="w-full sm:w-48">
-            <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
-            <SelectValue placeholder="Depósito" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los depósitos</SelectItem>
-            {warehouses.map((w) => (
-              <SelectItem key={w.id} value={w.id}>
-                {w.name}{w.is_default ? " (Principal)" : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Select value={filterWarehouse} onValueChange={setFilterWarehouse}>
+            <SelectTrigger className="w-full sm:w-48">
+              <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />
+              <SelectValue placeholder="Depósito" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los depósitos</SelectItem>
+              {warehouses.map((w) => (
+                <SelectItem key={w.id} value={w.id}>
+                  {w.name}{w.is_default ? " (Principal)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            className="gap-2 whitespace-nowrap"
+            onClick={() => { setNewWarehouseName(""); setWarehouseDialogOpen(true); }}
+            title="Crear nuevo depósito"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Nuevo depósito</span>
+          </Button>
+        </div>
       </div>
 
       {/* Barra de acciones masivas */}
