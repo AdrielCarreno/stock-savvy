@@ -16,7 +16,7 @@ import Products from "./pages/app/Products";
 import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
-import Arca from "./pages/app/Arca";
+import BusinessSettings from "./pages/app/BusinessSettings";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +49,7 @@ const App = () => (
             <Route path="movements" element={<Movements />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="integrations" element={<Integrations />} />
-            <Route path="arca" element={<Arca />} />
+            <Route path="settings" element={<BusinessSettings />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

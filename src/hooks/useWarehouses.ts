@@ -39,5 +39,24 @@ export function useWarehouses() {
     if (companyId) fetchWarehouses();
   }, [companyId, fetchWarehouses]);
 
-  return { warehouses, loading, refresh: fetchWarehouses };
+  const createWarehouse = useCallback(
+    async (name: string) => {
+      if (!companyId) return { error: new Error("Sin empresa") };
+      const trimmed = name.trim();
+      if (!trimmed) return { error: new Error("Nombre requerido") };
+      const { error } = await supabase
+        .from("warehouses")
+        .insert({ company_id: companyId, name: trimmed, is_default: false });
+      if (error) {
+        toast.error("Error al crear depósito: " + error.message);
+        return { error };
+      }
+      toast.success(`Depósito "${trimmed}" creado`);
+      await fetchWarehouses();
+      return { error: null };
+    },
+    [companyId, fetchWarehouses]
+  );
+
+  return { warehouses, loading, refresh: fetchWarehouses, createWarehouse };
 }

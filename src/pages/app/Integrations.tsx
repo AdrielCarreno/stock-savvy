@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Plug, Check } from "lucide-react";
+import { Plug, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import logoMercadoLibre from "@/assets/logo-mercadolibre.png";
 import logoTiendaNube from "@/assets/logo-tiendanube.png";
 import logoShopify from "@/assets/logo-shopify.png";
+import logoArca from "@/assets/logo-arca.webp";
 
 interface EcommercePlatform {
   id: string;
@@ -12,6 +13,7 @@ interface EcommercePlatform {
   description: string;
   logo: string;
   bgColor: string;
+  comingSoon?: boolean;
 }
 
 const platforms: EcommercePlatform[] = [
@@ -36,6 +38,14 @@ const platforms: EcommercePlatform[] = [
     logo: logoShopify,
     bgColor: "bg-white dark:bg-white",
   },
+  {
+    id: "arca",
+    name: "ARCA",
+    description: "Facturación electrónica y cumplimiento fiscal con AFIP/ARCA directamente desde OneStock.",
+    logo: logoArca,
+    bgColor: "bg-white dark:bg-white",
+    comingSoon: true,
+  },
 ];
 
 export default function Integrations() {
@@ -56,9 +66,9 @@ export default function Integrations() {
             <Plug className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Integraciones de E-commerce</h2>
+            <h2 className="text-lg font-semibold text-foreground">Integraciones</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Conectá OneStock con tus plataformas de venta online para sincronizar productos, stock y pedidos automáticamente.
+              Conectá OneStock con tus plataformas de venta online y servicios fiscales para sincronizar productos, stock, pedidos y comprobantes automáticamente.
             </p>
           </div>
         </div>
@@ -84,6 +94,10 @@ export default function Integrations() {
                 {isConnected ? (
                   <Badge className="bg-success-light text-success border-success/20">
                     <Check className="mr-1 h-3 w-3" /> Conectado
+                  </Badge>
+                ) : platform.comingSoon ? (
+                  <Badge variant="secondary" className="text-xs gap-1">
+                    <Clock className="h-3 w-3" /> Próximamente
                   </Badge>
                 ) : (
                   <Badge variant="secondary" className="text-xs">No conectado</Badge>

@@ -1,7 +1,7 @@
 import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
-import { Plug, Landmark, LogOut } from "lucide-react";
+import { Plug, Settings, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +15,7 @@ const primaryItems = [
 
 const moreItems = [
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "ARCA", url: "/app/arca", icon: Landmark },
+  { title: "Configuración de negocio", url: "/app/settings", icon: Settings },
 ];
 
 export function MobileBottomNav() {
