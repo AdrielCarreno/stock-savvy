@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2, Download } from "lucide-react";
+import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2, Download, Edit2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -26,16 +26,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useProducts } from "@/hooks/useProducts";
-import { useStockMovements } from "@/hooks/useStockMovements";
+import { useStockMovements, type MovementWithProduct } from "@/hooks/useStockMovements";
 import { toast } from "sonner";
 
 type SaleType = "mayorista" | "minorista";
 
 export default function Movements() {
   const { products } = useProducts();
-  const { movements, loading, createMovement } = useStockMovements();
+  const { movements, loading, createMovement, updateMovement } = useStockMovements();
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<MovementWithProduct | null>(null);
   const [form, setForm] = useState<{
     productId: string;
     type: "entrada" | "salida";
@@ -56,11 +57,51 @@ export default function Movements() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
-  const filtered = movements.filter(
-    (m) =>
-      m.product_name.toLowerCase().includes(search.toLowerCase()) ||
-      (m.product_sku?.toLowerCase().includes(search.toLowerCase()) ?? false)
-  );
+  // Column filters
+  const [fType, setFType] = useState<"all" | "entrada" | "salida">("all");
+  const [fSale, setFSale] = useState<"all" | "mayorista" | "minorista" | "none">("all");
+  const [fLogistics, setFLogistics] = useState("");
+  const [fNote, setFNote] = useState("");
+  const [fSku, setFSku] = useState("");
+  const [fDateFrom, setFDateFrom] = useState("");
+  const [fDateTo, setFDateTo] = useState("");
+
+  const clearFilters = () => {
+    setSearch("");
+    setFType("all");
+    setFSale("all");
+    setFLogistics("");
+    setFNote("");
+    setFSku("");
+    setFDateFrom("");
+    setFDateTo("");
+  };
+
+  const filtered = movements.filter((m) => {
+    const searchLower = search.toLowerCase();
+    if (search && !m.product_name.toLowerCase().includes(searchLower) &&
+        !(m.product_sku?.toLowerCase().includes(searchLower) ?? false)) return false;
+    if (fSku && !(m.product_sku?.toLowerCase().includes(fSku.toLowerCase()) ?? false)) return false;
+    if (fType !== "all" && m.type !== fType) return false;
+    if (fSale === "none" && m.sale_type !== null) return false;
+    if (fSale !== "all" && fSale !== "none" && m.sale_type !== fSale) return false;
+    if (fLogistics && !(m.logistics?.toLowerCase().includes(fLogistics.toLowerCase()) ?? false)) return false;
+    if (fNote && !(m.reason?.toLowerCase().includes(fNote.toLowerCase()) ?? false)) return false;
+    if (fDateFrom) {
+      const d = new Date(m.movement_date);
+      if (d < new Date(fDateFrom)) return false;
+    }
+    if (fDateTo) {
+      const d = new Date(m.movement_date);
+      const end = new Date(fDateTo);
+      end.setHours(23, 59, 59, 999);
+      if (d > end) return false;
+    }
+    return true;
+  });
+
+  const hasActiveFilters =
+    search || fType !== "all" || fSale !== "all" || fLogistics || fNote || fSku || fDateFrom || fDateTo;
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -100,22 +141,62 @@ export default function Movements() {
       movementDate: new Date().toISOString().slice(0, 16),
     });
 
+  const openCreate = () => {
+    setEditing(null);
+    setErrors({});
+    resetForm();
+    setDialogOpen(true);
+  };
+
+  const openEdit = (m: MovementWithProduct) => {
+    setEditing(m);
+    setErrors({});
+    setForm({
+      productId: m.product_id,
+      type: m.type,
+      quantity: m.quantity,
+      note: m.reason ?? "",
+      saleType: (m.sale_type ?? "minorista") as SaleType,
+      logistics: m.logistics ?? "",
+      movementDate: new Date(m.movement_date).toISOString().slice(0, 16),
+    });
+    setDialogOpen(true);
+  };
+
   const handleSave = async () => {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setSaving(true);
-    const { error } = await createMovement({
-      product_id: form.productId,
-      type: form.type,
-      quantity: form.quantity,
-      reason: form.note || undefined,
-      sale_type: form.saleType,
-      logistics: form.logistics.trim() || null,
-      movement_date: new Date(form.movementDate).toISOString(),
-    });
+    let res;
+    if (editing) {
+      res = await updateMovement(
+        editing.id,
+        { product_id: editing.product_id, type: editing.type, quantity: editing.quantity },
+        {
+          product_id: form.productId,
+          type: form.type,
+          quantity: form.quantity,
+          reason: form.note || null,
+          sale_type: form.saleType,
+          logistics: form.logistics.trim() || null,
+          movement_date: new Date(form.movementDate).toISOString(),
+        }
+      );
+    } else {
+      res = await createMovement({
+        product_id: form.productId,
+        type: form.type,
+        quantity: form.quantity,
+        reason: form.note || undefined,
+        sale_type: form.saleType,
+        logistics: form.logistics.trim() || null,
+        movement_date: new Date(form.movementDate).toISOString(),
+      });
+    }
     setSaving(false);
-    if (!error) {
+    if (!res.error) {
       setDialogOpen(false);
+      setEditing(null);
       resetForm();
       setErrors({});
     }
@@ -139,11 +220,13 @@ export default function Movements() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold">Movimientos de Stock</h2>
-          <p className="text-sm text-muted-foreground">{movements.length} registros totales</p>
+          <p className="text-sm text-muted-foreground">
+            {filtered.length} de {movements.length} registros
+          </p>
         </div>
         <Button
           className="gap-2 gradient-primary shadow-primary text-primary-foreground"
-          onClick={() => { setErrors({}); resetForm(); setDialogOpen(true); }}
+          onClick={openCreate}
           disabled={products.length === 0}
         >
           <Plus className="h-4 w-4" />
@@ -168,9 +251,16 @@ export default function Movements() {
         ))}
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" className="gap-1 self-start" onClick={clearFilters}>
+            <X className="h-3.5 w-3.5" /> Limpiar filtros
+          </Button>
+        )}
       </div>
 
       {/* Vista tabla (desktop) */}
@@ -189,7 +279,85 @@ export default function Movements() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nota</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha mov.</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Registrado</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Factura/Remito</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Acciones</th>
+              </tr>
+              {/* Filtros por columna */}
+              <tr className="border-b border-border bg-muted/20">
+                <th className="px-2 py-2">
+                  <Input
+                    placeholder="Filtrar producto..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </th>
+                <th className="px-2 py-2">
+                  <Input
+                    placeholder="SKU..."
+                    value={fSku}
+                    onChange={(e) => setFSku(e.target.value)}
+                    className="h-8 text-xs font-mono"
+                  />
+                </th>
+                <th className="px-2 py-2">
+                  <Select value={fType} onValueChange={(v) => setFType(v as typeof fType)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="entrada">Entrada</SelectItem>
+                      <SelectItem value="salida">Salida</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </th>
+                <th className="px-2 py-2">
+                  <Select value={fSale} onValueChange={(v) => setFSale(v as typeof fSale)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="minorista">Minorista</SelectItem>
+                      <SelectItem value="mayorista">Mayorista</SelectItem>
+                      <SelectItem value="none">Sin definir</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </th>
+                <th className="px-2 py-2" />
+                <th className="px-2 py-2" />
+                <th className="px-2 py-2">
+                  <Input
+                    placeholder="Logística..."
+                    value={fLogistics}
+                    onChange={(e) => setFLogistics(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </th>
+                <th className="px-2 py-2">
+                  <Input
+                    placeholder="Nota..."
+                    value={fNote}
+                    onChange={(e) => setFNote(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </th>
+                <th className="px-2 py-2">
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      type="date"
+                      value={fDateFrom}
+                      onChange={(e) => setFDateFrom(e.target.value)}
+                      className="h-7 text-[11px]"
+                      title="Desde"
+                    />
+                    <Input
+                      type="date"
+                      value={fDateTo}
+                      onChange={(e) => setFDateTo(e.target.value)}
+                      className="h-7 text-[11px]"
+                      title="Hasta"
+                    />
+                  </div>
+                </th>
+                <th className="px-2 py-2" />
+                <th className="px-2 py-2" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -199,7 +367,7 @@ export default function Movements() {
                 </td></tr>
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={11} className="px-4 py-10 text-center text-muted-foreground">
-                  {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos"}
+                  {movements.length === 0 ? "Aún no hay movimientos. Registrá el primero con el botón de arriba." : "No hay movimientos con esos filtros"}
                 </td></tr>
               ) : (
                 filtered.map((m) => (
@@ -238,21 +406,32 @@ export default function Movements() {
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDateOnly(m.movement_date)}</td>
                     <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{formatDate(m.created_at)}</td>
                     <td className="px-4 py-3 text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7" title="Descargar documento">
-                            <Download className="h-3.5 w-3.5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>
-                            Factura
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>
-                            Remito
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          title="Editar movimiento"
+                          onClick={() => openEdit(m)}
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Descargar documento">
+                              <Download className="h-3.5 w-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>
+                              Factura
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>
+                              Remito
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -270,7 +449,7 @@ export default function Movements() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            {movements.length === 0 ? "Aún no hay movimientos. Tocá el botón + para registrar el primero." : "No hay movimientos"}
+            {movements.length === 0 ? "Aún no hay movimientos. Tocá el botón + para registrar el primero." : "No hay movimientos con esos filtros"}
           </div>
         ) : (
           filtered.map((m) => (
@@ -301,17 +480,22 @@ export default function Movements() {
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">
                 <span>{formatDateOnly(m.movement_date)}</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">
-                      <Download className="h-3 w-3" />Factura/Remito
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>Factura</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>Remito</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => openEdit(m)}>
+                    <Edit2 className="h-3 w-3" />Editar
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">
+                        <Download className="h-3 w-3" />Doc.
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleDownloadDocument("factura")}>Factura</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDownloadDocument("remito")}>Remito</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               {m.logistics && <p className="mt-1 text-xs text-muted-foreground"><span className="font-medium">Logística:</span> {m.logistics}</p>}
               {m.reason && <p className="mt-1 text-xs text-muted-foreground">{m.reason}</p>}
@@ -320,10 +504,10 @@ export default function Movements() {
         )}
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) setEditing(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Registrar movimiento</DialogTitle>
+            <DialogTitle>{editing ? "Editar movimiento" : "Registrar movimiento"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
@@ -415,10 +599,10 @@ export default function Movements() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>Cancelar</Button>
+            <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null); }} disabled={saving}>Cancelar</Button>
             <Button onClick={handleSave} disabled={saving} className="gradient-primary shadow-primary text-primary-foreground">
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Registrar
+              {editing ? "Guardar cambios" : "Registrar"}
             </Button>
           </DialogFooter>
         </DialogContent>
