@@ -1,21 +1,31 @@
-import { 
-  LayoutDashboard, 
-  Package, 
-  ArrowLeftRight, 
+import {
+  LayoutDashboard,
+  Package,
+  ArrowLeftRight,
   AlertTriangle,
   Plug,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Ship,
+  Building2,
+  Plane,
+  FileText,
+  BarChart3,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 
 const navItems = [
   { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
+  { title: "Importaciones", url: "/app/imports", icon: Ship },
+  { title: "Proveedores", url: "/app/suppliers", icon: Building2 },
+  { title: "Embarques", url: "/app/shipments", icon: Plane },
+  { title: "Aduana", url: "/app/customs", icon: FileText },
   { title: "Productos", url: "/app/products", icon: Package },
+  { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Bajo Stock", url: "/app/low-stock", icon: AlertTriangle },
+  { title: "Reportes", url: "/app/reports", icon: BarChart3 },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración", url: "/app/settings", icon: Settings },
 ];
