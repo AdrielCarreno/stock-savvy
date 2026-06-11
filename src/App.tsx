@@ -17,6 +17,11 @@ import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
 import BusinessSettings from "./pages/app/BusinessSettings";
+import Suppliers from "./pages/app/Suppliers";
+import Imports from "./pages/app/Imports";
+import Shipments from "./pages/app/Shipments";
+import Customs from "./pages/app/Customs";
+import Reports from "./pages/app/Reports";
 
 const queryClient = new QueryClient();
 
@@ -45,9 +50,14 @@ const App = () => (
           >
             <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="imports" element={<Imports />} />
+            <Route path="suppliers" element={<Suppliers />} />
+            <Route path="shipments" element={<Shipments />} />
+            <Route path="customs" element={<Customs />} />
             <Route path="products" element={<Products />} />
-            <Route path="movements" element={<Movements />} />
             <Route path="low-stock" element={<LowStock />} />
+            <Route path="movements" element={<Movements />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<BusinessSettings />} />
           </Route>
