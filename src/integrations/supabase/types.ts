@@ -44,6 +44,48 @@ export type Database = {
         }
         Relationships: []
       }
+      customs_checklist: {
+        Row: {
+          checked: boolean
+          company_id: string
+          created_at: string
+          customs_id: string
+          id: string
+          item: string
+        }
+        Insert: {
+          checked?: boolean
+          company_id: string
+          created_at?: string
+          customs_id: string
+          id?: string
+          item: string
+        }
+        Update: {
+          checked?: boolean
+          company_id?: string
+          created_at?: string
+          customs_id?: string
+          id?: string
+          item?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customs_checklist_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customs_checklist_customs_id_fkey"
+            columns: ["customs_id"]
+            isOneToOne: false
+            referencedRelation: "customs_declarations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customs_declarations: {
         Row: {
           broker: string | null
@@ -123,6 +165,7 @@ export type Database = {
           insurance_usd: number | null
           notes: string | null
           origin_country: string | null
+          stage: string
           status: string
           supplier_id: string | null
           updated_at: string
@@ -139,6 +182,7 @@ export type Database = {
           insurance_usd?: number | null
           notes?: string | null
           origin_country?: string | null
+          stage?: string
           status?: string
           supplier_id?: string | null
           updated_at?: string
@@ -155,6 +199,7 @@ export type Database = {
           insurance_usd?: number | null
           notes?: string | null
           origin_country?: string | null
+          stage?: string
           status?: string
           supplier_id?: string | null
           updated_at?: string
@@ -172,6 +217,56 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          doc_type: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          notes: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          doc_type: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          notes?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          doc_type?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          notes?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -429,6 +524,7 @@ export type Database = {
           name: string
           notes: string | null
           payment_terms: string | null
+          rating: number | null
           updated_at: string
           website: string | null
         }
@@ -443,6 +539,7 @@ export type Database = {
           name: string
           notes?: string | null
           payment_terms?: string | null
+          rating?: number | null
           updated_at?: string
           website?: string | null
         }
@@ -457,6 +554,7 @@ export type Database = {
           name?: string
           notes?: string | null
           payment_terms?: string | null
+          rating?: number | null
           updated_at?: string
           website?: string | null
         }
