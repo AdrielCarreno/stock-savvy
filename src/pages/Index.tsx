@@ -154,10 +154,18 @@ export default function Index() {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <ThemeToggle />
             <Link to="/login"><Button variant="ghost" size="sm">Iniciar sesión</Button></Link>
             <Link to="/register">
               <Button size="sm" className="gradient-primary shadow-primary text-primary-foreground">Comenzar gratis</Button>
             </Link>
+          </div>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
 
           <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
