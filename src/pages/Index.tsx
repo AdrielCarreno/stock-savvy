@@ -24,6 +24,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LiveSocialProof } from "@/components/landing/LiveSocialProof";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const stages = [
   { icon: Users, title: "Proveedores", desc: "Buscá y evaluá proveedores internacionales" },
