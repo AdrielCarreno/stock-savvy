@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Building2, Pencil, FileText, History } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Plus, Trash2, Building2, Pencil, FileText, History, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { DocumentsManager } from "@/components/operations/DocumentsManager";
 import { StarRating } from "@/components/operations/StarRating";
@@ -124,6 +125,31 @@ export default function Suppliers() {
                     <TableCell>{s.payment_terms || "-"}</TableCell>
                     <TableCell className="text-right" onClick={e => e.stopPropagation()}>
                       <Button variant="ghost" size="icon" onClick={() => openEdit(s)}><Pencil className="h-4 w-4" /></Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" title="Contactar"><Phone className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {s.contact_phone && (
+                            <DropdownMenuItem onClick={() => window.open(`https://wa.me/${s.contact_phone.replace(/\D/g, '')}`, '_blank')}>
+                              WhatsApp
+                            </DropdownMenuItem>
+                          )}
+                          {s.contact_email && (
+                            <DropdownMenuItem onClick={() => window.open(`mailto:${s.contact_email}`, '_blank')}>
+                              Email
+                            </DropdownMenuItem>
+                          )}
+                          {s.website && (
+                            <DropdownMenuItem onClick={() => window.open(s.website, '_blank')}>
+                              Sitio web / Alibaba
+                            </DropdownMenuItem>
+                          )}
+                          {!s.contact_phone && !s.contact_email && !s.website && (
+                            <DropdownMenuItem disabled>Sin datos de contacto</DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       <Button variant="ghost" size="icon" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </TableCell>
                   </TableRow>
