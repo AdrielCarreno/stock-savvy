@@ -63,11 +63,12 @@ export function LiveSocialProof() {
 
   if (dismissed || !current) return null;
 
-  const isSubscription = current.kind === "subscription";
-  const Icon = isSubscription ? CheckCircle2 : CalendarCheck;
-  const iconWrapperClass = isSubscription
+  const isImportador = current.plan === "importador";
+  const Icon = CheckCircle2;
+  const iconWrapperClass = isImportador
     ? "bg-primary/15 text-primary"
     : "bg-accent/15 text-accent";
+  const planLabel = isImportador ? "plan Importador" : "plan Stock";
 
   return (
     <div
@@ -87,12 +88,8 @@ export function LiveSocialProof() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-foreground leading-snug">
-            <span className="font-semibold">{current.company}</span>, de {current.city},{" "}
-            {isSubscription ? (
-              <>se suscribió al <span className="font-semibold">plan Inicial</span></>
-            ) : (
-              <>agendó una <span className="font-semibold">consulta personalizada</span></>
-            )}
+            <span className="font-semibold">{current.company}</span>, de {current.city}, se suscribió al{" "}
+            <span className="font-semibold">{planLabel}</span>
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             hace {current.minutesAgo} min · verificado
