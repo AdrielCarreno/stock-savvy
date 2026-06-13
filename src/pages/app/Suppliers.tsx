@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Building2, Pencil, FileText, History } from "lucide-react";
+import { Plus, Trash2, Building2, Pencil, FileText, History, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { DocumentsManager } from "@/components/operations/DocumentsManager";
 import { StarRating } from "@/components/operations/StarRating";
