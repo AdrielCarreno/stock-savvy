@@ -63,7 +63,7 @@ export default function Movements() {
       (m.product_sku?.toLowerCase().includes(searchLower) ?? false);
   });
 
-    search || fType !== "all" || fSale !== "all" || fLogistics || fNote || fSku || fDateFrom || fDateTo;
+    
 
   const stats = useMemo(() => {
     const now = new Date();
