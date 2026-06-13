@@ -399,7 +399,7 @@ export default function Index() {
             <p className="text-muted-foreground">Precios en pesos argentinos. 14 días gratis sin tarjeta de crédito.</p>
           </div>
 
-          <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
             {plans.map((plan) => (
               <div
                 key={plan.name}
