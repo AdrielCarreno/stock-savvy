@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2, Download, Edit2, X } from "lucide-react";
+import { Plus, Search, ArrowDownCircle, ArrowUpCircle, Loader2, Download, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -58,49 +58,15 @@ export default function Movements() {
   const [saving, setSaving] = useState(false);
 
   // Column filters
-  const [fType, setFType] = useState<"all" | "entrada" | "salida">("all");
-  const [fSale, setFSale] = useState<"all" | "mayorista" | "minorista" | "none">("all");
-  const [fLogistics, setFLogistics] = useState("");
-  const [fNote, setFNote] = useState("");
-  const [fSku, setFSku] = useState("");
-  const [fDateFrom, setFDateFrom] = useState("");
-  const [fDateTo, setFDateTo] = useState("");
 
-  const clearFilters = () => {
-    setSearch("");
-    setFType("all");
-    setFSale("all");
-    setFLogistics("");
-    setFNote("");
-    setFSku("");
-    setFDateFrom("");
-    setFDateTo("");
-  };
 
   const filtered = movements.filter((m) => {
+    if (!search) return true;
     const searchLower = search.toLowerCase();
-    if (search && !m.product_name.toLowerCase().includes(searchLower) &&
-        !(m.product_sku?.toLowerCase().includes(searchLower) ?? false)) return false;
-    if (fSku && !(m.product_sku?.toLowerCase().includes(fSku.toLowerCase()) ?? false)) return false;
-    if (fType !== "all" && m.type !== fType) return false;
-    if (fSale === "none" && m.sale_type !== null) return false;
-    if (fSale !== "all" && fSale !== "none" && m.sale_type !== fSale) return false;
-    if (fLogistics && !(m.logistics?.toLowerCase().includes(fLogistics.toLowerCase()) ?? false)) return false;
-    if (fNote && !(m.reason?.toLowerCase().includes(fNote.toLowerCase()) ?? false)) return false;
-    if (fDateFrom) {
-      const d = new Date(m.movement_date);
-      if (d < new Date(fDateFrom)) return false;
-    }
-    if (fDateTo) {
-      const d = new Date(m.movement_date);
-      const end = new Date(fDateTo);
-      end.setHours(23, 59, 59, 999);
-      if (d > end) return false;
-    }
-    return true;
+    return m.product_name.toLowerCase().includes(searchLower) ||
+      (m.product_sku?.toLowerCase().includes(searchLower) ?? false);
   });
 
-  const hasActiveFilters =
     search || fType !== "all" || fSale !== "all" || fLogistics || fNote || fSku || fDateFrom || fDateTo;
 
   const stats = useMemo(() => {
@@ -256,11 +222,6 @@ export default function Movements() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" className="gap-1 self-start" onClick={clearFilters}>
-            <X className="h-3.5 w-3.5" /> Limpiar filtros
-          </Button>
-        )}
       </div>
 
       {/* Vista tabla (desktop) */}
@@ -280,84 +241,6 @@ export default function Movements() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha mov.</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Registrado</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Acciones</th>
-              </tr>
-              {/* Filtros por columna */}
-              <tr className="border-b border-border bg-muted/20">
-                <th className="px-2 py-2">
-                  <Input
-                    placeholder="Filtrar producto..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                </th>
-                <th className="px-2 py-2">
-                  <Input
-                    placeholder="SKU..."
-                    value={fSku}
-                    onChange={(e) => setFSku(e.target.value)}
-                    className="h-8 text-xs font-mono"
-                  />
-                </th>
-                <th className="px-2 py-2">
-                  <Select value={fType} onValueChange={(v) => setFType(v as typeof fType)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="entrada">Entrada</SelectItem>
-                      <SelectItem value="salida">Salida</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </th>
-                <th className="px-2 py-2">
-                  <Select value={fSale} onValueChange={(v) => setFSale(v as typeof fSale)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="minorista">Minorista</SelectItem>
-                      <SelectItem value="mayorista">Mayorista</SelectItem>
-                      <SelectItem value="none">Sin definir</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </th>
-                <th className="px-2 py-2" />
-                <th className="px-2 py-2" />
-                <th className="px-2 py-2">
-                  <Input
-                    placeholder="Logística..."
-                    value={fLogistics}
-                    onChange={(e) => setFLogistics(e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                </th>
-                <th className="px-2 py-2">
-                  <Input
-                    placeholder="Nota..."
-                    value={fNote}
-                    onChange={(e) => setFNote(e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                </th>
-                <th className="px-2 py-2">
-                  <div className="flex flex-col gap-1">
-                    <Input
-                      type="date"
-                      value={fDateFrom}
-                      onChange={(e) => setFDateFrom(e.target.value)}
-                      className="h-7 text-[11px]"
-                      title="Desde"
-                    />
-                    <Input
-                      type="date"
-                      value={fDateTo}
-                      onChange={(e) => setFDateTo(e.target.value)}
-                      className="h-7 text-[11px]"
-                      title="Hasta"
-                    />
-                  </div>
-                </th>
-                <th className="px-2 py-2" />
-                <th className="px-2 py-2" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
