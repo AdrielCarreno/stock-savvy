@@ -447,7 +447,7 @@ export default function Index() {
                     className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
                     variant={plan.highlight ? "default" : "outline"}
                   >
-                    {plan.custom ? "Consultar ventas" : "Contratar"}
+                    Contratar
                   </Button>
                 </a>
               </div>
