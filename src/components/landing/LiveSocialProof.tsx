@@ -1,50 +1,31 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, CalendarCheck, X } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type EventKind = "subscription" | "consultation";
+type PlanKind = "stock" | "importador";
 
 type ProofEvent = {
   id: string;
-  kind: EventKind;
+  plan: PlanKind;
   company: string;
   city: string;
   minutesAgo: number;
 };
 
-// Set fijo de 7 clientes reales/representativos que arrancaron a usar OneStock.
-// 4 de Córdoba (entre los inventados) + Compuaccess y Drinkmarket (también de Córdoba)
-// + 1 de Mendoza.
-const CLIENTS: { company: string; city: string }[] = [
-  { company: "Compuaccess", city: "Córdoba" },
-  { company: "Distribuidora de bebidas Drinkmarket", city: "Córdoba" },
-  { company: "Ferretería Industrial Belgrano", city: "Córdoba" },
-  { company: "Distribuidora Mayorista La Cañada", city: "Córdoba" },
-  { company: "Pinturería Nueva Córdoba", city: "Córdoba" },
-  { company: "Almacén Sierras Chicas", city: "Córdoba" },
-  { company: "Bodega y Distribuidora Los Andes", city: "Mendoza" },
-];
-
-// 5 suscripciones / 2 consultas, asignadas de forma estable.
-const KINDS: EventKind[] = [
-  "subscription",
-  "subscription",
-  "consultation",
-  "subscription",
-  "subscription",
-  "subscription",
-  "consultation",
+// 3 suscripciones al plan Stock (distribuidoras / pinturería) + 2 al plan Importador
+// (Compuaccess + empresa de tecnología inventada).
+const EVENTS: Omit<ProofEvent, "id">[] = [
+  { plan: "stock", company: "Distribuidora Mayorista La Cañada", city: "Córdoba", minutesAgo: 4 },
+  { plan: "importador", company: "Compuaccess", city: "Córdoba", minutesAgo: 9 },
+  { plan: "stock", company: "Pinturería Nueva Córdoba", city: "Córdoba", minutesAgo: 14 },
+  { plan: "importador", company: "NorTech Solutions", city: "Buenos Aires", minutesAgo: 21 },
+  { plan: "stock", company: "Distribuidora de bebidas Drinkmarket", city: "Córdoba", minutesAgo: 28 },
 ];
 
 function buildEvents(): ProofEvent[] {
-  return CLIENTS.map((c, i) => ({
-    id: `${i}-${c.company}`,
-    kind: KINDS[i],
-    company: c.company,
-    city: c.city,
-    minutesAgo: 3 + i * 4, // 3, 7, 11, 15, 19, 23, 27
-  }));
+  return EVENTS.map((e, i) => ({ ...e, id: `${i}-${e.company}` }));
 }
+
 
 const POLL_INTERVAL_MS = 35_000;
 const VISIBLE_DURATION_MS = 6_500;
