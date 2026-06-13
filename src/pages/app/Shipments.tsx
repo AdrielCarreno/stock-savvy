@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,7 +47,7 @@ export default function Shipments() {
 
   const load = async () => {
     const { data, error } = await supabase.from("shipments" as any).select("*").order("created_at", { ascending: false });
-    if (error) toast.error(error.message); else setRows((data as any) || []);
+    if (error) toast.error(friendlyError(error)); else setRows((data as any) || []);
   };
   useEffect(() => { load(); }, []);
 
@@ -71,7 +72,7 @@ export default function Shipments() {
       ? supabase.from("shipments" as any).update(payload).eq("id", editing.id)
       : supabase.from("shipments" as any).insert(payload);
     const { error } = await q;
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     toast.success(editing ? "Actualizado" : "Embarque registrado");
     setOpen(false); load();
   };

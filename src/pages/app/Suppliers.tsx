@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,7 +40,7 @@ export default function Suppliers() {
 
   const load = async () => {
     const { data, error } = await supabase.from("suppliers" as any).select("*").order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(friendlyError(error));
     else setSuppliers((data as any) || []);
   };
   useEffect(() => { load(); }, []);
@@ -69,7 +70,7 @@ export default function Suppliers() {
       ? supabase.from("suppliers" as any).update(payload).eq("id", editing.id)
       : supabase.from("suppliers" as any).insert(payload);
     const { error } = await q;
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     toast.success(editing ? "Actualizado" : "Proveedor creado");
     setOpen(false); load();
   };

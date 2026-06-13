@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,7 +45,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
       .eq("entity_type", entityType)
       .eq("entity_id", entityId)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(friendlyError(error));
     else setDocs((data as any) || []);
   };
 
@@ -56,7 +57,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
     setUploading(true);
     const path = `${companyId}/${entityType}/${entityId}/${Date.now()}-${file.name}`;
     const { error: upErr } = await supabase.storage.from("operation-docs").upload(path, file);
-    if (upErr) { toast.error(upErr.message); setUploading(false); return; }
+    if (upErr) { toast.error(friendlyError(upErr)); setUploading(false); return; }
     const { error: insErr } = await supabase.from("operation_documents" as any).insert({
       company_id: companyId,
       entity_type: entityType,
@@ -67,7 +68,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
       file_size: file.size,
       uploaded_by: user!.id,
     } as any);
-    if (insErr) toast.error(insErr.message);
+    if (insErr) toast.error(friendlyError(insErr));
     else toast.success("Documento subido");
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
@@ -76,7 +77,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
 
   const download = async (d: DocRow) => {
     const { data, error } = await supabase.storage.from("operation-docs").createSignedUrl(d.file_path, 60);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     window.open(data.signedUrl, "_blank");
   };
 
