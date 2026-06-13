@@ -1,33 +1,38 @@
 import { useEffect, useState } from "react";
-import { Moon, Sun, Flame } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type Theme = "light" | "dark" | "warm";
+type Theme = "light" | "dark";
 const KEY = "onestock-theme";
 
 function apply(theme: Theme) {
   const root = document.documentElement;
   root.classList.remove("dark", "warm");
   if (theme === "dark") root.classList.add("dark");
-  else if (theme === "warm") root.classList.add("warm");
 }
 
 export function initTheme() {
-  const t = (localStorage.getItem(KEY) as Theme) || "light";
+  let t = (localStorage.getItem(KEY) as Theme | "warm") || "light";
+  if (t === "warm") t = "light";
   apply(t);
+  if (t !== localStorage.getItem(KEY)) localStorage.setItem(KEY, t);
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(KEY) as Theme) || "light");
+  const [theme, setTheme] = useState<Theme>(() => {
+    let t = (localStorage.getItem(KEY) as Theme | "warm") || "light";
+    if (t === "warm") t = "light";
+    return t;
+  });
 
   useEffect(() => {
     apply(theme);
     localStorage.setItem(KEY, theme);
   }, [theme]);
 
-  const next: Record<Theme, Theme> = { light: "dark", dark: "warm", warm: "light" };
-  const Icon = theme === "dark" ? Moon : theme === "warm" ? Flame : Sun;
-  const label = theme === "dark" ? "Oscuro" : theme === "warm" ? "Cálido" : "Claro";
+  const next: Record<Theme, Theme> = { light: "dark", dark: "light" };
+  const Icon = theme === "dark" ? Moon : Sun;
+  const label = theme === "dark" ? "Oscuro" : "Claro";
 
   return (
     <Button
