@@ -168,10 +168,9 @@ export default function Index() {
             </button>
           </div>
 
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="hidden" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-        </div>
 
         {menuOpen && (
           <div className="border-t border-border bg-card px-4 py-4 md:hidden">
