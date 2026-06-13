@@ -2,6 +2,7 @@ import { Bell, LogOut, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface AppHeaderProps {
   title: string;
@@ -20,6 +21,7 @@ export function AppHeader({ title }: AppHeaderProps) {
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
       <h1 className="text-base font-semibold text-foreground">{title}</h1>
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <Button
           variant="ghost"
           size="icon"
