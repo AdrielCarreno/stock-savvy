@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,7 +45,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
       .eq("entity_type", entityType)
       .eq("entity_id", entityId)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(friendlyError(error));
     else setDocs((data as any) || []);
   };
 
@@ -53,10 +54,40 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !companyId) return;
+
+    const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+    const ALLOWED_MIME = new Set([
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "image/jpeg", "image/png", "image/webp", "image/gif",
+      "text/csv", "text/plain",
+    ]);
+    const ALLOWED_EXT = /\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|webp|gif|csv|txt)$/i;
+
+    if (file.size > MAX_BYTES) {
+      toast.error("El archivo supera el máximo de 10 MB.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+    if (!ALLOWED_EXT.test(file.name) || (file.type && !ALLOWED_MIME.has(file.type))) {
+      toast.error("Tipo de archivo no permitido. Subí PDF, Office, imágenes o CSV/TXT.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
-    const path = `${companyId}/${entityType}/${entityId}/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabase.storage.from("operation-docs").upload(path, file);
-    if (upErr) { toast.error(upErr.message); setUploading(false); return; }
+    const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = `${companyId}/${entityType}/${entityId}/${Date.now()}-${safeName}`;
+    const { error: upErr } = await supabase.storage.from("operation-docs").upload(path, file, {
+      contentType: file.type || "application/octet-stream",
+      upsert: false,
+    });
+    if (upErr) { toast.error(friendlyError(upErr)); setUploading(false); return; }
     const { error: insErr } = await supabase.from("operation_documents" as any).insert({
       company_id: companyId,
       entity_type: entityType,
@@ -67,7 +98,7 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
       file_size: file.size,
       uploaded_by: user!.id,
     } as any);
-    if (insErr) toast.error(insErr.message);
+    if (insErr) toast.error(friendlyError(insErr));
     else toast.success("Documento subido");
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
@@ -75,8 +106,10 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
   };
 
   const download = async (d: DocRow) => {
-    const { data, error } = await supabase.storage.from("operation-docs").createSignedUrl(d.file_path, 60);
-    if (error) return toast.error(error.message);
+    const { data, error } = await supabase.storage
+      .from("operation-docs")
+      .createSignedUrl(d.file_path, 60, { download: d.file_name });
+    if (error) return toast.error(friendlyError(error));
     window.open(data.signedUrl, "_blank");
   };
 

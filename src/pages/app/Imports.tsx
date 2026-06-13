@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -87,14 +88,14 @@ export default function Imports() {
       ? supabase.from("imports" as any).update(payload).eq("id", editing.id)
       : supabase.from("imports" as any).insert(payload);
     const { error } = await q;
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     toast.success(editing ? "Actualizado" : "Importación creada");
     setOpen(false); load();
   };
 
   const remove = async (id: string) => {
     const { error } = await supabase.from("imports" as any).delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     load();
   };
 

@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,7 +53,7 @@ export default function Customs() {
 
   const load = async () => {
     const { data, error } = await supabase.from("customs_declarations" as any).select("*").order("created_at", { ascending: false });
-    if (error) toast.error(error.message); else setRows((data as any) || []);
+    if (error) toast.error(friendlyError(error)); else setRows((data as any) || []);
   };
   useEffect(() => { load(); }, []);
 
@@ -105,7 +106,7 @@ export default function Customs() {
       ? supabase.from("customs_declarations" as any).update(payload).eq("id", editing.id)
       : supabase.from("customs_declarations" as any).insert(payload);
     const { error } = await q;
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyError(error));
     toast.success(editing ? "Actualizado" : "Declaración registrada");
     setOpen(false); load();
   };
