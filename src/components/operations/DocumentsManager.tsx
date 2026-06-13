@@ -106,7 +106,9 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
   };
 
   const download = async (d: DocRow) => {
-    const { data, error } = await supabase.storage.from("operation-docs").createSignedUrl(d.file_path, 60);
+    const { data, error } = await supabase.storage
+      .from("operation-docs")
+      .createSignedUrl(d.file_path, 60, { download: d.file_name });
     if (error) return toast.error(friendlyError(error));
     window.open(data.signedUrl, "_blank");
   };
