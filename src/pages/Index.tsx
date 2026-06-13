@@ -416,25 +416,24 @@ export default function Index() {
                   <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
                 </div>
-                <div className="mb-4">
-                  <span className={`font-bold text-foreground ${plan.custom ? "text-2xl" : "text-3xl"}`}>{plan.price}</span>
-                  {!plan.custom && <span className="text-sm text-muted-foreground"> /mes</span>}
+                <div className="mb-2">
+                  <span className="text-3xl font-bold text-foreground">{plan.price}</span>
+                  <span className="text-sm text-muted-foreground">/mes</span>
                 </div>
+                <p className="mb-5 text-xs text-accent">🏷 {plan.annual}</p>
+                {"headerNote" in plan && plan.headerNote && (
+                  <p className="mb-3 text-xs font-semibold tracking-wide text-muted-foreground">{plan.headerNote}</p>
+                )}
                 <div className="mb-6 space-y-2">
                   {plan.features.map((f) => (
                     <div key={f.label} className="flex items-start gap-2 text-sm">
-                      {typeof f.value === "boolean" ? (
-                        f.value ? (
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-                        ) : (
-                          <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
-                        )
-                      ) : (
+                      {f.value ? (
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                      ) : (
+                        <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
                       )}
-                      <span className={typeof f.value === "boolean" && !f.value ? "text-muted-foreground/60" : "text-foreground"}>
+                      <span className={!f.value ? "text-muted-foreground/60" : "text-foreground"}>
                         {f.label}
-                        {typeof f.value === "string" && <span className="text-muted-foreground">: {f.value}</span>}
                       </span>
                     </div>
                   ))}
