@@ -56,10 +56,6 @@ export default function Movements() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-
-  // Column filters
-
-
   const filtered = movements.filter((m) => {
     if (!search) return true;
     const searchLower = search.toLowerCase();
