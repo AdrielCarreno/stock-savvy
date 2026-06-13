@@ -54,9 +54,39 @@ export function DocumentsManager({ entityType, entityId }: { entityType: EntityT
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !companyId) return;
+
+    const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+    const ALLOWED_MIME = new Set([
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "image/jpeg", "image/png", "image/webp", "image/gif",
+      "text/csv", "text/plain",
+    ]);
+    const ALLOWED_EXT = /\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|webp|gif|csv|txt)$/i;
+
+    if (file.size > MAX_BYTES) {
+      toast.error("El archivo supera el máximo de 10 MB.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+    if (!ALLOWED_EXT.test(file.name) || (file.type && !ALLOWED_MIME.has(file.type))) {
+      toast.error("Tipo de archivo no permitido. Subí PDF, Office, imágenes o CSV/TXT.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
-    const path = `${companyId}/${entityType}/${entityId}/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabase.storage.from("operation-docs").upload(path, file);
+    const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = `${companyId}/${entityType}/${entityId}/${Date.now()}-${safeName}`;
+    const { error: upErr } = await supabase.storage.from("operation-docs").upload(path, file, {
+      contentType: file.type || "application/octet-stream",
+      upsert: false,
+    });
     if (upErr) { toast.error(friendlyError(upErr)); setUploading(false); return; }
     const { error: insErr } = await supabase.from("operation_documents" as any).insert({
       company_id: companyId,
