@@ -24,6 +24,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LiveSocialProof } from "@/components/landing/LiveSocialProof";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const stages = [
   { icon: Users, title: "Proveedores", desc: "Buscá y evaluá proveedores internacionales" },
@@ -46,88 +47,76 @@ const featuresDark = [
 const integrations = ["Mercado Libre", "Tienda Nube", "Shopify", "WhatsApp Business", "ARCA (AFIP)", "+ Más integraciones"];
 
 const faqs = [
-  { q: "¿Necesito instalar algo?", a: "No. OneStock es 100% web y funciona desde cualquier computadora con internet. Ofrecemos capacitación y migración de datos sin costo adicional." },
-  { q: "¿Sirve si importo desde China o Estados Unidos?", a: "Sí. OneStock está pensado para importadores argentinos que traen mercadería desde China, EE.UU. y cualquier otro origen, con seguimiento aduanero y costeo automático." },
-  { q: "¿Cuántos usuarios puedo tener?", a: "Depende del plan. Desde 1 usuario en el plan Básico hasta equipos completos en Empresa y A medida." },
-  { q: "¿Qué pasa cuando termina el período de prueba?", a: "Tu cuenta queda suspendida hasta activar el plan. Tus datos no se pierden." },
-  { q: "¿Mis datos están seguros?", a: "Sí. Cada empresa tiene sus datos completamente aislados. Usamos cifrado y backups automáticos." },
+  {
+    q: "¿OneStock funciona para mi tipo de operación de importación?",
+    a: "Sí. OneStock está diseñado para importadores que trabajan con proveedores internacionales, independientemente del régimen de importación, el canal de venta o el volumen de operaciones. Ya sea que importes desde China, Estados Unidos o Europa, vendas por Mercado Libre, Tienda Nube o canal propio, o manejes uno o varios depósitos — el sistema se adapta a tu flujo. Durante los 14 días de prueba gratuita podés configurarlo con tu operación real y validarlo sin ningún riesgo.",
+  },
+  {
+    q: "¿Necesito instalar algo para usar OneStock?",
+    a: "No. OneStock es 100% en la nube. Solo necesitás un navegador y acceso a internet. No hay nada que descargar, instalar ni configurar en tu computadora o servidor. Podés acceder desde cualquier dispositivo, en cualquier momento.",
+  },
+  {
+    q: "¿Qué módulos incluye el sistema y cuándo los necesito?",
+    a: "OneStock está organizado en módulos que cubren todo el ciclo de importación: Proveedores, Compras, Embarques, Aduana, Depósito, Stock e Inventario, Ventas y Distribución, y Reportes y Finanzas. No todos los importadores necesitan todos los módulos desde el día uno — por eso tenemos planes diferenciados. Podés empezar con lo esencial y escalar cuando tu operación lo requiera.",
+  },
+  {
+    q: "¿Mis datos están seguros?",
+    a: "Sí. Toda la información que cargás en OneStock está almacenada en servidores con cifrado, backups automáticos y acceso protegido por credenciales individuales. Vos controlás quién ve qué dentro de tu equipo mediante permisos por usuario. Nunca compartimos ni vendemos tus datos a terceros.",
+  },
+  {
+    q: "¿Puedo usar OneStock si también vendo por Mercado Libre o Tienda Nube?",
+    a: "Sí, de hecho es una de las ventajas principales. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para que tus ventas, stock y pedidos estén sincronizados en un solo lugar. También se conecta con ARCA (ex-AFIP) para simplificar la parte impositiva.",
+  },
+  {
+    q: "¿Qué pasa cuando termina el período de prueba?",
+    a: "Al finalizar los 14 días podés elegir el plan que mejor se adapte a tu operación y continuar sin perder ningún dato. Si decidís no continuar, no se te cobra nada — no pedimos tarjeta de crédito para empezar.",
+  },
+  {
+    q: "¿Puedo importar mis datos desde Excel?",
+    a: "Sí. OneStock permite importar proveedores, productos, movimientos de stock y operaciones desde archivos Excel para que no empieces de cero. Disponible en cualquier plan.",
+  },
 ];
 
 const plans = [
   {
-    name: "Básico",
-    price: "$27.800",
+    name: "Stock",
+    price: "$24.900",
+    annual: "$19.900/mes pagando anual",
     highlight: false,
-    desc: "Ideal para arrancar a controlar tu operación",
+    desc: "Para mayoristas y distribuidores",
     features: [
-      { label: "Operaciones", value: "Básico" },
-      { label: "Usuarios", value: "1 a 2" },
-      { label: "Depósitos", value: "1" },
-      { label: "Dashboard analítico de ingresos y egresos", value: true },
-      { label: "Integraciones", value: false },
-      { label: "Importaciones desde Excel", value: true },
+      { label: "Modelo de stock e inventario", value: true },
       { label: "Alertas de stock", value: true },
-      { label: "Funciones de IA", value: false },
-      { label: "Soporte", value: true },
-      { label: "Factura electrónica y remitos", value: true },
+      { label: "Movimientos de inventario", value: true },
+      { label: "Integraciones (ML, TN, Shopify)", value: true },
+      { label: "Hasta 2 usuarios", value: true },
+      { label: "Soporte por email", value: true },
+      { label: "Importaciones y aduana", value: false },
+      { label: "Embarques y logística", value: false },
+      { label: "Reportes financieros", value: false },
     ],
   },
   {
-    name: "Premium",
-    price: "$46.800",
+    name: "Importador",
+    price: "$49.900",
+    annual: "$39.900/mes pagando anual",
     highlight: true,
-    desc: "Para equipos que necesitan más potencia",
+    desc: "Para importadores — sistema completo",
+    headerNote: "TODO LO DEL PLAN STOCK, MÁS",
     features: [
-      { label: "Operaciones", value: "Premium" },
-      { label: "Usuarios", value: "3 a 5" },
-      { label: "Depósitos", value: "Hasta 3" },
-      { label: "Dashboard analítico de ingresos y egresos", value: true },
-      { label: "Integraciones", value: true },
-      { label: "Importaciones desde Excel", value: true },
-      { label: "Alertas de stock", value: true },
-      { label: "Funciones de IA", value: true },
-      { label: "Soporte", value: true },
-      { label: "Factura electrónica y remitos", value: true },
-    ],
-  },
-  {
-    name: "Empresa",
-    price: "$72.300",
-    highlight: false,
-    desc: "Para operaciones que escalan",
-    features: [
-      { label: "Operaciones", value: "Empresa" },
-      { label: "Usuarios", value: "7 a 10" },
-      { label: "Depósitos", value: "+4" },
-      { label: "Dashboard analítico de ingresos y egresos", value: true },
-      { label: "Integraciones", value: true },
-      { label: "Importaciones desde Excel", value: true },
-      { label: "Alertas de stock", value: true },
-      { label: "Funciones de IA", value: true },
-      { label: "Soporte", value: true },
-      { label: "Factura electrónica y remitos", value: true },
-    ],
-  },
-  {
-    name: "A medida",
-    price: "Consultar ventas",
-    highlight: false,
-    custom: true,
-    desc: "Software a medida, ecommerce, logística y más",
-    features: [
-      { label: "Operaciones", value: "A medida" },
-      { label: "Usuarios", value: "A medida" },
-      { label: "Depósitos", value: "A medida" },
-      { label: "Dashboard analítico personalizado", value: true },
-      { label: "Integraciones específicas", value: true },
-      { label: "Importaciones a medida", value: true },
-      { label: "Alertas de stock", value: true },
-      { label: "IA personalizada", value: true },
-      { label: "Soporte dedicado", value: true },
-      { label: "Factura electrónica y remitos", value: true },
+      { label: "Proveedores internacionales", value: true },
+      { label: "Órdenes de compra e importación", value: true },
+      { label: "Embarques y logística internacional", value: true },
+      { label: "Módulo de aduana y documentación", value: true },
+      { label: "Ventas, pedidos y distribución", value: true },
+      { label: "Reportes financieros por importación", value: true },
+      { label: "Hasta 5 usuarios", value: true },
+      { label: "Soporte prioritario por WhatsApp", value: true },
+      { label: "Importación desde Excel", value: true },
     ],
   },
 ];
+
 
 export default function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -153,16 +142,23 @@ export default function Index() {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <ThemeToggle />
             <Link to="/login"><Button variant="ghost" size="sm">Iniciar sesión</Button></Link>
             <Link to="/register">
               <Button size="sm" className="gradient-primary shadow-primary text-primary-foreground">Comenzar gratis</Button>
             </Link>
           </div>
 
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+
         </div>
+
+
 
         {menuOpen && (
           <div className="border-t border-border bg-card px-4 py-4 md:hidden">
@@ -403,7 +399,7 @@ export default function Index() {
             <p className="text-muted-foreground">Precios en pesos argentinos. 14 días gratis sin tarjeta de crédito.</p>
           </div>
 
-          <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
             {plans.map((plan) => (
               <div
                 key={plan.name}
@@ -420,25 +416,24 @@ export default function Index() {
                   <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
                 </div>
-                <div className="mb-4">
-                  <span className={`font-bold text-foreground ${plan.custom ? "text-2xl" : "text-3xl"}`}>{plan.price}</span>
-                  {!plan.custom && <span className="text-sm text-muted-foreground"> /mes</span>}
+                <div className="mb-2">
+                  <span className="text-3xl font-bold text-foreground">{plan.price}</span>
+                  <span className="text-sm text-muted-foreground">/mes</span>
                 </div>
+                <p className="mb-5 text-xs text-accent">🏷 {plan.annual}</p>
+                {"headerNote" in plan && plan.headerNote && (
+                  <p className="mb-3 text-xs font-semibold tracking-wide text-muted-foreground">{plan.headerNote}</p>
+                )}
                 <div className="mb-6 space-y-2">
                   {plan.features.map((f) => (
                     <div key={f.label} className="flex items-start gap-2 text-sm">
-                      {typeof f.value === "boolean" ? (
-                        f.value ? (
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-                        ) : (
-                          <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
-                        )
-                      ) : (
+                      {f.value ? (
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                      ) : (
+                        <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
                       )}
-                      <span className={typeof f.value === "boolean" && !f.value ? "text-muted-foreground/60" : "text-foreground"}>
+                      <span className={!f.value ? "text-muted-foreground/60" : "text-foreground"}>
                         {f.label}
-                        {typeof f.value === "string" && <span className="text-muted-foreground">: {f.value}</span>}
                       </span>
                     </div>
                   ))}
@@ -452,7 +447,7 @@ export default function Index() {
                     className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
                     variant={plan.highlight ? "default" : "outline"}
                   >
-                    {plan.custom ? "Consultar ventas" : "Contratar"}
+                    Contratar
                   </Button>
                 </a>
               </div>
