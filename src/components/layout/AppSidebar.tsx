@@ -7,10 +7,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Ship,
-  Building2,
-  Plane,
-  FileText,
   BarChart3,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -18,10 +14,6 @@ import { useState } from "react";
 
 const navItems = [
   { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
-  { title: "Importaciones", url: "/app/imports", icon: Ship },
-  { title: "Proveedores", url: "/app/suppliers", icon: Building2 },
-  { title: "Embarques", url: "/app/shipments", icon: Plane },
-  { title: "Aduana", url: "/app/customs", icon: FileText },
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
@@ -39,7 +31,6 @@ export function AppSidebar() {
         collapsed ? "w-14" : "w-56"
       }`}
     >
-      {/* Logo */}
       <div className={`flex h-14 items-center border-b border-sidebar-border px-3 ${collapsed ? "justify-center" : "gap-2 px-4"}`}>
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg gradient-primary">
           <Package className="h-3.5 w-3.5 text-white" />
@@ -47,7 +38,6 @@ export function AppSidebar() {
         {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">OneStock</span>}
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 space-y-1 p-2 pt-4">
         {navItems.map((item) => (
           <NavLink
@@ -62,7 +52,6 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-card hover:text-foreground transition-colors"
@@ -70,7 +59,6 @@ export function AppSidebar() {
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>
 
-      {/* Bottom user area */}
       <div className={`border-t border-sidebar-border p-3 ${collapsed ? "flex justify-center" : ""}`}>
         {collapsed ? (
           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">A</div>
