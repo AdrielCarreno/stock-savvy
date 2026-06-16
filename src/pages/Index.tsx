@@ -7,16 +7,11 @@ import {
   ChevronDown,
   Menu,
   X,
-  Users,
-  Truck,
-  Ship,
-  Landmark,
-  Warehouse,
-  Store,
-  ShoppingBag,
-  Globe,
-  FileText,
-  TrendingUp,
+  AlertTriangle,
+  ArrowLeftRight,
+  Plug,
+  Smartphone,
+  ShieldCheck,
   PlayCircle,
   Sparkles,
 } from "lucide-react";
@@ -26,101 +21,134 @@ import { Badge } from "@/components/ui/badge";
 import { LiveSocialProof } from "@/components/landing/LiveSocialProof";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-const stages = [
-  { icon: Users, title: "Proveedores", desc: "Buscá y evaluá proveedores internacionales" },
-  { icon: ShoppingBag, title: "Compra", desc: "Creá órdenes de compra y controlá pagos a proveedores" },
-  { icon: Ship, title: "Embarque", desc: "Hacé seguimiento de tus embarques en tiempo real" },
-  { icon: Landmark, title: "Aduana", desc: "Gestioná documentos y estados de aduana sin complicaciones" },
-  { icon: Warehouse, title: "Depósito", desc: "Controlá tu stock y costos de almacenamiento" },
-  { icon: Store, title: "Venta", desc: "Vendé en todos tus canales y hacé crecer tu negocio" },
-];
+type BillingCycle = "mensual" | "anual";
 
 const featuresDark = [
-  { icon: Globe, title: "Importaciones", desc: "Gestioná proveedores, órdenes de compra, costos, pagos y toda tu operación internacional." },
-  { icon: Truck, title: "Logística internacional", desc: "Seguimiento de embarques aéreos, marítimos y courier. Alertas y fechas estimadas." },
-  { icon: Landmark, title: "Aduana", desc: "Documentación, estados y vencimientos. Tené todo bajo control hasta la liberación." },
-  { icon: Package, title: "Stock e inventario", desc: "Controlá tu stock en tiempo real, múltiples depósitos, lotes, series y más." },
-  { icon: Store, title: "Ventas y distribución", desc: "Gestioná pedidos, remitos, despachos y vendedores. Integrado con tus canales de venta." },
-  { icon: BarChart3, title: "Reportes y finanzas", desc: "Rentabilidad por importación, productos, clientes y más. Tomá mejores decisiones." },
+  { icon: Package, title: "Control de stock", desc: "Gestioná tu inventario en tiempo real, con múltiples depósitos y trazabilidad por producto." },
+  { icon: ArrowLeftRight, title: "Movimientos", desc: "Registrá entradas, salidas y ajustes. Mantené el historial completo de tu mercadería." },
+  { icon: AlertTriangle, title: "Alertas de bajo stock", desc: "Configurá mínimos por producto y recibí avisos antes de quedarte sin mercadería." },
+  { icon: Plug, title: "Integraciones", desc: "Conectá Mercado Libre, Tienda Nube, Shopify, WhatsApp Business y ARCA en pocos clics." },
+  { icon: BarChart3, title: "Reportes claros", desc: "Valor de inventario, rotación, productos críticos y evolución mes a mes." },
+  { icon: ShieldCheck, title: "Datos seguros", desc: "Información cifrada, backups automáticos y permisos por usuario." },
 ];
 
 const integrations = ["Mercado Libre", "Tienda Nube", "Shopify", "WhatsApp Business", "ARCA (AFIP)", "+ Más integraciones"];
 
 const faqs = [
   {
-    q: "¿OneStock funciona para mi tipo de operación de importación?",
-    a: "Sí. OneStock está diseñado para importadores que trabajan con proveedores internacionales, independientemente del régimen de importación, el canal de venta o el volumen de operaciones. Ya sea que importes desde China, Estados Unidos o Europa, vendas por Mercado Libre, Tienda Nube o canal propio, o manejes uno o varios depósitos — el sistema se adapta a tu flujo. Durante los 14 días de prueba gratuita podés configurarlo con tu operación real y validarlo sin ningún riesgo.",
+    q: "¿OneStock funciona para mi tipo de negocio?",
+    a: "Sí. OneStock está pensado para comercios, distribuidoras, mayoristas y pymes que necesitan controlar stock, entradas, salidas y ventas. Funciona igual de bien si tenés un solo local o varios depósitos, y si vendés por mostrador, online o por canales como Mercado Libre, Tienda Nube o Shopify.",
   },
   {
-    q: "¿Necesito instalar algo para usar OneStock?",
-    a: "No. OneStock es 100% en la nube. Solo necesitás un navegador y acceso a internet. No hay nada que descargar, instalar ni configurar en tu computadora o servidor. Podés acceder desde cualquier dispositivo, en cualquier momento.",
+    q: "¿Necesito instalar algo para usarlo?",
+    a: "No. OneStock es 100% en la nube. Solo necesitás un navegador y acceso a internet — no hay nada que descargar ni configurar en tu computadora. Podés acceder desde cualquier dispositivo, en cualquier momento.",
   },
   {
-    q: "¿Qué módulos incluye el sistema y cuándo los necesito?",
-    a: "OneStock está organizado en módulos que cubren todo el ciclo de importación: Proveedores, Compras, Embarques, Aduana, Depósito, Stock e Inventario, Ventas y Distribución, y Reportes y Finanzas. No todos los importadores necesitan todos los módulos desde el día uno — por eso tenemos planes diferenciados. Podés empezar con lo esencial y escalar cuando tu operación lo requiera.",
+    q: "¿Cómo funciona el control de stock y los movimientos?",
+    a: "Cada producto tiene su stock actual, stock mínimo y costo. Cuando registrás una entrada (compra, ajuste) o una salida (venta, devolución), el sistema actualiza el inventario al instante y guarda el movimiento en el historial. Si un producto cae por debajo del mínimo, recibís una alerta de bajo stock.",
+  },
+  {
+    q: "¿Puedo conectar Mercado Libre, Tienda Nube o Shopify?",
+    a: "Sí. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para sincronizar productos, stock y pedidos en un solo lugar. También se conecta con ARCA (ex-AFIP) para simplificar la parte impositiva.",
   },
   {
     q: "¿Mis datos están seguros?",
     a: "Sí. Toda la información que cargás en OneStock está almacenada en servidores con cifrado, backups automáticos y acceso protegido por credenciales individuales. Vos controlás quién ve qué dentro de tu equipo mediante permisos por usuario. Nunca compartimos ni vendemos tus datos a terceros.",
   },
   {
-    q: "¿Puedo usar OneStock si también vendo por Mercado Libre o Tienda Nube?",
-    a: "Sí, de hecho es una de las ventajas principales. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para que tus ventas, stock y pedidos estén sincronizados en un solo lugar. También se conecta con ARCA (ex-AFIP) para simplificar la parte impositiva.",
+    q: "¿Puedo importar mis productos desde Excel?",
+    a: "Sí. OneStock permite importar productos y movimientos de stock desde archivos Excel/CSV para que no tengas que cargar todo a mano. Disponible en todos los planes.",
   },
   {
     q: "¿Qué pasa cuando termina el período de prueba?",
-    a: "Al finalizar los 14 días podés elegir el plan que mejor se adapte a tu operación y continuar sin perder ningún dato. Si decidís no continuar, no se te cobra nada — no pedimos tarjeta de crédito para empezar.",
-  },
-  {
-    q: "¿Puedo importar mis datos desde Excel?",
-    a: "Sí. OneStock permite importar proveedores, productos, movimientos de stock y operaciones desde archivos Excel para que no empieces de cero. Disponible en cualquier plan.",
+    a: "Al finalizar los 14 días podés elegir el plan que mejor se adapte a tu negocio y continuar sin perder ningún dato. No pedimos tarjeta de crédito para empezar — si decidís no continuar, no se te cobra nada.",
   },
 ];
 
-const plans = [
+type Plan = {
+  name: string;
+  monthly: number | null;
+  desc: string;
+  highlight?: boolean;
+  custom?: boolean;
+  features: string[];
+};
+
+const plans: Plan[] = [
   {
-    name: "Stock",
-    price: "$24.900",
-    annual: "$19.900/mes pagando anual",
-    highlight: false,
-    desc: "Para mayoristas y distribuidores",
+    name: "Inicial",
+    monthly: 28700,
+    desc: "Para comercios y pymes que empiezan a ordenar su stock",
     features: [
-      { label: "Modelo de stock e inventario", value: true },
-      { label: "Alertas de stock", value: true },
-      { label: "Movimientos de inventario", value: true },
-      { label: "Integraciones (ML, TN, Shopify)", value: true },
-      { label: "Hasta 2 usuarios", value: true },
-      { label: "Soporte por email", value: true },
-      { label: "Importaciones y aduana", value: false },
-      { label: "Embarques y logística", value: false },
-      { label: "Reportes financieros", value: false },
+      "Hasta 500 productos",
+      "1 depósito",
+      "Movimientos ilimitados",
+      "Alertas de bajo stock",
+      "Hasta 2 usuarios",
+      "Soporte por email",
     ],
   },
   {
-    name: "Importador",
-    price: "$49.900",
-    annual: "$39.900/mes pagando anual",
+    name: "Premium",
+    monthly: 47600,
+    desc: "Para negocios que venden por varios canales",
     highlight: true,
-    desc: "Para importadores — sistema completo",
-    headerNote: "TODO LO DEL PLAN STOCK, MÁS",
     features: [
-      { label: "Proveedores internacionales", value: true },
-      { label: "Órdenes de compra e importación", value: true },
-      { label: "Embarques y logística internacional", value: true },
-      { label: "Módulo de aduana y documentación", value: true },
-      { label: "Ventas, pedidos y distribución", value: true },
-      { label: "Reportes financieros por importación", value: true },
-      { label: "Hasta 5 usuarios", value: true },
-      { label: "Soporte prioritario por WhatsApp", value: true },
-      { label: "Importación desde Excel", value: true },
+      "Productos ilimitados",
+      "Hasta 3 depósitos",
+      "Integraciones (Mercado Libre, Tienda Nube, Shopify)",
+      "WhatsApp Business y ARCA",
+      "Reportes avanzados",
+      "Hasta 5 usuarios",
+      "Soporte prioritario",
+    ],
+  },
+  {
+    name: "Empresarial",
+    monthly: 68400,
+    desc: "Para distribuidoras y empresas con operación grande",
+    features: [
+      "Todo lo del plan Premium",
+      "Depósitos ilimitados",
+      "Usuarios ilimitados con permisos avanzados",
+      "Integraciones completas",
+      "Reportes personalizados",
+      "Onboarding asistido",
+      "Soporte por WhatsApp dedicado",
+    ],
+  },
+  {
+    name: "A medida",
+    monthly: null,
+    custom: true,
+    desc: "¿Necesitás algo distinto? Armamos un plan a la medida de tu operación",
+    features: [
+      "Integraciones a medida",
+      "Volumen y SLA personalizado",
+      "Implementación y migración asistida",
+      "Capacitación para tu equipo",
+      "Facturación corporativa",
     ],
   },
 ];
 
+const MP_LINKS: Record<string, string> = {
+  Inicial: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
+  Premium: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
+  Empresarial: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
+};
+
+const fmtAR = (n: number) => `$${n.toLocaleString("es-AR")}`;
 
 export default function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [cycle, setCycle] = useState<BillingCycle>("mensual");
+
+  const priceFor = (p: Plan) => {
+    if (p.monthly == null) return null;
+    return cycle === "anual" ? Math.round(p.monthly * 0.9) : p.monthly;
+  };
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -155,10 +183,7 @@ export default function Index() {
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
-
         </div>
-
-
 
         {menuOpen && (
           <div className="border-t border-border bg-card px-4 py-4 md:hidden">
@@ -181,17 +206,17 @@ export default function Index() {
         <div className="container grid items-center gap-12 lg:grid-cols-2">
           <div>
             <Badge className="mb-6 inline-flex bg-primary-light text-primary border-primary/20 hover:bg-primary-light">
-              <Sparkles className="mr-1 h-3 w-3" /> Sistema operativo para importadores argentinos
+              <Sparkles className="mr-1 h-3 w-3" /> Sistema de control de stock para tu negocio
             </Badge>
             <h1 className="text-balance mb-6 text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
-              Gestioná toda tu operación de importación{" "}
+              Controlá tu stock y tus movimientos{" "}
               <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                 en un solo lugar
               </span>
             </h1>
             <p className="mb-8 max-w-xl text-lg text-muted-foreground">
-              Desde la compra a proveedores internacionales hasta la venta final. Controlá costos,
-              embarques, aduana, stock y distribución desde una única plataforma.
+              Gestioná productos, entradas, salidas y alertas de bajo stock. Integrá Mercado Libre,
+              Tienda Nube, Shopify, WhatsApp Business y ARCA — todo desde una misma plataforma.
             </p>
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Link to="/register">
@@ -200,7 +225,7 @@ export default function Index() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <a href="#how" className="inline-flex items-center gap-2 text-sm text-foreground hover:text-primary">
+              <a href="#features" className="inline-flex items-center gap-2 text-sm text-foreground hover:text-primary">
                 <PlayCircle className="h-5 w-5" /> Ver cómo funciona
               </a>
             </div>
@@ -219,7 +244,7 @@ export default function Index() {
                   <div className="h-5 w-5 rounded gradient-primary" />
                   <span className="font-semibold text-white">OneStock</span>
                 </div>
-                {["Inicio","Importaciones","Proveedores","Embarques","Aduana","Stock","Ventas","Reportes","Configuración"].map((i, idx) => (
+                {["Dashboard","Productos","Alertas de stock","Movimientos","Reportes","Integraciones","Configuración"].map((i, idx) => (
                   <div key={i} className={`mb-1 rounded px-2 py-1.5 ${idx===0 ? "bg-primary/20 text-white" : ""}`}>{i}</div>
                 ))}
               </aside>
@@ -230,10 +255,10 @@ export default function Index() {
                 </div>
                 <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[
-                    { l: "Mercadería en tránsito", v: "US$ 128.540" },
-                    { l: "En aduana", v: "US$ 45.230" },
-                    { l: "Stock total", v: "$ 245.760.000" },
-                    { l: "Órdenes activas", v: "24" },
+                    { l: "Productos", v: "342" },
+                    { l: "Stock total", v: "12.480" },
+                    { l: "Valor inventario", v: "$ 18.450.000" },
+                    { l: "Bajo stock", v: "7" },
                   ].map((k) => (
                     <div key={k.l} className="rounded-lg border border-border bg-card p-2">
                       <div className="text-[10px] text-muted-foreground">{k.l}</div>
@@ -243,24 +268,24 @@ export default function Index() {
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-lg border border-border bg-card p-3">
-                    <div className="mb-2 text-[10px] font-medium text-muted-foreground">Costo total de importaciones</div>
+                    <div className="mb-2 text-[10px] font-medium text-muted-foreground">Evolución de stock</div>
                     <svg viewBox="0 0 100 40" className="h-16 w-full">
                       <polyline fill="none" stroke="hsl(221 83% 53%)" strokeWidth="1.5" points="0,30 15,25 30,28 45,18 60,22 75,12 100,8" />
                       <polyline fill="hsl(221 83% 53% / 0.15)" stroke="none" points="0,30 15,25 30,28 45,18 60,22 75,12 100,8 100,40 0,40" />
                     </svg>
                   </div>
                   <div className="rounded-lg border border-border bg-card p-3">
-                    <div className="mb-2 text-[10px] font-medium text-muted-foreground">Estado de embarques</div>
+                    <div className="mb-2 text-[10px] font-medium text-muted-foreground">Movimientos (7d)</div>
                     <div className="flex items-center gap-3">
                       <svg viewBox="0 0 36 36" className="h-16 w-16">
                         <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(220 14% 93%)" strokeWidth="5" />
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(221 83% 53%)" strokeWidth="5" strokeDasharray="40 100" strokeDashoffset="0" transform="rotate(-90 18 18)" />
-                        <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(168 84% 42%)" strokeWidth="5" strokeDasharray="25 100" strokeDashoffset="-40" transform="rotate(-90 18 18)" />
+                        <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(168 84% 42%)" strokeWidth="5" strokeDasharray="55 100" strokeDashoffset="0" transform="rotate(-90 18 18)" />
+                        <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(221 83% 53%)" strokeWidth="5" strokeDasharray="30 100" strokeDashoffset="-55" transform="rotate(-90 18 18)" />
                       </svg>
                       <div className="space-y-1 text-[10px]">
-                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-primary" />En tránsito</div>
-                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accent" />En aduana</div>
-                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-muted-foreground/40" />Liberados</div>
+                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accent" />Entradas</div>
+                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-primary" />Salidas</div>
+                        <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-muted-foreground/40" />Ajustes</div>
                       </div>
                     </div>
                   </div>
@@ -271,34 +296,11 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Stages */}
-      <section id="how" className="border-y border-border bg-card py-16 px-4">
-        <div className="container">
-          <h2 className="mb-10 text-center text-2xl font-bold md:text-3xl">Cada etapa, controlada</h2>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-            {stages.map((s, i) => (
-              <div key={s.title} className="relative">
-                {i < stages.length - 1 && (
-                  <div className="absolute left-full top-8 hidden h-px w-full -translate-x-1/2 border-t border-dashed border-border lg:block" />
-                )}
-                <div className="relative rounded-xl border border-border bg-background p-4 text-center shadow-card">
-                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light">
-                    <s.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="mb-1 text-sm font-semibold">{s.title}</h3>
-                  <p className="text-xs text-muted-foreground">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Features (dark) */}
       <section id="features" className="gradient-hero px-4 py-20">
         <div className="container">
           <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
-            Todo lo que necesitás para importar y vender
+            Todo lo que necesitás para controlar tu stock
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {featuresDark.map((f) => (
@@ -328,130 +330,114 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Reports / Insight */}
-      <section className="bg-primary-light/40 py-20 px-4">
-        <div className="container grid items-center gap-10 lg:grid-cols-2">
-          <div>
-            <Badge className="mb-4 bg-primary-light text-primary border-primary/20">Visión completa de tu negocio</Badge>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Tomá decisiones con información real</h2>
-            <ul className="mb-6 space-y-3">
-              {["Costeo automático de importaciones","Capital inmovilizado y rentabilidad","Métricas en tiempo real","Reportes claros y personalizados"].map((t) => (
-                <li key={t} className="flex items-center gap-2 text-foreground">
-                  <CheckCircle2 className="h-5 w-5 text-primary" /> {t}
-                </li>
-              ))}
-            </ul>
-            <a href="#pricing"><Button variant="outline">Ver reportes en acción</Button></a>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-elevated">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-light"><FileText className="h-4 w-4 text-primary" /></div>
-              <span className="font-semibold">Rentabilidad por importación</span>
-            </div>
-            <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[
-                { l: "Importaciones", v: "12" },
-                { l: "Inversión total", v: "US$ 287.450" },
-                { l: "Ganancia total", v: "US$ 98.750" },
-                { l: "Rentabilidad", v: "34,3%" },
-              ].map((k) => (
-                <div key={k.l} className="rounded-lg border border-border p-3">
-                  <div className="text-[10px] text-muted-foreground">{k.l}</div>
-                  <div className="text-sm font-semibold">{k.v}</div>
-                </div>
-              ))}
-            </div>
-            <div className="overflow-hidden rounded-lg border border-border">
-              <table className="w-full text-xs">
-                <thead className="bg-muted/50 text-muted-foreground">
-                  <tr>
-                    <th className="px-3 py-2 text-left">Importación</th>
-                    <th className="px-3 py-2 text-left">Fecha</th>
-                    <th className="px-3 py-2 text-left">Inversión</th>
-                    <th className="px-3 py-2 text-left">Ventas</th>
-                    <th className="px-3 py-2 text-left">Rentab.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ["ARG-2024-05","10/05/2024","US$ 64.250","US$ 89.500","39,3%"],
-                    ["ARG-2024-04","20/04/2024","US$ 53.400","US$ 74.600","39,7%"],
-                    ["ARG-2024-03","15/03/2024","US$ 46.800","US$ 61.100","30,6%"],
-                    ["ARG-2024-02","10/02/2024","US$ 58.700","US$ 79.300","35,1%"],
-                  ].map((r) => (
-                    <tr key={r[0]} className="border-t border-border">
-                      {r.map((c, idx) => <td key={idx} className="px-3 py-2">{c}</td>)}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
       <section id="pricing" className="py-20 px-4">
         <div className="container max-w-7xl">
-          <div className="mb-12 text-center">
+          <div className="mb-10 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precios</Badge>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Elegí el plan que mejor se adapta a tu operación</h2>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Elegí el plan que mejor se adapta a tu negocio</h2>
             <p className="text-muted-foreground">Precios en pesos argentinos. 14 días gratis sin tarjeta de crédito.</p>
           </div>
 
-          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-2xl border bg-card p-6 shadow-card transition-all hover:shadow-elevated ${
-                  plan.highlight ? "border-2 border-primary shadow-elevated" : "border-border"
+          {/* Billing toggle */}
+          <div className="mb-10 flex items-center justify-center">
+            <div className="inline-flex rounded-full border border-border bg-card p-1">
+              <button
+                onClick={() => setCycle("mensual")}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  cycle === "mensual" ? "bg-primary text-primary-foreground shadow-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
-                  </div>
-                )}
-                <div className="mb-3 pt-2">
-                  <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
-                </div>
-                <div className="mb-2">
-                  <span className="text-3xl font-bold text-foreground">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground">/mes</span>
-                </div>
-                <p className="mb-5 text-xs text-accent">🏷 {plan.annual}</p>
-                {"headerNote" in plan && plan.headerNote && (
-                  <p className="mb-3 text-xs font-semibold tracking-wide text-muted-foreground">{plan.headerNote}</p>
-                )}
-                <div className="mb-6 space-y-2">
-                  {plan.features.map((f) => (
-                    <div key={f.label} className="flex items-start gap-2 text-sm">
-                      {f.value ? (
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-                      ) : (
-                        <X className="h-4 w-4 shrink-0 text-muted-foreground/40 mt-0.5" />
-                      )}
-                      <span className={!f.value ? "text-muted-foreground/60" : "text-foreground"}>
-                        {f.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <a
-                  href={`https://wa.me/5493516516785?text=${encodeURIComponent(`Hola, quiero consultar por el plan ${plan.name} de OneStock`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                Mensual
+              </button>
+              <button
+                onClick={() => setCycle("anual")}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                  cycle === "anual" ? "bg-primary text-primary-foreground shadow-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Anual
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cycle === "anual" ? "bg-white/20 text-white" : "bg-accent/15 text-accent"}`}>
+                  -10%
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {plans.map((plan) => {
+              const price = priceFor(plan);
+              const isCustom = plan.custom;
+              return (
+                <div
+                  key={plan.name}
+                  className={`relative flex flex-col rounded-2xl border bg-card p-6 shadow-card transition-all hover:shadow-elevated ${
+                    plan.highlight ? "border-2 border-primary shadow-elevated" : "border-border"
+                  }`}
                 >
-                  <Button
-                    className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
-                    variant={plan.highlight ? "default" : "outline"}
-                  >
-                    Contratar
-                  </Button>
-                </a>
-              </div>
-            ))}
+                  {plan.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <Badge className="gradient-primary text-primary-foreground border-0 px-3 py-1">Recomendado</Badge>
+                    </div>
+                  )}
+                  <div className="mb-3 pt-2">
+                    <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 min-h-[2.5rem]">{plan.desc}</p>
+                  </div>
+
+                  <div className="mb-5 min-h-[4.5rem]">
+                    {isCustom ? (
+                      <div>
+                        <span className="text-2xl font-bold text-foreground">Personalizado</span>
+                        <p className="mt-1 text-xs text-muted-foreground">Hablemos para armar tu propuesta</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <span className="text-3xl font-bold text-foreground">{fmtAR(price!)}</span>
+                          <span className="text-sm text-muted-foreground">/mes</span>
+                        </div>
+                        {cycle === "anual" ? (
+                          <p className="mt-1 text-xs text-accent">🏷 Pagando anual ahorrás un 10%</p>
+                        ) : (
+                          <p className="mt-1 text-xs text-muted-foreground">Pagando anual: {fmtAR(Math.round(plan.monthly! * 0.9))}/mes</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  <ul className="mb-6 space-y-2 flex-1">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-accent mt-0.5" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {isCustom ? (
+                    <a
+                      href={`https://wa.me/5493516516785?text=${encodeURIComponent("Hola, me interesa un plan a medida de OneStock")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full" variant="outline">
+                        Contactar ventas
+                      </Button>
+                    </a>
+                  ) : (
+                    <a href={MP_LINKS[plan.name]} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
+                        variant={plan.highlight ? "default" : "outline"}
+                      >
+                        Contratar
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -462,10 +448,11 @@ export default function Index() {
           <div className="flex flex-col items-start justify-between gap-6 rounded-2xl gradient-primary p-8 text-primary-foreground md:flex-row md:items-center">
             <div>
               <h3 className="mb-1 text-2xl font-bold">Probalo gratis durante 14 días</h3>
-              <p className="text-sm text-white/80">Descubrí por qué cada vez más importadores eligen OneStock para hacer crecer su negocio.</p>
+              <p className="text-sm text-white/80">Descubrí por qué cada vez más negocios eligen OneStock para controlar su stock.</p>
               <div className="mt-3 flex flex-wrap gap-4 text-xs text-white/80">
                 <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Sin tarjeta de crédito</span>
                 <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Cancelá cuando quieras</span>
+                <span className="inline-flex items-center gap-1"><Smartphone className="h-3.5 w-3.5" /> Acceso desde cualquier dispositivo</span>
               </div>
             </div>
             <Link to="/register">
@@ -508,7 +495,7 @@ export default function Index() {
               <div className="flex h-6 w-6 items-center justify-center rounded gradient-primary"><Package className="h-3 w-3 text-white" /></div>
               <span className="font-semibold text-white">OneStock</span>
             </div>
-            <p className="text-sm">El sistema operativo para importadores y distribuidores que quieren crecer sin límites.</p>
+            <p className="text-sm">El sistema de control de stock pensado para negocios que quieren crecer sin perder el orden.</p>
           </div>
           <div>
             <h4 className="mb-3 text-sm font-semibold text-white">Producto</h4>

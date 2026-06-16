@@ -17,10 +17,6 @@ import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
 import BusinessSettings from "./pages/app/BusinessSettings";
-import Suppliers from "./pages/app/Suppliers";
-import Imports from "./pages/app/Imports";
-import Shipments from "./pages/app/Shipments";
-import Customs from "./pages/app/Customs";
 import Reports from "./pages/app/Reports";
 
 const queryClient = new QueryClient();
@@ -32,14 +28,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Public */}
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* App (protected) */}
           <Route
             path="/app"
             element={
@@ -50,16 +44,17 @@ const App = () => (
           >
             <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="imports" element={<Imports />} />
-            <Route path="suppliers" element={<Suppliers />} />
-            <Route path="shipments" element={<Shipments />} />
-            <Route path="customs" element={<Customs />} />
             <Route path="products" element={<Products />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
             <Route path="reports" element={<Reports />} />
             <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<BusinessSettings />} />
+            {/* Legacy redirects */}
+            <Route path="imports" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="suppliers" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="shipments" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="customs" element={<Navigate to="/app/dashboard" replace />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
