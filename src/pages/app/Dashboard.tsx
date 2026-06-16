@@ -104,7 +104,7 @@ export default function Dashboard() {
             ) : recentMovements.map((m: any) => (
               <div key={m.id} className="flex items-center justify-between px-5 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{m.product?.name ?? "Producto"}</p>
+                  <p className="truncate text-sm font-medium">{m.product_name ?? "Producto"}</p>
                   <p className="text-xs text-muted-foreground capitalize">{m.type} · {new Date(m.created_at).toLocaleDateString("es-AR")}</p>
                 </div>
                 <div className="ml-3 text-right">
