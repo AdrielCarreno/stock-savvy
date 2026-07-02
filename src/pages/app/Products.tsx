@@ -418,9 +418,6 @@ export default function Products() {
                         {p.category ? <Badge variant="secondary" className="text-xs">{p.category}</Badge> : <span className="text-muted-foreground text-xs">—</span>}
                       </td>
                       <td className="px-4 py-3">
-                        {p.client ? <span className="text-sm text-foreground">{p.client}</span> : <span className="text-muted-foreground text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-3">
                         {whNames.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {whNames.map((n) => (
@@ -434,7 +431,8 @@ export default function Products() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
-                      <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
+                      <td className="px-4 py-3 text-right font-medium">{formatCurrency((p as any).price_wholesale)}</td>
+                      <td className="px-4 py-3 text-right font-medium">{formatCurrency((p as any).price_retail ?? p.price)}</td>
                       <td className="px-4 py-3 text-center">
                         {filterWarehouse === "all" ? (
                           <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
