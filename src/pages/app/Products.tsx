@@ -39,7 +39,7 @@ type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
   name: "", sku: "", category: "", client: "", unit: "unidad",
-  current_stock: 0, min_stock: 0, price: 0, cost: 0,
+  current_stock: 0, min_stock: 0, price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
   warehouse_id: undefined,
 };
 
@@ -162,6 +162,8 @@ export default function Products() {
       current_stock: p.current_stock,
       min_stock: p.min_stock,
       price: p.price,
+      price_wholesale: (p as any).price_wholesale ?? 0,
+      price_retail: (p as any).price_retail ?? p.price ?? 0,
       cost: p.cost,
       description: p.description,
       warehouse_id: undefined,
