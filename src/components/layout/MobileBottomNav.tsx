@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 import { Plug, Settings, LogOut } from "lucide-react";
@@ -14,7 +14,6 @@ const primaryItems = [
 ];
 
 const moreItems = [
-  { title: "Reportes", url: "/app/reports", icon: BarChart3 },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración de negocio", url: "/app/settings", icon: Settings },
 ];

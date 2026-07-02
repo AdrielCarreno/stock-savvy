@@ -7,7 +7,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  BarChart3,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
@@ -17,7 +16,6 @@ const navItems = [
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Reportes", url: "/app/reports", icon: BarChart3 },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración", url: "/app/settings", icon: Settings },
 ];
