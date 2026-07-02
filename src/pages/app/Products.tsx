@@ -591,12 +591,21 @@ export default function Products() {
               {errors.cost && <p className="text-xs text-destructive">{errors.cost}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Precio venta</Label>
+              <Label>Precio mayorista</Label>
               <Input
                 type="number"
                 min={0}
-                value={form.price ?? 0}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                value={form.price_wholesale ?? 0}
+                onChange={(e) => setForm({ ...form, price_wholesale: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Precio minorista</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.price_retail ?? 0}
+                onChange={(e) => setForm({ ...form, price_retail: Number(e.target.value) })}
               />
               {errors.price && <p className="text-xs text-destructive">{errors.price}</p>}
             </div>
