@@ -200,6 +200,8 @@ export default function Products() {
       sku: form.sku?.trim() || null,
       category: form.category?.trim() || null,
       client: form.client?.trim() || null,
+      // mantener price en sincronía con precio minorista para compatibilidad
+      price: form.price_retail ?? form.price ?? 0,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
