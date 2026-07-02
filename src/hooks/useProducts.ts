@@ -13,6 +13,8 @@ export type ProductInput = {
   current_stock: number;
   min_stock: number;
   price: number | null;
+  price_wholesale?: number | null;
+  price_retail?: number | null;
   cost: number | null;
   description?: string | null;
 };
