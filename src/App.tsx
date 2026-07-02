@@ -17,7 +17,7 @@ import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
 import BusinessSettings from "./pages/app/BusinessSettings";
-import Reports from "./pages/app/Reports";
+
 
 const queryClient = new QueryClient();
 
@@ -47,7 +47,7 @@ const App = () => (
             <Route path="products" element={<Products />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
-            <Route path="reports" element={<Reports />} />
+            <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<BusinessSettings />} />
             {/* Legacy redirects */}

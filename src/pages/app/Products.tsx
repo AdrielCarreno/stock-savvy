@@ -39,7 +39,7 @@ type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
   name: "", sku: "", category: "", client: "", unit: "unidad",
-  current_stock: 0, min_stock: 0, price: 0, cost: 0,
+  current_stock: 0, min_stock: 0, price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
   warehouse_id: undefined,
 };
 
@@ -162,6 +162,8 @@ export default function Products() {
       current_stock: p.current_stock,
       min_stock: p.min_stock,
       price: p.price,
+      price_wholesale: (p as any).price_wholesale ?? 0,
+      price_retail: (p as any).price_retail ?? p.price ?? 0,
       cost: p.cost,
       description: p.description,
       warehouse_id: undefined,
@@ -198,6 +200,8 @@ export default function Products() {
       sku: form.sku?.trim() || null,
       category: form.category?.trim() || null,
       client: form.client?.trim() || null,
+      // mantener price en sincronía con precio minorista para compatibilidad
+      price: form.price_retail ?? form.price ?? 0,
     };
     const { error } = editing
       ? await updateProduct(editing.id, payload)
@@ -368,10 +372,10 @@ export default function Products() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Depósito</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Costo</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Venta</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Mayorista</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">P. Minorista</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {filterWarehouse === "all" ? "Stock" : "Stock depósito"}
                 </th>
@@ -416,9 +420,6 @@ export default function Products() {
                         {p.category ? <Badge variant="secondary" className="text-xs">{p.category}</Badge> : <span className="text-muted-foreground text-xs">—</span>}
                       </td>
                       <td className="px-4 py-3">
-                        {p.client ? <span className="text-sm text-foreground">{p.client}</span> : <span className="text-muted-foreground text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-3">
                         {whNames.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {whNames.map((n) => (
@@ -432,7 +433,8 @@ export default function Products() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(p.cost)}</td>
-                      <td className="px-4 py-3 text-right font-medium">{formatCurrency(p.price)}</td>
+                      <td className="px-4 py-3 text-right font-medium">{formatCurrency((p as any).price_wholesale)}</td>
+                      <td className="px-4 py-3 text-right font-medium">{formatCurrency((p as any).price_retail ?? p.price)}</td>
                       <td className="px-4 py-3 text-center">
                         {filterWarehouse === "all" ? (
                           <span className={`font-bold ${isLow ? "text-warning" : "text-foreground"}`}>{p.current_stock}</span>
@@ -510,8 +512,8 @@ export default function Products() {
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
                   <div className="text-xs">
-                    <span className="text-muted-foreground">Venta: </span>
-                    <span className="font-semibold text-foreground">{formatCurrency(p.price)}</span>
+                    <span className="text-muted-foreground">Minorista: </span>
+                    <span className="font-semibold text-foreground">{formatCurrency((p as any).price_retail ?? p.price)}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
@@ -589,12 +591,21 @@ export default function Products() {
               {errors.cost && <p className="text-xs text-destructive">{errors.cost}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Precio venta</Label>
+              <Label>Precio mayorista</Label>
               <Input
                 type="number"
                 min={0}
-                value={form.price ?? 0}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                value={form.price_wholesale ?? 0}
+                onChange={(e) => setForm({ ...form, price_wholesale: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Precio minorista</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.price_retail ?? 0}
+                onChange={(e) => setForm({ ...form, price_retail: Number(e.target.value) })}
               />
               {errors.price && <p className="text-xs text-destructive">{errors.price}</p>}
             </div>

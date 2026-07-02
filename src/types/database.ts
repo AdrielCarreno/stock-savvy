@@ -68,6 +68,8 @@ export interface Database {
           current_stock: number;
           min_stock: number;
           price: number | null;
+          price_wholesale: number | null;
+          price_retail: number | null;
           cost: number | null;
           created_at: string;
           updated_at: string;
@@ -84,6 +86,8 @@ export interface Database {
           current_stock?: number;
           min_stock?: number;
           price?: number | null;
+          price_wholesale?: number | null;
+          price_retail?: number | null;
           cost?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -100,6 +104,8 @@ export interface Database {
           current_stock?: number;
           min_stock?: number;
           price?: number | null;
+          price_wholesale?: number | null;
+          price_retail?: number | null;
           cost?: number | null;
           created_at?: string;
           updated_at?: string;

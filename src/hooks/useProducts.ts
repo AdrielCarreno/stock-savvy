@@ -13,6 +13,8 @@ export type ProductInput = {
   current_stock: number;
   min_stock: number;
   price: number | null;
+  price_wholesale?: number | null;
+  price_retail?: number | null;
   cost: number | null;
   description?: string | null;
 };
@@ -58,6 +60,8 @@ export function useProducts() {
           current_stock: input.current_stock,
           min_stock: input.min_stock,
           price: input.price,
+          price_wholesale: input.price_wholesale ?? null,
+          price_retail: input.price_retail ?? null,
           cost: input.cost,
           description: input.description ?? null,
         })
@@ -136,6 +140,8 @@ export function useProducts() {
           current_stock: input.current_stock,
           min_stock: input.min_stock,
           price: input.price,
+          price_wholesale: input.price_wholesale ?? null,
+          price_retail: input.price_retail ?? null,
           cost: input.cost,
           description: input.description ?? null,
         }));
