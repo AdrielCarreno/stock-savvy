@@ -140,6 +140,8 @@ export function useProducts() {
           current_stock: input.current_stock,
           min_stock: input.min_stock,
           price: input.price,
+          price_wholesale: input.price_wholesale ?? null,
+          price_retail: input.price_retail ?? null,
           cost: input.cost,
           description: input.description ?? null,
         }));
