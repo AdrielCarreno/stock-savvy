@@ -512,8 +512,8 @@ export default function Products() {
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
                   <div className="text-xs">
-                    <span className="text-muted-foreground">Venta: </span>
-                    <span className="font-semibold text-foreground">{formatCurrency(p.price)}</span>
+                    <span className="text-muted-foreground">Minorista: </span>
+                    <span className="font-semibold text-foreground">{formatCurrency((p as any).price_retail ?? p.price)}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
