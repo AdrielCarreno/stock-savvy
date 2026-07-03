@@ -16,6 +16,11 @@ import Products from "./pages/app/Products";
 import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
+import Purchases from "./pages/app/Purchases";
+import Sales from "./pages/app/Sales";
+import Suppliers from "./pages/app/Suppliers";
+import Customers from "./pages/app/Customers";
+import UsersPermissions from "./pages/app/UsersPermissions";
 import BusinessSettings from "./pages/app/BusinessSettings";
 
 
