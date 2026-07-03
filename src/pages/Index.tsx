@@ -174,7 +174,7 @@ export default function Index() {
       {/* HERO with background images */}
       <section className="relative overflow-hidden">
         {/* Background carousel */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           {heroImages.map((src, i) => (
             <div
               key={src}
@@ -190,7 +190,7 @@ export default function Index() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
         </div>
 
-        <div className="container px-4 py-24 md:py-32">
+        <div className="container relative z-10 px-4 py-24 md:py-32">
           <div className="max-w-2xl">
             <Badge className="mb-6 inline-flex bg-white/10 text-white border-white/20 backdrop-blur hover:bg-white/15">
               <Sparkles className="mr-1 h-3 w-3" /> Sistema de control de stock para tu negocio
