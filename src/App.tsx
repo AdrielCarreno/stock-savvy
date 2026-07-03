@@ -53,11 +53,15 @@ const App = () => (
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
             <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="purchases" element={<Purchases />} />
+            <Route path="sales" element={<Sales />} />
+            <Route path="suppliers" element={<Suppliers />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="users" element={<UsersPermissions />} />
             <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<BusinessSettings />} />
             {/* Legacy redirects */}
             <Route path="imports" element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="suppliers" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="shipments" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="customs" element={<Navigate to="/app/dashboard" replace />} />
           </Route>
