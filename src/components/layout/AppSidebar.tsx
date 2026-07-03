@@ -5,6 +5,11 @@ import {
   AlertTriangle,
   Plug,
   Settings,
+  ShoppingCart,
+  Receipt,
+  Truck,
+  Users,
+  Shield,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -14,8 +19,13 @@ import { useState } from "react";
 const navItems = [
   { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
   { title: "Productos", url: "/app/products", icon: Package },
+  { title: "Compras", url: "/app/purchases", icon: ShoppingCart },
+  { title: "Ventas", url: "/app/sales", icon: Receipt },
+  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+  { title: "Clientes", url: "/app/customers", icon: Users },
   { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
+  { title: "Usuarios y Permisos", url: "/app/users", icon: Shield },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración", url: "/app/settings", icon: Settings },
 ];

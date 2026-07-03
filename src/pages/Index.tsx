@@ -80,11 +80,11 @@ type Plan = {
 };
 
 const plans: Plan[] = [
-  { name: "Inicial", monthly: 28700, desc: "Para comercios y pymes que empiezan a ordenar su stock",
+  { name: "Inicial", monthly: 34500, desc: "Para comercios y pymes que empiezan a ordenar su stock",
     features: ["Hasta 500 productos", "1 depósito", "Movimientos ilimitados", "Alertas de bajo stock", "Hasta 2 usuarios", "Soporte por email"] },
-  { name: "Premium", monthly: 47600, desc: "Para negocios que venden por varios canales", highlight: true,
+  { name: "Premium", monthly: 61000, desc: "Para negocios que venden por varios canales", highlight: true,
     features: ["Productos ilimitados", "Hasta 3 depósitos", "Integraciones (Mercado Libre, Tienda Nube, Shopify)", "WhatsApp Business y ARCA", "Reportes avanzados", "Hasta 5 usuarios", "Soporte prioritario"] },
-  { name: "Empresarial", monthly: 68400, desc: "Para distribuidoras y empresas con operación grande",
+  { name: "Empresarial", monthly: 87000, desc: "Para distribuidoras y empresas con operación grande",
     features: ["Todo lo del plan Premium", "Depósitos ilimitados", "Usuarios ilimitados con permisos avanzados", "Integraciones completas", "Reportes personalizados", "Onboarding asistido", "Soporte por WhatsApp dedicado"] },
   { name: "A medida", monthly: null, custom: true, desc: "¿Necesitás algo distinto? Armamos un plan a la medida de tu operación",
     features: ["Integraciones a medida", "Volumen y SLA personalizado", "Implementación y migración asistida", "Capacitación para tu equipo", "Facturación corporativa"] },
