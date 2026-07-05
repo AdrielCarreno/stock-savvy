@@ -171,8 +171,10 @@ export default function Index() {
         )}
       </nav>
 
+      <main>
       {/* HERO with background images */}
       <section className="relative overflow-hidden">
+
         {/* Background carousel */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           {heroImages.map((src, i) => (
