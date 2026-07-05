@@ -171,8 +171,10 @@ export default function Index() {
         )}
       </nav>
 
+      <main>
       {/* HERO with background images */}
       <section className="relative overflow-hidden">
+
         {/* Background carousel */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           {heroImages.map((src, i) => (
@@ -566,9 +568,11 @@ export default function Index() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="gradient-hero px-4 py-12 text-white/70">
+
         <div className="container grid gap-8 md:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2">

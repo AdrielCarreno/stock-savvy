@@ -287,11 +287,13 @@ export default function Products() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label="Buscar productos por nombre o SKU"
             placeholder="Buscar por nombre o SKU..."
             className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+
         </div>
         <Select value={filterCategory} onValueChange={setFilterCategory}>
           <SelectTrigger className="w-full sm:w-48">
@@ -329,10 +331,12 @@ export default function Products() {
             className="gap-2 whitespace-nowrap"
             onClick={() => { setNewWarehouseName(""); setWarehouseDialogOpen(true); }}
             title="Crear nuevo depósito"
+            aria-label="Crear nuevo depósito"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Nuevo depósito</span>
           </Button>
+
         </div>
       </div>
 

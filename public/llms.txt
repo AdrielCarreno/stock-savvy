@@ -1,0 +1,9 @@
+# OneStock
+
+> Sistema en la nube para controlar stock, movimientos, compras y ventas de comercios y distribuidoras. Se integra con Mercado Libre, Tienda Nube, Shopify, WhatsApp Business y ARCA.
+
+## Pages
+
+- [Inicio](/): Descripción del producto, funcionalidades, planes y preguntas frecuentes.
+- [Registro](/register): Crear una cuenta para iniciar la prueba gratuita de 14 días.
+- [Iniciar sesión](/login): Acceso a la aplicación para usuarios existentes.
