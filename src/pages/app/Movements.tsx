@@ -216,7 +216,7 @@ export default function Movements() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input aria-label="Buscar movimientos por producto o SKU" placeholder="Buscar por producto o SKU..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
