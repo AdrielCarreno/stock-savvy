@@ -73,7 +73,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-warning" />
-              <h3 className="text-sm font-semibold">Alertas de stock</h3>
+              <h2 className="text-sm font-semibold">Alertas de stock</h2>
               <Badge className="bg-warning-light text-warning border-warning/20 text-xs">{stats.lowStock.length}</Badge>
             </div>
             <Link to="/app/low-stock"><Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">Ver todos<ArrowRight className="h-3 w-3" /></Button></Link>
