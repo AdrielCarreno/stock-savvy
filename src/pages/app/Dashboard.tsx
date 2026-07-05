@@ -95,7 +95,7 @@ export default function Dashboard() {
         <div className="xl:col-span-2"><ClientsChart /></div>
         <div className="rounded-xl border border-border bg-card shadow-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h3 className="text-sm font-semibold">Movimientos recientes</h3>
+            <h2 className="text-sm font-semibold">Movimientos recientes</h2>
             <Link to="/app/movements"><Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">Ver todos<ArrowRight className="h-3 w-3" /></Button></Link>
           </div>
           <div className="divide-y divide-border">
