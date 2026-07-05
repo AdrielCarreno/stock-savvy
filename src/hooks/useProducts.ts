@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -34,7 +35,7 @@ export function useProducts() {
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
     if (error) {
-      toast.error("Error al cargar productos: " + error.message);
+      toast.error(friendlyError(error, "Error al cargar productos"));
     } else {
       setProducts((data ?? []) as Product[]);
     }
@@ -68,7 +69,7 @@ export function useProducts() {
         .select("id")
         .maybeSingle();
       if (error || !data) {
-        toast.error("Error al crear producto: " + (error?.message ?? "desconocido"));
+        toast.error(friendlyError(error, "Error al crear producto"));
         return { error: error ?? new Error("insert failed") };
       }
 
@@ -113,7 +114,7 @@ export function useProducts() {
         .update(input)
         .eq("id", id);
       if (error) {
-        toast.error("Error al actualizar: " + error.message);
+        toast.error(friendlyError(error, "Error al actualizar"));
         return { error };
       }
       toast.success("Producto actualizado");
@@ -162,7 +163,7 @@ export function useProducts() {
     async (id: string) => {
       const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) {
-        toast.error("Error al eliminar: " + error.message);
+        toast.error(friendlyError(error, "Error al eliminar"));
         return { error };
       }
       toast.success("Producto eliminado");
@@ -177,7 +178,7 @@ export function useProducts() {
       if (ids.length === 0) return { error: null };
       const { error } = await supabase.from("products").delete().in("id", ids);
       if (error) {
-        toast.error("Error al eliminar: " + error.message);
+        toast.error(friendlyError(error, "Error al eliminar"));
         return { error };
       }
       toast.success(`${ids.length} producto(s) eliminado(s)`);
@@ -192,7 +193,7 @@ export function useProducts() {
       if (ids.length === 0) return { error: null };
       const { error } = await supabase.from("products").update(patch).in("id", ids);
       if (error) {
-        toast.error("Error al actualizar: " + error.message);
+        toast.error(friendlyError(error, "Error al actualizar"));
         return { error };
       }
       toast.success(`${ids.length} producto(s) actualizado(s)`);

@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,7 +42,7 @@ export function useStockMovements() {
       .order("movement_date", { ascending: false })
       .limit(500);
     if (error) {
-      toast.error("Error al cargar movimientos: " + error.message);
+      toast.error(friendlyError(error, "Error al cargar movimientos"));
     } else {
       const mapped = (data ?? []).map((m: any) => {
         const price = m.products?.price ?? null;

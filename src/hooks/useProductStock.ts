@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,7 +26,7 @@ export function useProductStock() {
       .select("id, company_id, product_id, warehouse_id, quantity")
       .eq("company_id", companyId);
     if (error) {
-      toast.error("Error al cargar stock por depósito: " + error.message);
+      toast.error(friendlyError(error, "Error al cargar stock por depósito"));
     } else {
       setStock((data ?? []) as ProductStockRow[]);
     }
