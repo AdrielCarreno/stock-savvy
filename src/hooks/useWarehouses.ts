@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,7 +29,7 @@ export function useWarehouses() {
       .order("is_default", { ascending: false })
       .order("name", { ascending: true });
     if (error) {
-      toast.error("Error al cargar depósitos: " + error.message);
+      toast.error(friendlyError(error, "Error al cargar depósitos"));
     } else {
       setWarehouses((data ?? []) as Warehouse[]);
     }
@@ -48,7 +49,7 @@ export function useWarehouses() {
         .from("warehouses")
         .insert({ company_id: companyId, name: trimmed, is_default: false });
       if (error) {
-        toast.error("Error al crear depósito: " + error.message);
+        toast.error(friendlyError(error, "Error al crear depósito"));
         return { error };
       }
       toast.success(`Depósito "${trimmed}" creado`);

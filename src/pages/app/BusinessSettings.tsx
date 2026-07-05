@@ -1,3 +1,4 @@
+import { friendlyError } from "@/lib/errors";
 import { useEffect, useState } from "react";
 import { Building2, Save, Loader2, Bell, Globe, Receipt, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -96,7 +97,7 @@ export default function BusinessSettings() {
         .update({ name: name.trim() })
         .eq("id", company.id);
       if (error) {
-        toast.error("Error al guardar el nombre: " + error.message);
+        toast.error(friendlyError(error, "Error al guardar el nombre"));
         setSaving(false);
         return;
       }
