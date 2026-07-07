@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Plus, Edit2, Trash2, Loader2, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Edit2, Trash2, Loader2, Users, Search, Filter, MessageCircle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { friendlyError } from "@/lib/errors";
+
+const cleanPhone = (p?: string | null) => (p ?? "").replace(/[^\d]/g, "");
 
 type Customer = { id: string; name: string; email?: string | null; phone?: string | null; tax_id?: string | null; address?: string | null; notes?: string | null; balance: number };
 

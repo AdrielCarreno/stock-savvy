@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Plus, Loader2, ShoppingCart, PackageCheck, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Loader2, ShoppingCart, PackageCheck, Trash2, Search, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import { friendlyError } from "@/lib/errors";
 
-type Purchase = { id: string; reference: string | null; status: string; order_date: string; received_date: string | null; total: number; supplier_id: string | null; product_id: string | null; quantity: number; unit_cost: number; supplier_name?: string; product_name?: string };
+type Purchase = { id: string; reference: string | null; status: string; order_date: string; received_date: string | null; total: number; supplier_id: string | null; product_id: string | null; quantity: number; unit_cost: number; supplier_name?: string; product_name?: string; product_sku?: string };
 
 export default function Purchases() {
   const { company } = useAuth();
@@ -25,25 +25,45 @@ export default function Purchases() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ supplier_id: "", product_id: "", reference: "", quantity: 1, unit_cost: 0 });
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [supplierFilter, setSupplierFilter] = useState<string>("all");
 
   const load = async () => {
     setLoading(true);
     const [{ data: purchases }, { data: items }, { data: sups }] = await Promise.all([
       supabase.from("purchases").select("*, suppliers(name)").order("created_at", { ascending: false }),
-      supabase.from("purchase_items").select("*, products(name)"),
+      supabase.from("purchase_items").select("*, products(name, sku)"),
       supabase.from("suppliers").select("id, name").order("name"),
     ]);
     const itemsByPurchase = new Map<string, any>();
     (items ?? []).forEach((it: any) => itemsByPurchase.set(it.purchase_id, it));
     const merged = (purchases ?? []).map((p: any) => {
       const it = itemsByPurchase.get(p.id);
-      return { ...p, supplier_name: p.suppliers?.name, product_id: it?.product_id ?? null, product_name: it?.products?.name ?? null, quantity: it?.quantity ?? 0, unit_cost: it?.unit_cost ?? 0 };
+      return { ...p, supplier_name: p.suppliers?.name, product_id: it?.product_id ?? null, product_name: it?.products?.name ?? null, product_sku: it?.products?.sku ?? null, quantity: it?.quantity ?? 0, unit_cost: it?.unit_cost ?? 0 };
     });
     setRows(merged);
     setSuppliers(sups ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
+
+  const filtered = useMemo(() => {
+    return rows.filter((p) => {
+      if (statusFilter !== "all" && p.status !== statusFilter) return false;
+      if (supplierFilter !== "all" && p.supplier_id !== supplierFilter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (
+          p.reference?.toLowerCase().includes(q) ||
+          p.product_name?.toLowerCase().includes(q) ||
+          p.product_sku?.toLowerCase().includes(q) ||
+          p.supplier_name?.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [rows, search, statusFilter, supplierFilter]);
 
   const fmt = (n: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
@@ -90,9 +110,34 @@ export default function Purchases() {
         <Button onClick={() => setOpen(true)} className="gap-2"><Plus className="h-4 w-4" />Nueva compra</Button>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input placeholder="Buscar por código, producto o proveedor..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+        <div className="flex gap-2">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Filter className="h-3.5 w-3.5" />Filtros:</div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40"><SelectValue placeholder="Estado" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los estados</SelectItem>
+              <SelectItem value="pendiente">Pendiente</SelectItem>
+              <SelectItem value="recibida">Recibida</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={supplierFilter} onValueChange={setSupplierFilter}>
+            <SelectTrigger className="w-48"><SelectValue placeholder="Proveedor" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los proveedores</SelectItem>
+              {suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="rounded-xl border border-border bg-card shadow-card">
-        {loading ? <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin" /></div> : rows.length === 0 ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">Aún no cargaste órdenes de compra.</div>
+        {loading ? <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin" /></div> : filtered.length === 0 ? (
+          <div className="py-16 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste órdenes de compra." : "No hay compras que coincidan con los filtros."}</div>
         ) : (
           <Table>
             <TableHeader><TableRow>
@@ -101,11 +146,11 @@ export default function Purchases() {
               <TableHead>Estado</TableHead><TableHead>Fecha</TableHead><TableHead className="text-right">Acciones</TableHead>
             </TableRow></TableHeader>
             <TableBody>
-              {rows.map((p) => (
+              {filtered.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.reference ?? p.id.slice(0, 6)}</TableCell>
                   <TableCell>{p.supplier_name ?? "-"}</TableCell>
-                  <TableCell>{p.product_name ?? "-"}</TableCell>
+                  <TableCell>{p.product_name ?? "-"}{p.product_sku && <span className="ml-1 text-xs text-muted-foreground">({p.product_sku})</span>}</TableCell>
                   <TableCell className="text-right">{p.quantity}</TableCell>
                   <TableCell className="text-right">{fmt(Number(p.total))}</TableCell>
                   <TableCell><Badge variant={p.status === "recibida" ? "default" : "secondary"}>{p.status}</Badge></TableCell>

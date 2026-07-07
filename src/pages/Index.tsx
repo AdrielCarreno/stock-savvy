@@ -67,7 +67,7 @@ const faqs = [
   { q: "¿Puedo conectar Mercado Libre, Tienda Nube o Shopify?", a: "Sí. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para sincronizar productos, stock y pedidos en un solo lugar. También se conecta con ARCA (ex-AFIP) para simplificar la parte impositiva." },
   { q: "¿Mis datos están seguros?", a: "Sí. Toda la información que cargás en OneStock está almacenada en servidores con cifrado, backups automáticos y acceso protegido por credenciales individuales. Vos controlás quién ve qué dentro de tu equipo mediante permisos por usuario. Nunca compartimos ni vendemos tus datos a terceros." },
   { q: "¿Puedo importar mis productos desde Excel?", a: "Sí. OneStock permite importar productos y movimientos de stock desde archivos Excel/CSV para que no tengas que cargar todo a mano. Disponible en todos los planes." },
-  { q: "¿Qué pasa cuando termina el período de prueba?", a: "Al finalizar los 14 días podés elegir el plan que mejor se adapte a tu negocio y continuar sin perder ningún dato. No pedimos tarjeta de crédito para empezar — si decidís no continuar, no se te cobra nada." },
+  { q: "¿Qué pasa cuando termina el período de prueba?", a: "Al finalizar los 7 días podés elegir el plan que mejor se adapte a tu negocio y continuar sin perder ningún dato. No pedimos tarjeta de crédito para empezar — si decidís no continuar, no se te cobra nada." },
 ];
 
 type Plan = {
@@ -385,7 +385,7 @@ export default function Index() {
           <div className="mb-10 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Precios</Badge>
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Elegí el plan que mejor se adapta a tu negocio</h2>
-            <p className="text-muted-foreground">Precios en pesos argentinos. 14 días gratis sin tarjeta de crédito.</p>
+            <p className="text-muted-foreground">Precios en pesos argentinos. 7 días gratis sin tarjeta de crédito.</p>
           </div>
 
           <div className="mb-10 flex items-center justify-center">
@@ -431,6 +431,10 @@ export default function Index() {
                   <div className="mb-3 pt-2">
                     <h3 className={`text-xl font-semibold ${plan.highlight ? "text-primary" : "text-foreground"}`}>{plan.name}</h3>
                     <p className="text-xs text-muted-foreground mt-1 min-h-[2.5rem]">{plan.desc}</p>
+                    <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
+                      <Sparkles className="h-3 w-3" />
+                      Prueba 7 días gratis
+                    </div>
                   </div>
 
                   <div className="mb-5 min-h-[4.5rem]">
