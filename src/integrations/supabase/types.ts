@@ -664,7 +664,11 @@ export type Database = {
           customer_id: string | null
           discount: number
           id: string
+          invoice_number: string | null
+          invoice_url: string | null
+          logistics: string | null
           notes: string | null
+          payment_method: string | null
           reference: string | null
           sale_date: string
           status: string
@@ -679,7 +683,11 @@ export type Database = {
           customer_id?: string | null
           discount?: number
           id?: string
+          invoice_number?: string | null
+          invoice_url?: string | null
+          logistics?: string | null
           notes?: string | null
+          payment_method?: string | null
           reference?: string | null
           sale_date?: string
           status?: string
@@ -694,7 +702,11 @@ export type Database = {
           customer_id?: string | null
           discount?: number
           id?: string
+          invoice_number?: string | null
+          invoice_url?: string | null
+          logistics?: string | null
           notes?: string | null
+          payment_method?: string | null
           reference?: string | null
           sale_date?: string
           status?: string
