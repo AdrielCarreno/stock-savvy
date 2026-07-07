@@ -1,7 +1,6 @@
-import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal } from "lucide-react";
+import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, ShoppingCart, Receipt, Truck, Users, Shield, Plug, Settings, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
-import { Plug, Settings, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +13,11 @@ const primaryItems = [
 ];
 
 const moreItems = [
+  { title: "Compras", url: "/app/purchases", icon: ShoppingCart },
+  { title: "Ventas", url: "/app/sales", icon: Receipt },
+  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+  { title: "Clientes", url: "/app/customers", icon: Users },
+  { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración de negocio", url: "/app/settings", icon: Settings },
 ];
@@ -53,7 +57,7 @@ export function MobileBottomNav() {
               <span>Más</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Más opciones</SheetTitle>
             </SheetHeader>
