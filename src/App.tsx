@@ -16,13 +16,10 @@ import Products from "./pages/app/Products";
 import Movements from "./pages/app/Movements";
 import LowStock from "./pages/app/LowStock";
 import Integrations from "./pages/app/Integrations";
-import Purchases from "./pages/app/Purchases";
-import Sales from "./pages/app/Sales";
 import Suppliers from "./pages/app/Suppliers";
-import Customers from "./pages/app/Customers";
 import UsersPermissions from "./pages/app/UsersPermissions";
 import BusinessSettings from "./pages/app/BusinessSettings";
-
+import Accounting from "./pages/app/Accounting";
 
 const queryClient = new QueryClient();
 
@@ -52,15 +49,16 @@ const App = () => (
             <Route path="products" element={<Products />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
-            <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="purchases" element={<Purchases />} />
-            <Route path="sales" element={<Sales />} />
+            <Route path="accounting" element={<Accounting />} />
             <Route path="suppliers" element={<Suppliers />} />
-            <Route path="customers" element={<Customers />} />
             <Route path="users" element={<UsersPermissions />} />
             <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<BusinessSettings />} />
-            {/* Legacy redirects */}
+            {/* Redirects for merged/removed sections */}
+            <Route path="purchases" element={<Navigate to="/app/movements?tab=purchases" replace />} />
+            <Route path="sales" element={<Navigate to="/app/movements?tab=sales" replace />} />
+            <Route path="customers" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="imports" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="shipments" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="customs" element={<Navigate to="/app/dashboard" replace />} />

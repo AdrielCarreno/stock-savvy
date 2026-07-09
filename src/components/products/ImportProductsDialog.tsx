@@ -136,8 +136,7 @@ export function ImportProductsDialog({ open, onOpenChange, existingSkus, onImpor
                 <div className="space-y-1">
                   <p className="text-sm font-medium">¿Primera vez?</p>
                   <p className="text-xs text-muted-foreground">
-                    Descargá la plantilla con las columnas correctas: nombre, sku, categoria, unidad, stock,
-                    stock_minimo, costo, precio.
+                    Descargá la plantilla con las columnas exactas de la tabla de productos: <span className="font-medium">Producto, SKU, Categoría, Depósito, P. Costo, P. Mayorista, P. Minorista, Stock, Mín.</span>
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={downloadTemplate} className="shrink-0 gap-2">

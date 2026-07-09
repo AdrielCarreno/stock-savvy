@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, ShoppingCart, Receipt, Truck, Users, Shield, Plug, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, Truck, Shield, Plug, Settings, Calculator, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -9,14 +9,12 @@ const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Movim.", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Alertas", url: "/app/low-stock", icon: AlertTriangle },
+  { title: "Contab.", url: "/app/accounting", icon: Calculator },
 ];
 
 const moreItems = [
-  { title: "Compras", url: "/app/purchases", icon: ShoppingCart },
-  { title: "Ventas", url: "/app/sales", icon: Receipt },
   { title: "Proveedores", url: "/app/suppliers", icon: Truck },
-  { title: "Clientes", url: "/app/customers", icon: Users },
+  { title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
   { title: "Configuración de negocio", url: "/app/settings", icon: Settings },
