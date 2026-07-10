@@ -126,12 +126,12 @@ export default function Accounting() {
         </div>
       ) : (
         <Tabs defaultValue="chart">
-          <TabsList className="mb-4 grid w-full grid-cols-2 md:w-auto md:inline-flex md:grid-cols-5">
-            <TabsTrigger value="chart">Plan de cuentas</TabsTrigger>
-            <TabsTrigger value="journal">Libro diario</TabsTrigger>
-            <TabsTrigger value="ledger">Libro mayor</TabsTrigger>
-            <TabsTrigger value="balance">Balance</TabsTrigger>
-            <TabsTrigger value="income">Estado de resultados</TabsTrigger>
+          <TabsList className="mb-4 grid w-full grid-cols-5 gap-1 h-auto md:w-auto md:inline-flex">
+            <TabsTrigger value="chart" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Plan</TabsTrigger>
+            <TabsTrigger value="journal" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Diario</TabsTrigger>
+            <TabsTrigger value="ledger" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Mayor</TabsTrigger>
+            <TabsTrigger value="balance" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Balance</TabsTrigger>
+            <TabsTrigger value="income" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Resultados</TabsTrigger>
           </TabsList>
           <TabsContent value="chart"><ChartOfAccountsView accounts={accounts} onReload={load} companyId={company!.id} /></TabsContent>
           <TabsContent value="journal"><JournalView accounts={accounts} entries={entries} lines={lines} onReload={load} companyId={company!.id} /></TabsContent>
