@@ -175,7 +175,7 @@ function ChartOfAccountsView({ accounts, onReload, companyId }: { accounts: Acco
         <p className="text-sm text-muted-foreground">{accounts.length} cuentas</p>
         <Button onClick={openNew} size="sm" className="gap-2"><Plus className="h-4 w-4" />Nueva cuenta</Button>
       </div>
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         <Table>
           <TableHeader><TableRow>
             <TableHead className="w-24">Código</TableHead><TableHead>Nombre</TableHead><TableHead>Tipo</TableHead><TableHead className="text-right">Acciones</TableHead>
@@ -301,7 +301,7 @@ function JournalView({ accounts, entries, lines, onReload, companyId }: { accoun
         <Button onClick={() => { reset(); setOpen(true); }} size="sm" className="gap-2"><Plus className="h-4 w-4" />Nuevo asiento</Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {entries.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">Todavía no registraste asientos.</div>
         ) : (
@@ -422,7 +422,7 @@ function LedgerView({ accounts, entries, lines }: { accounts: Account[]; entries
           ))}</SelectContent>
         </Select>
       </div>
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {rows.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">Sin movimientos para esta cuenta.</div>
         ) : (
