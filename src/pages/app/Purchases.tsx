@@ -135,7 +135,8 @@ export default function Purchases() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      {/* Tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {loading ? <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin" /></div> : filtered.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste órdenes de compra." : "No hay compras que coincidan con los filtros."}</div>
         ) : (
@@ -164,6 +165,36 @@ export default function Purchases() {
             </TableBody>
           </Table>
         )}
+      </div>
+
+      {/* Tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground"><Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando...</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste órdenes de compra." : "Sin resultados."}</div>
+        ) : filtered.map((p) => (
+          <div key={p.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="font-semibold text-foreground truncate">{p.reference ?? p.id.slice(0, 6)}</p>
+                  <Badge variant={p.status === "recibida" ? "default" : "secondary"} className="text-[10px]">{p.status}</Badge>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground truncate">{p.supplier_name ?? "Sin proveedor"}</p>
+                <p className="text-xs text-muted-foreground truncate">{p.product_name ?? "-"} · {p.quantity} u.</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{p.order_date}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-bold text-foreground">{fmt(Number(p.total))}</p>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-end gap-1 border-t border-border pt-2">
+              {p.status !== "recibida" && <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => receive(p)}><PackageCheck className="h-3 w-3" />Recibir</Button>}
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </div>
+          </div>
+        ))}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
