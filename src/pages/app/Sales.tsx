@@ -142,23 +142,23 @@ export default function Sales() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold flex items-center gap-2"><Receipt className="h-5 w-5 text-primary" /> Ventas</h2>
           <p className="text-sm text-muted-foreground">Registro de ventas con salida automática de inventario</p>
         </div>
-        <Button onClick={() => { setForm(emptyForm()); setOpen(true); }} className="gap-2"><Plus className="h-4 w-4" />Nueva venta</Button>
+        <Button onClick={() => { setForm(emptyForm()); setOpen(true); }} className="gap-2 w-full sm:w-auto"><Plus className="h-4 w-4" />Nueva venta</Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Buscar por referencia, cliente, factura o producto..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <div className="flex gap-2 items-center">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Filter className="h-3.5 w-3.5" />Filtros:</div>
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground"><Filter className="h-3.5 w-3.5" />Filtros:</div>
           <Select value={channelFilter} onValueChange={setChannelFilter}>
-            <SelectTrigger className="w-36"><SelectValue placeholder="Canal" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-36"><SelectValue placeholder="Canal" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="local">Local</SelectItem>
@@ -168,7 +168,7 @@ export default function Sales() {
             </SelectContent>
           </Select>
           <Select value={payFilter} onValueChange={setPayFilter}>
-            <SelectTrigger className="w-40"><SelectValue placeholder="Medio de pago" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="Medio de pago" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los pagos</SelectItem>
               {PAYMENTS.map((p) => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
@@ -177,7 +177,8 @@ export default function Sales() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
+      {/* Tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {loading ? <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin" /></div> : filtered.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste ventas." : "No hay ventas con esos filtros."}</div>
         ) : (
@@ -223,6 +224,49 @@ export default function Sales() {
             </TableBody>
           </Table>
         )}
+      </div>
+
+      {/* Tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground"><Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando...</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste ventas." : "Sin resultados."}</div>
+        ) : filtered.map((s) => (
+          <div key={s.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="font-semibold text-foreground truncate">{s.reference ?? s.id.slice(0, 6)}</p>
+                  {s.channel && <Badge variant="outline" className="text-[10px]">{s.channel}</Badge>}
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground truncate">{s.customer_name ?? "Consumidor final"}</p>
+                {s.items.length > 0 && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    {s.items.slice(0, 2).map((it) => `${it.quantity}× ${it.product_name ?? "—"}`).join(", ")}
+                    {s.items.length > 2 && ` +${s.items.length - 2}`}
+                  </p>
+                )}
+                <div className="mt-1 flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-[10px] uppercase">{payLabel(s.payment_method)}</Badge>
+                  {s.logistics && <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground"><Truck className="h-2.5 w-2.5" />{s.logistics}</span>}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">{s.sale_date}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-bold text-foreground">{fmt(Number(s.total))}</p>
+                {s.invoice_url && /^https?:\/\//i.test(s.invoice_url) && (
+                  <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs mt-1">
+                    <a href={s.invoice_url} target="_blank" rel="noopener noreferrer"><FileDown className="h-3 w-3" />Factura</a>
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-end gap-1 border-t border-border pt-2">
+              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </div>
+          </div>
+        ))}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

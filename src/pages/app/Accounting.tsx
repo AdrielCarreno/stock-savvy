@@ -126,12 +126,12 @@ export default function Accounting() {
         </div>
       ) : (
         <Tabs defaultValue="chart">
-          <TabsList className="mb-4 grid w-full grid-cols-2 md:w-auto md:inline-flex md:grid-cols-5">
-            <TabsTrigger value="chart">Plan de cuentas</TabsTrigger>
-            <TabsTrigger value="journal">Libro diario</TabsTrigger>
-            <TabsTrigger value="ledger">Libro mayor</TabsTrigger>
-            <TabsTrigger value="balance">Balance</TabsTrigger>
-            <TabsTrigger value="income">Estado de resultados</TabsTrigger>
+          <TabsList className="mb-4 grid w-full grid-cols-5 gap-1 h-auto md:w-auto md:inline-flex">
+            <TabsTrigger value="chart" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Plan</TabsTrigger>
+            <TabsTrigger value="journal" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Diario</TabsTrigger>
+            <TabsTrigger value="ledger" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Mayor</TabsTrigger>
+            <TabsTrigger value="balance" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Balance</TabsTrigger>
+            <TabsTrigger value="income" className="text-[10px] md:text-sm px-1 md:px-3 leading-tight">Resultados</TabsTrigger>
           </TabsList>
           <TabsContent value="chart"><ChartOfAccountsView accounts={accounts} onReload={load} companyId={company!.id} /></TabsContent>
           <TabsContent value="journal"><JournalView accounts={accounts} entries={entries} lines={lines} onReload={load} companyId={company!.id} /></TabsContent>
@@ -175,7 +175,7 @@ function ChartOfAccountsView({ accounts, onReload, companyId }: { accounts: Acco
         <p className="text-sm text-muted-foreground">{accounts.length} cuentas</p>
         <Button onClick={openNew} size="sm" className="gap-2"><Plus className="h-4 w-4" />Nueva cuenta</Button>
       </div>
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         <Table>
           <TableHeader><TableRow>
             <TableHead className="w-24">Código</TableHead><TableHead>Nombre</TableHead><TableHead>Tipo</TableHead><TableHead className="text-right">Acciones</TableHead>
@@ -301,7 +301,7 @@ function JournalView({ accounts, entries, lines, onReload, companyId }: { accoun
         <Button onClick={() => { reset(); setOpen(true); }} size="sm" className="gap-2"><Plus className="h-4 w-4" />Nuevo asiento</Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {entries.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">Todavía no registraste asientos.</div>
         ) : (
@@ -422,7 +422,7 @@ function LedgerView({ accounts, entries, lines }: { accounts: Account[]; entries
           ))}</SelectContent>
         </Select>
       </div>
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {rows.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">Sin movimientos para esta cuenta.</div>
         ) : (

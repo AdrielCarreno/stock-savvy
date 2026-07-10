@@ -140,23 +140,23 @@ export default function Suppliers() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold flex items-center gap-2"><Truck className="h-5 w-5 text-primary" /> Proveedores</h2>
           <p className="text-sm text-muted-foreground">Base de proveedores con productos que provee y contacto</p>
         </div>
-        <Button onClick={openNew} className="gap-2"><Plus className="h-4 w-4" />Nuevo</Button>
+        <Button onClick={openNew} className="gap-2 w-full sm:w-auto"><Plus className="h-4 w-4" />Nuevo</Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Buscar por nombre, contacto o email..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-2 items-center">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Filter className="h-3.5 w-3.5" />Filtros:</div>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground"><Filter className="h-3.5 w-3.5" />Filtros:</div>
           <Select value={countryFilter} onValueChange={setCountryFilter}>
-            <SelectTrigger className="w-40"><SelectValue placeholder="País" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="País" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los países</SelectItem>
               {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -165,7 +165,8 @@ export default function Suppliers() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card">
+      {/* Tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
         ) : filtered.length === 0 ? (
@@ -222,6 +223,48 @@ export default function Suppliers() {
             </TableBody>
           </Table>
         )}
+      </div>
+
+      {/* Tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground"><Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando...</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">{rows.length === 0 ? "Aún no cargaste proveedores." : "Sin resultados."}</div>
+        ) : filtered.map((s) => {
+          const phone = cleanPhone(s.contact_phone);
+          return (
+            <div key={s.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground truncate">{s.name}</p>
+                  {s.country && <p className="text-xs text-muted-foreground">{s.country}</p>}
+                  {s.contact_name && <p className="mt-1 text-sm truncate">{s.contact_name}</p>}
+                  {s.contact_email && <p className="text-xs text-muted-foreground truncate">{s.contact_email}</p>}
+                  {s.contact_phone && <p className="text-xs text-muted-foreground">{s.contact_phone}</p>}
+                  {s.payment_terms && <p className="mt-1 text-[10px] text-muted-foreground">Pago: {s.payment_terms}</p>}
+                  <div className="mt-2">{renderProducts(s.id)}</div>
+                </div>
+                <div className="flex flex-col gap-1 shrink-0">
+                  {phone && (
+                    <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                      <a href={`https://wa.me/${phone}`} target="_blank" rel="noopener noreferrer"><MessageCircle className="h-4 w-4 text-success" /></a>
+                    </Button>
+                  )}
+                  {s.contact_email && (
+                    <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                      <a href={`mailto:${s.contact_email}`}><Mail className="h-4 w-4 text-primary" /></a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="mt-2 flex items-center justify-end gap-1 border-t border-border pt-2">
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(s)}><Edit2 className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
