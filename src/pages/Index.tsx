@@ -329,8 +329,8 @@ export default function Index() {
         <div className="container max-w-6xl">
           <div className="mb-12 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Roadmap</Badge>
-            <h2 className="mb-3 text-3xl font-bold md:text-4xl">Cómo usar OneStock</h2>
-            <p className="text-muted-foreground">Un mapa simple para empezar a controlar tu stock en minutos.</p>
+            <h2 className="mb-3 text-3xl font-bold md:text-4xl">Cómo funciona OneStock</h2>
+            <p className="text-muted-foreground">De la carga del catálogo a la contabilidad, todo en un mismo flujo.</p>
           </div>
 
           <div className="relative">
