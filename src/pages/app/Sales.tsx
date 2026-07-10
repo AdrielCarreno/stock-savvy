@@ -118,7 +118,7 @@ export default function Sales() {
       payment_method: form.payment_method || null,
       logistics: form.logistics || null,
       invoice_number: form.invoice_number || null,
-      invoice_url: form.invoice_url || null,
+      invoice_url: rawUrl || null,
     } as any).select().single();
     if (error || !sale) return toast({ title: "Error", description: friendlyError(error), variant: "destructive" });
 
