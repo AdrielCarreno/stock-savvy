@@ -255,15 +255,13 @@ export default function Index() {
               Ordenar tu stock no tiene que ser complicado
             </h2>
             <p className="mb-4 text-muted-foreground">
-              OneStock nació con un objetivo claro: darle a los comercios, distribuidoras y pymes
-              de Argentina una herramienta simple, en español y a precio local para llevar el control
-              real de su inventario y sus movimientos, sin planillas de Excel desordenadas ni sistemas
-              carísimos pensados para grandes multinacionales.
+              OneStock es el sistema simple, en español y a precio local para llevar tu negocio:
+              controlá stock, compras, ventas, proveedores y contabilidad desde un solo lugar.
             </p>
             <p className="text-muted-foreground">
-              Creemos que cada negocio, sin importar su tamaño, merece saber en tiempo real qué tiene,
-              qué le falta, cuánto vale su mercadería y qué se mueve. Por eso construimos una
-              plataforma clara, rápida y conectada con los canales que ya usás.
+              Con dashboard en tiempo real, movimientos unificados, contabilidad con partida doble
+              e integraciones con Mercado Libre, Tienda Nube y Shopify. Y lo mejor: también funciona
+              como <span className="font-semibold text-foreground">app móvil</span> para operar tu negocio desde el celular.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
