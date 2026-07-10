@@ -226,7 +226,7 @@ export default function Index() {
               </a>
             </div>
             <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/70">
-              <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary-glow" /> 14 días gratis</span>
+              <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary-glow" /> 7 días gratis</span>
               <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary-glow" /> Sin tarjeta de crédito</span>
               <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary-glow" /> Cancelá cuando quieras</span>
             </div>
