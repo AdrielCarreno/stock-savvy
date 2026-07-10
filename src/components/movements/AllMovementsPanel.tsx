@@ -31,7 +31,8 @@ export function AllMovementsPanel() {
         <Input placeholder="Buscar por producto, SKU o nota..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+      {/* Tabla (desktop) */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -72,6 +73,41 @@ export function AllMovementsPanel() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Tarjetas (móvil) */}
+      <div className="md:hidden space-y-2">
+        {loading ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            <Loader2 className="inline h-4 w-4 animate-spin mr-2" />Cargando...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            {movements.length === 0 ? "Aún no hay movimientos registrados." : "Sin resultados."}
+          </div>
+        ) : filtered.map((m: any) => (
+          <div key={m.id} className="rounded-xl border border-border bg-card p-3 shadow-card">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold text-foreground">{m.product_name}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  {m.product_sku && <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{m.product_sku}</code>}
+                  <Badge className={`text-[10px] ${m.type === "entrada" ? "bg-success-light text-success border-success/20" : "bg-destructive/10 text-destructive border-destructive/20"}`}>
+                    {m.type === "entrada" ? <><ArrowDownCircle className="mr-1 h-2.5 w-2.5" />Entrada</> : <><ArrowUpCircle className="mr-1 h-2.5 w-2.5" />Salida</>}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-lg font-bold leading-none">{m.quantity}</p>
+                {m.value > 0 && <p className="text-[10px] text-muted-foreground mt-0.5">{fmt(m.value)}</p>}
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-[11px] text-muted-foreground">
+              <span className="truncate">{m.reason ?? "—"}</span>
+              <span className="whitespace-nowrap ml-2">{fmtDate(m.created_at)}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
