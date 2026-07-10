@@ -119,7 +119,7 @@ export function useStockMovements() {
         movement_date: input.movement_date ?? new Date().toISOString(),
       });
       if (mErr) {
-        toast.error("Error al registrar movimiento: " + mErr.message);
+        toast.error(friendlyError(mErr, "Error al registrar movimiento"));
         return { error: mErr };
       }
 
@@ -128,7 +128,7 @@ export function useStockMovements() {
         .update({ current_stock: newStock })
         .eq("id", input.product_id);
       if (uErr) {
-        toast.error("Error al actualizar stock: " + uErr.message);
+        toast.error(friendlyError(uErr, "Error al actualizar stock"));
         return { error: uErr };
       }
 
@@ -212,7 +212,7 @@ export function useStockMovements() {
         })
         .eq("id", id);
       if (mErr) {
-        toast.error("Error al actualizar movimiento: " + mErr.message);
+        toast.error(friendlyError(mErr, "Error al actualizar movimiento"));
         return { error: mErr };
       }
 
@@ -222,7 +222,7 @@ export function useStockMovements() {
           .update({ current_stock: u.newStock })
           .eq("id", u.id);
         if (uErr) {
-          toast.error("Error al actualizar stock: " + uErr.message);
+          toast.error(friendlyError(uErr, "Error al actualizar stock"));
           return { error: uErr };
         }
       }

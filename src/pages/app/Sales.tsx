@@ -97,6 +97,10 @@ export default function Sales() {
     if (!company?.id) return;
     const items: SaleItem[] = form.items.filter((it: SaleItem) => it.product_id && Number(it.quantity) > 0);
     if (items.length === 0) return toast({ title: "Agregá al menos un producto", variant: "destructive" });
+    const rawUrl = (form.invoice_url || "").trim();
+    if (rawUrl && !/^https?:\/\//i.test(rawUrl)) {
+      return toast({ title: "URL de factura inválida", description: "Debe comenzar con http:// o https://", variant: "destructive" });
+    }
 
     // Register stock movements (validates stock) for each item
     for (const it of items) {
@@ -114,7 +118,7 @@ export default function Sales() {
       payment_method: form.payment_method || null,
       logistics: form.logistics || null,
       invoice_number: form.invoice_number || null,
-      invoice_url: form.invoice_url || null,
+      invoice_url: rawUrl || null,
     } as any).select().single();
     if (error || !sale) return toast({ title: "Error", description: friendlyError(error), variant: "destructive" });
 
@@ -202,7 +206,7 @@ export default function Sales() {
                   <TableCell><Badge variant="outline" className="uppercase text-xs">{payLabel(s.payment_method)}</Badge></TableCell>
                   <TableCell className="text-xs text-muted-foreground">{s.logistics ? <span className="inline-flex items-center gap-1"><Truck className="h-3 w-3" />{s.logistics}</span> : "-"}</TableCell>
                   <TableCell>
-                    {s.invoice_url ? (
+                    {s.invoice_url && /^https?:\/\//i.test(s.invoice_url) ? (
                       <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs">
                         <a href={s.invoice_url} target="_blank" rel="noopener noreferrer"><FileDown className="h-3 w-3" />{s.invoice_number ?? "Descargar"}</a>
                       </Button>
