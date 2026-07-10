@@ -97,6 +97,10 @@ export default function Sales() {
     if (!company?.id) return;
     const items: SaleItem[] = form.items.filter((it: SaleItem) => it.product_id && Number(it.quantity) > 0);
     if (items.length === 0) return toast({ title: "Agregá al menos un producto", variant: "destructive" });
+    const rawUrl = (form.invoice_url || "").trim();
+    if (rawUrl && !/^https?:\/\//i.test(rawUrl)) {
+      return toast({ title: "URL de factura inválida", description: "Debe comenzar con http:// o https://", variant: "destructive" });
+    }
 
     // Register stock movements (validates stock) for each item
     for (const it of items) {
