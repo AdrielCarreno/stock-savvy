@@ -206,7 +206,7 @@ export default function Sales() {
                   <TableCell><Badge variant="outline" className="uppercase text-xs">{payLabel(s.payment_method)}</Badge></TableCell>
                   <TableCell className="text-xs text-muted-foreground">{s.logistics ? <span className="inline-flex items-center gap-1"><Truck className="h-3 w-3" />{s.logistics}</span> : "-"}</TableCell>
                   <TableCell>
-                    {s.invoice_url ? (
+                    {s.invoice_url && /^https?:\/\//i.test(s.invoice_url) ? (
                       <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs">
                         <a href={s.invoice_url} target="_blank" rel="noopener noreferrer"><FileDown className="h-3 w-3" />{s.invoice_number ?? "Descargar"}</a>
                       </Button>
