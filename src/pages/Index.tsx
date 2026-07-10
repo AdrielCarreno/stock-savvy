@@ -211,8 +211,8 @@ export default function Index() {
               </span>
             </h1>
             <p className="mb-8 max-w-xl text-lg text-white/80">
-              Gestioná productos, entradas, salidas y alertas de bajo stock. Integrá Mercado Libre,
-              Tienda Nube, Shopify, WhatsApp Business y ARCA — todo desde una misma plataforma.
+              Stock, movimientos de compra y venta, contabilidad con partida doble y proveedores —
+              todo en un solo sistema, integrado con tus canales y disponible también como app móvil.
             </p>
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Link to="/register">
