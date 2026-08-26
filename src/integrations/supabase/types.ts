@@ -513,6 +513,7 @@ export type Database = {
           id: string
           product_id: string
           quantity: number
+          reserved: number
           updated_at: string
           warehouse_id: string
         }
@@ -522,6 +523,7 @@ export type Database = {
           id?: string
           product_id: string
           quantity?: number
+          reserved?: number
           updated_at?: string
           warehouse_id: string
         }
@@ -531,6 +533,7 @@ export type Database = {
           id?: string
           product_id?: string
           quantity?: number
+          reserved?: number
           updated_at?: string
           warehouse_id?: string
         }
@@ -558,8 +561,66 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          barcode: string | null
+          color: string | null
+          company_id: string
+          created_at: string
+          id: string
+          name: string
+          product_id: string
+          size: string | null
+          sku: string | null
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          color?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          name: string
+          product_id: string
+          size?: string | null
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          color?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          product_id?: string
+          size?: string | null
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
+          barcode: string | null
           category: string | null
           client: string | null
           company_id: string
@@ -567,7 +628,9 @@ export type Database = {
           created_at: string
           current_stock: number
           description: string | null
+          expiry_date: string | null
           id: string
+          max_stock: number
           min_stock: number
           name: string
           price: number | null
@@ -578,6 +641,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          barcode?: string | null
           category?: string | null
           client?: string | null
           company_id: string
@@ -585,7 +649,9 @@ export type Database = {
           created_at?: string
           current_stock?: number
           description?: string | null
+          expiry_date?: string | null
           id?: string
+          max_stock?: number
           min_stock?: number
           name: string
           price?: number | null
@@ -596,6 +662,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          barcode?: string | null
           category?: string | null
           client?: string | null
           company_id?: string
@@ -603,7 +670,9 @@ export type Database = {
           created_at?: string
           current_stock?: number
           description?: string | null
+          expiry_date?: string | null
           id?: string
+          max_stock?: number
           min_stock?: number
           name?: string
           price?: number | null
@@ -944,6 +1013,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string
+          from_warehouse_id: string | null
           id: string
           logistics: string | null
           movement_date: string
@@ -951,12 +1021,16 @@ export type Database = {
           quantity: number
           reason: string | null
           sale_type: string | null
+          to_warehouse_id: string | null
           type: string
+          unit_cost: number | null
           user_id: string
+          warehouse_id: string | null
         }
         Insert: {
           company_id: string
           created_at?: string
+          from_warehouse_id?: string | null
           id?: string
           logistics?: string | null
           movement_date?: string
@@ -964,12 +1038,16 @@ export type Database = {
           quantity: number
           reason?: string | null
           sale_type?: string | null
+          to_warehouse_id?: string | null
           type: string
+          unit_cost?: number | null
           user_id: string
+          warehouse_id?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string
+          from_warehouse_id?: string | null
           id?: string
           logistics?: string | null
           movement_date?: string
@@ -977,8 +1055,11 @@ export type Database = {
           quantity?: number
           reason?: string | null
           sale_type?: string | null
+          to_warehouse_id?: string | null
           type?: string
+          unit_cost?: number | null
           user_id?: string
+          warehouse_id?: string | null
         }
         Relationships: [
           {
@@ -989,10 +1070,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "stock_movements_from_warehouse_id_fkey"
+            columns: ["from_warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stock_movements_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_to_warehouse_id_fkey"
+            columns: ["to_warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
             referencedColumns: ["id"]
           },
           {
@@ -1002,26 +1097,103 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "stock_movements_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      supplier_products: {
+      supplier_price_history: {
         Row: {
           company_id: string
+          cost: number
           created_at: string
+          currency: string
+          effective_date: string
+          id: string
+          notes: string | null
           product_id: string
           supplier_id: string
         }
         Insert: {
           company_id: string
+          cost: number
           created_at?: string
+          currency?: string
+          effective_date?: string
+          id?: string
+          notes?: string | null
           product_id: string
           supplier_id: string
         }
         Update: {
           company_id?: string
+          cost?: number
           created_at?: string
+          currency?: string
+          effective_date?: string
+          id?: string
+          notes?: string | null
           product_id?: string
           supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_price_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_price_history_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_products: {
+        Row: {
+          company_id: string
+          cost: number | null
+          created_at: string
+          is_preferred: boolean
+          product_id: string
+          supplier_id: string
+          supplier_sku: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          cost?: number | null
+          created_at?: string
+          is_preferred?: boolean
+          product_id: string
+          supplier_id: string
+          supplier_sku?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          cost?: number | null
+          created_at?: string
+          is_preferred?: boolean
+          product_id?: string
+          supplier_id?: string
+          supplier_sku?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
