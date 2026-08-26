@@ -19,7 +19,8 @@ import Integrations from "./pages/app/Integrations";
 import Suppliers from "./pages/app/Suppliers";
 import UsersPermissions from "./pages/app/UsersPermissions";
 import BusinessSettings from "./pages/app/BusinessSettings";
-import Accounting from "./pages/app/Accounting";
+import Reports from "./pages/app/Reports";
+import AI from "./pages/app/AI";
 
 const queryClient = new QueryClient();
 
@@ -49,16 +50,17 @@ const App = () => (
             <Route path="products" element={<Products />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
-            <Route path="accounting" element={<Accounting />} />
             <Route path="suppliers" element={<Suppliers />} />
-            <Route path="users" element={<UsersPermissions />} />
             <Route path="integrations" element={<Integrations />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="ai" element={<AI />} />
+            <Route path="users" element={<UsersPermissions />} />
             <Route path="settings" element={<BusinessSettings />} />
             {/* Redirects for merged/removed sections */}
             <Route path="purchases" element={<Navigate to="/app/movements?tab=purchases" replace />} />
             <Route path="sales" element={<Navigate to="/app/movements?tab=sales" replace />} />
+            <Route path="accounting" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="customers" element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="reports" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="imports" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="shipments" element={<Navigate to="/app/dashboard" replace />} />
             <Route path="customs" element={<Navigate to="/app/dashboard" replace />} />
