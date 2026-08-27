@@ -7,7 +7,8 @@ import {
   Settings,
   Truck,
   Shield,
-  Calculator,
+  FileBarChart,
+  Sparkles,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -17,12 +18,13 @@ import { useState } from "react";
 const navItems = [
   { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
   { title: "Productos", url: "/app/products", icon: Package },
-  { title: "Movimientos", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Contabilidad", url: "/app/accounting", icon: Calculator },
-  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
   { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
-  { title: "Usuarios y Permisos", url: "/app/users", icon: Shield },
+  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+  { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
+  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
+  { title: "IA", url: "/app/ai", icon: Sparkles },
+  { title: "Usuarios y Permisos", url: "/app/users", icon: Shield },
   { title: "Configuración", url: "/app/settings", icon: Settings },
 ];
 
@@ -42,7 +44,7 @@ export function AppSidebar() {
         {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">OneStock</span>}
       </div>
 
-      <nav className="flex-1 space-y-1 p-2 pt-4">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-2 pt-4">
         {navItems.map((item) => (
           <NavLink
             key={item.url}
@@ -51,7 +53,7 @@ export function AppSidebar() {
             activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>{item.title}</span>}
+            {!collapsed && <span className="truncate">{item.title}</span>}
           </NavLink>
         ))}
       </nav>
