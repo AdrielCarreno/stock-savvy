@@ -10,13 +10,15 @@ const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
   "/app/products": "Productos",
   "/app/low-stock": "Alertas de Stock",
-  "/app/movements": "Movimientos",
-  "/app/accounting": "Contabilidad",
   "/app/suppliers": "Proveedores",
-  "/app/users": "Usuarios y permisos",
+  "/app/movements": "Stock y Movimientos",
   "/app/integrations": "Integraciones",
+  "/app/reports": "Reportes",
+  "/app/ai": "IA",
+  "/app/users": "Usuarios y permisos",
   "/app/settings": "Configuración de negocio",
 };
+
 
 export function AppLayout() {
   const location = useLocation();

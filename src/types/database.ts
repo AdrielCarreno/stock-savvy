@@ -61,12 +61,15 @@ export interface Database {
           company_id: string;
           name: string;
           sku: string | null;
+          barcode: string | null;
           description: string | null;
           category: string | null;
           client: string | null;
           unit: string;
           current_stock: number;
           min_stock: number;
+          max_stock: number;
+          expiry_date: string | null;
           price: number | null;
           price_wholesale: number | null;
           price_retail: number | null;
@@ -74,17 +77,21 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
+
         Insert: {
           id?: string;
           company_id: string;
           name: string;
           sku?: string | null;
+          barcode?: string | null;
           description?: string | null;
           category?: string | null;
           client?: string | null;
           unit?: string;
           current_stock?: number;
           min_stock?: number;
+          max_stock?: number;
+          expiry_date?: string | null;
           price?: number | null;
           price_wholesale?: number | null;
           price_retail?: number | null;
@@ -97,18 +104,22 @@ export interface Database {
           company_id?: string;
           name?: string;
           sku?: string | null;
+          barcode?: string | null;
           description?: string | null;
           category?: string | null;
           client?: string | null;
           unit?: string;
           current_stock?: number;
           min_stock?: number;
+          max_stock?: number;
+          expiry_date?: string | null;
           price?: number | null;
           price_wholesale?: number | null;
           price_retail?: number | null;
           cost?: number | null;
           created_at?: string;
           updated_at?: string;
+
         };
       };
       stock_movements: {

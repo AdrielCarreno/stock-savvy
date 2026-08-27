@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, Truck, Shield, Plug, Settings, Calculator, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, Truck, Shield, Plug, Settings, FileBarChart, Sparkles, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -8,16 +8,17 @@ import { useAuth } from "@/contexts/AuthContext";
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
   { title: "Productos", url: "/app/products", icon: Package },
-  { title: "Movim.", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Contab.", url: "/app/accounting", icon: Calculator },
+  { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
+  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
 ];
 
 const moreItems = [
-  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
   { title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle },
-  { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
+  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "Configuración de negocio", url: "/app/settings", icon: Settings },
+  { title: "IA", url: "/app/ai", icon: Sparkles },
+  { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
+  { title: "Configuración", url: "/app/settings", icon: Settings },
 ];
 
 export function MobileBottomNav() {
