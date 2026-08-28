@@ -8,17 +8,21 @@ import { toast } from "sonner";
 export type ProductInput = {
   name: string;
   sku: string | null;
+  barcode?: string | null;
   category: string | null;
   client?: string | null;
   unit?: string;
   current_stock: number;
   min_stock: number;
+  max_stock?: number;
+  expiry_date?: string | null;
   price: number | null;
   price_wholesale?: number | null;
   price_retail?: number | null;
   cost: number | null;
   description?: string | null;
 };
+
 
 export function useProducts() {
   const { profile } = useAuth();
