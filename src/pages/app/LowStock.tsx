@@ -79,7 +79,7 @@ export default function LowStock() {
   const { products, loading, updateProduct } = useProducts();
   const { movements } = useStockMovements();
 
-  const handleSave = async (id: string) => async (min: number, max: number, expiry: string | null) => {
+  const handleSave = (id: string) => async (min: number, max: number, expiry: string | null) => {
     await updateProduct(id, { min_stock: min, max_stock: max, expiry_date: expiry });
   };
 
@@ -196,7 +196,7 @@ export default function LowStock() {
                     <span>Mín: {p.min_stock}{(p.max_stock ?? 0) > 0 ? ` · Máx: ${p.max_stock}` : ""}</span>
                   </div>
                   <StockBar stock={p.current_stock} min={p.min_stock} />
-                  <StockLevelsDialog product={p} onSave={await_wrapper(handleSave(p.id))} />
+                  <StockLevelsDialog product={p} onSave={handleSave(p.id)} />
                 </div>
               ))}
             </div>
@@ -222,7 +222,7 @@ export default function LowStock() {
                   <p className="text-xs text-muted-foreground">
                     Vence el {new Date(p.expiry_date as string).toLocaleDateString("es-AR")} · {p.current_stock} u. en stock
                   </p>
-                  <StockLevelsDialog product={p} onSave={await_wrapper(handleSave(p.id))} />
+                  <StockLevelsDialog product={p} onSave={handleSave(p.id)} />
                 </div>
               ))}
             </div>
@@ -267,7 +267,7 @@ export default function LowStock() {
                     <Badge variant="secondary" className="shrink-0 text-[10px]">+{p.current_stock - p.max_stock}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">{p.current_stock} u. · máximo {p.max_stock}</p>
-                  <StockLevelsDialog product={p} onSave={await_wrapper(handleSave(p.id))} />
+                  <StockLevelsDialog product={p} onSave={handleSave(p.id)} />
                 </div>
               ))}
             </div>
@@ -276,12 +276,4 @@ export default function LowStock() {
       </Tabs>
     </div>
   );
-}
-
-/** handleSave devuelve una promesa de función; la desenvolvemos para el diálogo. */
-function await_wrapper(fn: Promise<(min: number, max: number, expiry: string | null) => Promise<void>>) {
-  return async (min: number, max: number, expiry: string | null) => {
-    const resolved = await fn;
-    await resolved(min, max, expiry);
-  };
 }
