@@ -8,17 +8,21 @@ import { toast } from "sonner";
 export type ProductInput = {
   name: string;
   sku: string | null;
+  barcode?: string | null;
   category: string | null;
   client?: string | null;
   unit?: string;
   current_stock: number;
   min_stock: number;
+  max_stock?: number;
+  expiry_date?: string | null;
   price: number | null;
   price_wholesale?: number | null;
   price_retail?: number | null;
   cost: number | null;
   description?: string | null;
 };
+
 
 export function useProducts() {
   const { profile } = useAuth();
@@ -55,11 +59,14 @@ export function useProducts() {
           company_id: companyId,
           name: input.name,
           sku: input.sku,
+          barcode: input.barcode ?? null,
           category: input.category,
           client: input.client ?? null,
           unit: input.unit ?? "unidad",
           current_stock: input.current_stock,
           min_stock: input.min_stock,
+          max_stock: input.max_stock ?? 0,
+          expiry_date: input.expiry_date ?? null,
           price: input.price,
           price_wholesale: input.price_wholesale ?? null,
           price_retail: input.price_retail ?? null,
@@ -135,11 +142,14 @@ export function useProducts() {
           company_id: companyId,
           name: input.name,
           sku: input.sku,
+          barcode: input.barcode ?? null,
           category: input.category,
           client: input.client ?? null,
           unit: input.unit ?? "unidad",
           current_stock: input.current_stock,
           min_stock: input.min_stock,
+          max_stock: input.max_stock ?? 0,
+          expiry_date: input.expiry_date ?? null,
           price: input.price,
           price_wholesale: input.price_wholesale ?? null,
           price_retail: input.price_retail ?? null,
