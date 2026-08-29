@@ -234,5 +234,95 @@ export function useStockMovements() {
     [companyId, fetchMovements]
   );
 
-  return { movements, loading, refresh: fetchMovements, createMovement, updateMovement };
+  const transferStock = useCallback(
+    async (input: {
+      product_id: string;
+      from_warehouse_id: string;
+      to_warehouse_id: string;
+      quantity: number;
+      reason?: string | null;
+    }) => {
+      if (!companyId || !user?.id) return { error: new Error("No autenticado") };
+      if (input.from_warehouse_id === input.to_warehouse_id) {
+        toast.error("Elegí depósitos distintos");
+        return { error: new Error("same warehouse") };
+      }
+      if (input.quantity <= 0) {
+        toast.error("La cantidad debe ser mayor a cero");
+        return { error: new Error("invalid qty") };
+      }
+
+      const { data: origin, error: oErr } = await supabase
+        .from("product_stock")
+        .select("id, quantity")
+        .eq("product_id", input.product_id)
+        .eq("warehouse_id", input.from_warehouse_id)
+        .maybeSingle();
+      if (oErr) {
+        toast.error(friendlyError(oErr, "Error al leer stock de origen"));
+        return { error: oErr };
+      }
+      if (!origin || origin.quantity < input.quantity) {
+        toast.error(`Stock insuficiente en el depósito de origen (${origin?.quantity ?? 0})`);
+        return { error: new Error("insufficient") };
+      }
+
+      const { data: dest, error: dErr } = await supabase
+        .from("product_stock")
+        .select("id, quantity")
+        .eq("product_id", input.product_id)
+        .eq("warehouse_id", input.to_warehouse_id)
+        .maybeSingle();
+      if (dErr) {
+        toast.error(friendlyError(dErr, "Error al leer stock de destino"));
+        return { error: dErr };
+      }
+
+      const { error: upErr } = await supabase
+        .from("product_stock")
+        .update({ quantity: origin.quantity - input.quantity })
+        .eq("id", origin.id);
+      if (upErr) {
+        toast.error(friendlyError(upErr, "Error al descontar stock"));
+        return { error: upErr };
+      }
+
+      const destErr = dest
+        ? (await supabase
+            .from("product_stock")
+            .update({ quantity: dest.quantity + input.quantity })
+            .eq("id", dest.id)).error
+        : (await supabase.from("product_stock").insert({
+            company_id: companyId,
+            product_id: input.product_id,
+            warehouse_id: input.to_warehouse_id,
+            quantity: input.quantity,
+          })).error;
+      if (destErr) {
+        // revertir origen
+        await supabase.from("product_stock").update({ quantity: origin.quantity }).eq("id", origin.id);
+        toast.error(friendlyError(destErr, "Error al acreditar stock"));
+        return { error: destErr };
+      }
+
+      await supabase.from("stock_movements").insert({
+        company_id: companyId,
+        product_id: input.product_id,
+        user_id: user.id,
+        type: "salida",
+        quantity: input.quantity,
+        reason: input.reason ?? "Transferencia entre depósitos",
+        from_warehouse_id: input.from_warehouse_id,
+        to_warehouse_id: input.to_warehouse_id,
+        movement_date: new Date().toISOString(),
+      });
+
+      toast.success("Transferencia registrada");
+      await fetchMovements();
+      return { error: null };
+    },
+    [companyId, user?.id, fetchMovements]
+  );
+
+  return { movements, loading, refresh: fetchMovements, createMovement, updateMovement, transferStock };
 }
