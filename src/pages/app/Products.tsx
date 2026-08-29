@@ -520,6 +520,9 @@ export default function Products() {
                     <span className="font-semibold text-foreground">{formatCurrency((p as any).price_retail ?? p.price)}</span>
                   </div>
                   <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailProduct(p)} aria-label="Ver detalle">
+                      <Layers className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
                       <Edit2 className="h-4 w-4" />
                     </Button>
