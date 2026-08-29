@@ -206,6 +206,8 @@ export default function Products() {
     const payload: ProductInput = {
       ...rest,
       sku: form.sku?.trim() || null,
+      barcode: form.barcode?.trim() || null,
+      expiry_date: form.expiry_date || null,
       category: form.category?.trim() || null,
       client: form.client?.trim() || null,
       // mantener price en sincronía con precio minorista para compatibilidad
