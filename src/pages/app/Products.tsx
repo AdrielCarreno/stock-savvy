@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X } from "lucide-react";
+import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Warehouse, X, Layers } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
+import { ProductDetailDialog } from "@/components/products/ProductDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -38,8 +39,9 @@ import type { Product } from "@/types/database";
 type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
-  name: "", sku: "", category: "", client: "", unit: "unidad",
-  current_stock: 0, min_stock: 0, price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
+  name: "", sku: "", barcode: "", category: "", client: "", unit: "unidad",
+  current_stock: 0, min_stock: 0, max_stock: 0, expiry_date: null,
+  price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
   warehouse_id: undefined,
 };
 
@@ -53,6 +55,7 @@ export default function Products() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -131,9 +134,11 @@ export default function Products() {
   }, [productStock, warehouseNameById]);
 
   const filtered = products.filter((p) => {
+    const q = search.toLowerCase();
     const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.sku?.toLowerCase().includes(search.toLowerCase()) ?? false);
+      p.name.toLowerCase().includes(q) ||
+      (p.sku?.toLowerCase().includes(q) ?? false) ||
+      ((p as any).barcode?.toLowerCase().includes(q) ?? false);
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
     const matchWarehouse = !productsInWarehouse || productsInWarehouse.has(p.id);
     return matchSearch && matchCategory && matchWarehouse;
@@ -156,11 +161,14 @@ export default function Products() {
     setForm({
       name: p.name,
       sku: p.sku,
+      barcode: (p as any).barcode ?? "",
       category: p.category,
       client: p.client,
       unit: p.unit,
       current_stock: p.current_stock,
       min_stock: p.min_stock,
+      max_stock: (p as any).max_stock ?? 0,
+      expiry_date: (p as any).expiry_date ?? null,
       price: p.price,
       price_wholesale: (p as any).price_wholesale ?? 0,
       price_retail: (p as any).price_retail ?? p.price ?? 0,
@@ -198,6 +206,8 @@ export default function Products() {
     const payload: ProductInput = {
       ...rest,
       sku: form.sku?.trim() || null,
+      barcode: form.barcode?.trim() || null,
+      expiry_date: form.expiry_date || null,
       category: form.category?.trim() || null,
       client: form.client?.trim() || null,
       // mantener price en sincronía con precio minorista para compatibilidad
@@ -287,8 +297,8 @@ export default function Products() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            aria-label="Buscar productos por nombre o SKU"
-            placeholder="Buscar por nombre o SKU..."
+            aria-label="Buscar productos por nombre, SKU o código de barras"
+            placeholder="Buscar por nombre, SKU o código de barras..."
             className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -451,6 +461,9 @@ export default function Products() {
                       <td className="px-4 py-3 text-center text-muted-foreground">{p.min_stock}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDetailProduct(p)} title="Detalle, variantes y proveedores" aria-label="Ver detalle">
+                            <Layers className="h-3.5 w-3.5" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(p)}>
                             <Edit2 className="h-3.5 w-3.5" />
                           </Button>
@@ -520,6 +533,9 @@ export default function Products() {
                     <span className="font-semibold text-foreground">{formatCurrency((p as any).price_retail ?? p.price)}</span>
                   </div>
                   <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailProduct(p)} aria-label="Ver detalle">
+                      <Layers className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
                       <Edit2 className="h-4 w-4" />
                     </Button>
@@ -558,6 +574,15 @@ export default function Products() {
                 className="font-mono"
               />
               {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Código de barras</Label>
+              <Input
+                value={form.barcode ?? ""}
+                onChange={(e) => setForm({ ...form, barcode: e.target.value })}
+                placeholder="7790000000000"
+                className="font-mono"
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Categoría</Label>
@@ -633,6 +658,23 @@ export default function Products() {
               />
               {errors.min_stock && <p className="text-xs text-destructive">{errors.min_stock}</p>}
             </div>
+            <div className="space-y-1.5">
+              <Label>Stock máximo</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.max_stock ?? 0}
+                onChange={(e) => setForm({ ...form, max_stock: Math.max(0, Number(e.target.value)) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vencimiento</Label>
+              <Input
+                type="date"
+                value={form.expiry_date ?? ""}
+                onChange={(e) => setForm({ ...form, expiry_date: e.target.value || null })}
+              />
+            </div>
             {!editing && warehouses.length > 0 && (
               <div className="col-span-2 space-y-1.5">
                 <Label>Depósito *</Label>
@@ -690,6 +732,13 @@ export default function Products() {
         onOpenChange={setImportOpen}
         existingSkus={existingSkus}
         onImport={bulkCreateProducts}
+      />
+
+      <ProductDetailDialog
+        product={detailProduct}
+        open={!!detailProduct}
+        onOpenChange={(o) => !o && setDetailProduct(null)}
+        onChanged={() => { refreshStock(); }}
       />
 
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
