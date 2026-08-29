@@ -633,6 +633,23 @@ export default function Products() {
               />
               {errors.min_stock && <p className="text-xs text-destructive">{errors.min_stock}</p>}
             </div>
+            <div className="space-y-1.5">
+              <Label>Stock máximo</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.max_stock ?? 0}
+                onChange={(e) => setForm({ ...form, max_stock: Math.max(0, Number(e.target.value)) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vencimiento</Label>
+              <Input
+                type="date"
+                value={form.expiry_date ?? ""}
+                onChange={(e) => setForm({ ...form, expiry_date: e.target.value || null })}
+              />
+            </div>
             {!editing && warehouses.length > 0 && (
               <div className="col-span-2 space-y-1.5">
                 <Label>Depósito *</Label>
