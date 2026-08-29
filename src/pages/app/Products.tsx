@@ -131,9 +131,11 @@ export default function Products() {
   }, [productStock, warehouseNameById]);
 
   const filtered = products.filter((p) => {
+    const q = search.toLowerCase();
     const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.sku?.toLowerCase().includes(search.toLowerCase()) ?? false);
+      p.name.toLowerCase().includes(q) ||
+      (p.sku?.toLowerCase().includes(q) ?? false) ||
+      ((p as any).barcode?.toLowerCase().includes(q) ?? false);
     const matchCategory = filterCategory === "all" || p.category === filterCategory;
     const matchWarehouse = !productsInWarehouse || productsInWarehouse.has(p.id);
     return matchSearch && matchCategory && matchWarehouse;
