@@ -692,6 +692,13 @@ export default function Products() {
         onImport={bulkCreateProducts}
       />
 
+      <ProductDetailDialog
+        product={detailProduct}
+        open={!!detailProduct}
+        onOpenChange={(o) => !o && setDetailProduct(null)}
+        onChanged={() => { refreshStock(); }}
+      />
+
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
