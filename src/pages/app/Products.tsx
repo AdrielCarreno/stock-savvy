@@ -560,6 +560,15 @@ export default function Products() {
               {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
             </div>
             <div className="space-y-1.5">
+              <Label>Código de barras</Label>
+              <Input
+                value={form.barcode ?? ""}
+                onChange={(e) => setForm({ ...form, barcode: e.target.value })}
+                placeholder="7790000000000"
+                className="font-mono"
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label>Categoría</Label>
               <Input
                 value={form.category ?? ""}
