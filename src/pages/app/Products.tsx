@@ -39,8 +39,9 @@ import type { Product } from "@/types/database";
 type ProductFormState = ProductInput & { warehouse_id?: string };
 
 const emptyForm: ProductFormState = {
-  name: "", sku: "", category: "", client: "", unit: "unidad",
-  current_stock: 0, min_stock: 0, price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
+  name: "", sku: "", barcode: "", category: "", client: "", unit: "unidad",
+  current_stock: 0, min_stock: 0, max_stock: 0, expiry_date: null,
+  price: 0, price_wholesale: 0, price_retail: 0, cost: 0,
   warehouse_id: undefined,
 };
 
