@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Edit2, Trash2, Loader2, Truck, Search, Filter, MessageCircle, Mail, Package } from "lucide-react";
+import { Plus, Edit2, Trash2, Loader2, Truck, Search, Filter, MessageCircle, Mail, Package, History } from "lucide-react";
+import { SupplierHistoryDialog } from "@/components/suppliers/SupplierHistoryDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/hooks/useProducts";
