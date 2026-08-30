@@ -35,6 +35,7 @@ export default function Suppliers() {
   const [search, setSearch] = useState("");
   const [countryFilter, setCountryFilter] = useState("all");
   const [saving, setSaving] = useState(false);
+  const [historyFor, setHistoryFor] = useState<{ id: string; name: string } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -215,6 +216,7 @@ export default function Suppliers() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
+                      <Button size="icon" variant="ghost" title="Historial" onClick={() => setHistoryFor({ id: s.id, name: s.name })}><History className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => openEdit(s)}><Edit2 className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </TableCell>
@@ -260,6 +262,7 @@ export default function Suppliers() {
                 </div>
               </div>
               <div className="mt-2 flex items-center justify-end gap-1 border-t border-border pt-2">
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setHistoryFor({ id: s.id, name: s.name })}><History className="h-4 w-4" /></Button>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(s)}><Edit2 className="h-4 w-4" /></Button>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </div>
@@ -324,6 +327,12 @@ export default function Suppliers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SupplierHistoryDialog
+        supplier={historyFor}
+        open={!!historyFor}
+        onOpenChange={(v) => !v && setHistoryFor(null)}
+      />
     </div>
   );
 }
