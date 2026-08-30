@@ -18,7 +18,7 @@ export default function Movements() {
   return (
     <div className="animate-fade-in">
       <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="mb-4 grid w-full grid-cols-3 gap-1 h-auto md:w-auto md:inline-flex">
+        <TabsList className="mb-4 grid w-full grid-cols-3 sm:grid-cols-5 gap-1 h-auto md:w-auto md:inline-flex">
           <TabsTrigger value="all" className="text-xs md:text-sm px-2">Todos</TabsTrigger>
           <TabsTrigger value="purchases" className="text-xs md:text-sm px-2">Compras</TabsTrigger>
           <TabsTrigger value="sales" className="text-xs md:text-sm px-2">Ventas</TabsTrigger>
