@@ -19,7 +19,7 @@ import {
   Store,
   Mail,
   MessageCircle,
-  Calculator,
+  
   Truck,
   FileText,
 } from "lucide-react";
