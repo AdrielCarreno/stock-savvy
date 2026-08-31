@@ -257,11 +257,11 @@ export default function Index() {
             </h2>
             <p className="mb-4 text-muted-foreground">
               OneStock es el sistema simple, en español y a precio local para llevar tu negocio:
-              controlá stock, compras, ventas, proveedores y contabilidad desde un solo lugar.
+              controlá stock, compras, ventas, proveedores y reportes desde un solo lugar.
             </p>
             <p className="text-muted-foreground">
-              Con dashboard en tiempo real, movimientos unificados, contabilidad con partida doble
-              e integraciones con Mercado Libre, Tienda Nube y Shopify. Y lo mejor: también funciona
+              Con dashboard en tiempo real, movimientos unificados con transferencias entre depósitos,
+              Kardex exportable e integraciones con Mercado Libre, Tienda Nube y Shopify. Y lo mejor: también funciona
               como <span className="font-semibold text-foreground">app móvil</span> para operar tu negocio desde el celular.
             </p>
           </div>
@@ -331,7 +331,7 @@ export default function Index() {
           <div className="mb-12 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Roadmap</Badge>
             <h2 className="mb-3 text-3xl font-bold md:text-4xl">Cómo funciona OneStock</h2>
-            <p className="text-muted-foreground">De la carga del catálogo a la contabilidad, todo en un mismo flujo.</p>
+            <p className="text-muted-foreground">De la carga del catálogo a los reportes, todo en un mismo flujo.</p>
           </div>
 
           <div className="relative">
