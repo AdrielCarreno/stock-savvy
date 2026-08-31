@@ -19,8 +19,9 @@ import {
   Store,
   Mail,
   MessageCircle,
-  Calculator,
+  
   Truck,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -38,15 +39,15 @@ type BillingCycle = "mensual" | "anual";
 const heroImages = [warehouse1.url, warehouse2.url, warehouse3.url];
 
 const featuresDark = [
-  { icon: Package, title: "Control de stock", desc: "Gestioná tu inventario en tiempo real, con múltiples depósitos y trazabilidad por producto." },
-  { icon: ArrowLeftRight, title: "Movimientos unificados", desc: "Compras, ventas y ajustes en un solo módulo con pestañas. Todo el historial sincronizado al instante." },
-  { icon: Calculator, title: "Contabilidad partida doble", desc: "Plan de cuentas, libro diario, mayor, balance y estado de resultados. Contabilidad formal integrada." },
-  { icon: Truck, title: "Proveedores y compras", desc: "Cargá proveedores, asociá los productos que te proveen y registrá cada compra sin salir del sistema." },
-  { icon: AlertTriangle, title: "Alertas de bajo stock", desc: "Configurá mínimos por producto y recibí avisos antes de quedarte sin mercadería." },
-  { icon: BarChart3, title: "Dashboard y reportes", desc: "Ventas totales, productos más vendidos, entradas y salidas monetarias y evolución mes a mes." },
+  { icon: Package, title: "Control de stock", desc: "SKU, código de barras, variantes (talle/color) y margen costo vs. venta. Multi-depósito con stock reservado." },
+  { icon: ArrowLeftRight, title: "Movimientos unificados", desc: "Compras, ventas, ajustes y transferencias entre depósitos en un solo módulo. Trazabilidad completa con fecha, usuario y motivo." },
+  { icon: FileText, title: "Reportes y Kardex", desc: "Kardex por producto, valorización del inventario y exportación a Excel/CSV y PDF en un clic." },
+  { icon: Truck, title: "Proveedores y compras", desc: "Órdenes de compra, historial de precios por proveedor y contacto directo por WhatsApp o email." },
+  { icon: AlertTriangle, title: "Alertas inteligentes", desc: "Stock mínimo y máximo, seguimiento de vencimientos y detección de productos estancados sin rotación." },
+  { icon: BarChart3, title: "Dashboard en tiempo real", desc: "Valor del inventario, productos más y menos vendidos, rotación y evolución de entradas y salidas." },
+  { icon: Sparkles, title: "IA para tu negocio", desc: "Asistente inteligente para analizar tu inventario y ayudarte a tomar mejores decisiones." },
+  { icon: Plug, title: "Integraciones", desc: "Facturación electrónica ARCA, punto de venta y e-commerce: Mercado Libre, Tienda Nube, Shopify y WhatsApp." },
   { icon: Smartphone, title: "App móvil", desc: "Usá OneStock desde el celular con la misma potencia que en escritorio. Todos los módulos, adaptados." },
-  { icon: Plug, title: "Integraciones", desc: "Conectá Mercado Libre, Tienda Nube, Shopify, WhatsApp Business y ARCA en pocos clics." },
-  { icon: ShieldCheck, title: "Usuarios y permisos", desc: "Sumá tu equipo con roles y permisos. Datos cifrados, backups automáticos y multi-empresa." },
 ];
 
 const industries = [
@@ -56,24 +57,24 @@ const industries = [
 ];
 
 const roadmap = [
-  { step: "01", title: "Cargá tu catálogo", desc: "Importá tus productos desde Excel o creálos manualmente. Definí SKU, categoría, costo y precios mayorista/minorista.", icon: Package },
-  { step: "02", title: "Sumá proveedores y clientes", desc: "Cargá tus proveedores con los productos que te proveen y armá tu base para operar compras y ventas.", icon: Truck },
+  { step: "01", title: "Cargá tu catálogo", desc: "Importá tus productos desde Excel o creálos manualmente. Definí SKU, código de barras, variantes, costo y precios mayorista/minorista.", icon: Package },
+  { step: "02", title: "Sumá tus proveedores", desc: "Cargá proveedores con los productos que te proveen, condiciones comerciales e historial de precios.", icon: Truck },
   { step: "03", title: "Operá compras y ventas", desc: "Registrá compras, ventas y ajustes desde el módulo unificado de Movimientos. El stock se actualiza al instante.", icon: ArrowLeftRight },
-  { step: "04", title: "Llevá tu contabilidad", desc: "Plan de cuentas, libro diario y mayor con partida doble. Balance y estado de resultados generados automáticamente.", icon: Calculator },
-  { step: "05", title: "Conectá tus canales", desc: "Sincronizá Mercado Libre, Tienda Nube, Shopify, WhatsApp Business y ARCA para operar todo desde un solo lugar.", icon: Plug },
-  { step: "06", title: "Analizá desde donde estés", desc: "Revisá el dashboard con ventas, top productos y alertas — desde tu compu o desde el celular como app móvil.", icon: BarChart3 },
+  { step: "04", title: "Mové mercadería entre depósitos", desc: "Transferí stock de un depósito a otro sin alterar el total, con trazabilidad de cada movimiento y stock reservado.", icon: ArrowLeftRight },
+  { step: "05", title: "Conectá tus canales", desc: "Sincronizá Mercado Libre, Tienda Nube, Shopify, WhatsApp Business y la facturación electrónica de ARCA.", icon: Plug },
+  { step: "06", title: "Analizá y exportá reportes", desc: "Kardex por producto, valorización del inventario y exportación a Excel/PDF — desde tu compu o el celular.", icon: BarChart3 },
 ];
 
 const integrations = ["Mercado Libre", "Tienda Nube", "Shopify", "WhatsApp Business", "ARCA (AFIP)", "+ Más integraciones"];
 
 const faqs = [
-  { q: "¿OneStock funciona para mi tipo de negocio?", a: "Sí. OneStock está pensado para comercios, distribuidoras, depósitos y pymes que necesitan controlar stock, compras, ventas y contabilidad. Funciona igual de bien si tenés un solo local o varios depósitos, y si vendés por mostrador, online o por canales como Mercado Libre, Tienda Nube o Shopify." },
-  { q: "¿Puedo usarlo desde el celular como una app?", a: "Sí. OneStock está optimizado como app móvil: todos los módulos (dashboard, productos, movimientos, contabilidad, proveedores) se ven y funcionan perfecto desde el teléfono. Podés agregarlo a la pantalla de inicio y usarlo como una app nativa." },
-  { q: "¿Cómo funcionan los movimientos de compra, venta y ajustes?", a: "En el módulo de Movimientos unificado tenés pestañas para Todos, Compras, Ventas y Ajustes de stock. Cada operación actualiza el inventario al instante y queda registrada con fecha, usuario y motivo. También podés generar automáticamente el asiento contable correspondiente." },
-  { q: "¿Qué incluye el módulo de contabilidad?", a: "Contabilidad completa con partida doble: plan de cuentas configurable, libro diario, libro mayor por cuenta, balance general (Activo = Pasivo + PN) y estado de resultados por período. Validación en tiempo real de que cada asiento cuadre." },
-  { q: "¿Puedo conectar Mercado Libre, Tienda Nube o Shopify?", a: "Sí. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para sincronizar productos, stock y pedidos. También se conecta con ARCA (ex-AFIP) para la parte impositiva." },
+  { q: "¿OneStock funciona para mi tipo de negocio?", a: "Sí. OneStock está pensado para comercios, distribuidoras, depósitos y pymes que necesitan controlar stock, compras y ventas. Funciona igual de bien si tenés un solo local o varios depósitos, y si vendés por mostrador, online o por canales como Mercado Libre, Tienda Nube o Shopify." },
+  { q: "¿Puedo usarlo desde el celular como una app?", a: "Sí. OneStock está optimizado como app móvil: todos los módulos (dashboard, productos, movimientos, proveedores, reportes) se ven y funcionan perfecto desde el teléfono. Podés agregarlo a la pantalla de inicio y usarlo como una app nativa." },
+  { q: "¿Cómo funcionan los movimientos y las transferencias?", a: "En el módulo de Movimientos unificado tenés pestañas para Todos, Compras, Ventas, Ajustes y Transferencias entre depósitos. Cada operación actualiza el inventario al instante y queda registrada con fecha, usuario y motivo, con trazabilidad completa y stock reservado." },
+  { q: "¿Qué reportes puedo generar?", a: "Desde el módulo de Reportes accedés al Kardex de cada producto, a la valorización del inventario y a los movimientos del período. Todo se puede exportar a Excel/CSV y PDF para compartir con tu contador o tu equipo." },
+  { q: "¿Puedo controlar vencimientos y stock mínimo?", a: "Sí. En Alertas de Stock configurás stock mínimo y máximo por producto, hacés seguimiento de fechas de vencimiento y detectás productos estancados sin rotación para liquidarlos a tiempo." },
+  { q: "¿Puedo conectar Mercado Libre, Tienda Nube o Shopify?", a: "Sí. OneStock se integra con Mercado Libre, Tienda Nube, Shopify y WhatsApp Business para sincronizar productos, stock y pedidos. También se conecta con ARCA (ex-AFIP) para la facturación electrónica." },
   { q: "¿Mis datos están seguros?", a: "Sí. Toda la información está cifrada, con backups automáticos y acceso por credenciales individuales. Controlás quién ve qué mediante roles y permisos por usuario. Nunca compartimos ni vendemos tus datos." },
-  { q: "¿Puedo importar mis productos desde Excel?", a: "Sí. Podés importar productos y movimientos desde Excel/CSV usando la plantilla del sistema con las mismas columnas que ves en la tabla. Disponible en todos los planes." },
   { q: "¿Qué pasa cuando termina el período de prueba?", a: "Al finalizar los 7 días podés elegir el plan que mejor se adapte a tu negocio y continuar sin perder ningún dato. No pedimos tarjeta de crédito para empezar — si decidís no continuar, no se te cobra nada." },
 ];
 
@@ -211,7 +212,7 @@ export default function Index() {
               </span>
             </h1>
             <p className="mb-8 max-w-xl text-lg text-white/80">
-              Stock, movimientos de compra y venta, contabilidad con partida doble y proveedores —
+              Stock, movimientos de compra y venta, transferencias entre depósitos, proveedores y reportes —
               todo en un solo sistema, integrado con tus canales y disponible también como app móvil.
             </p>
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
@@ -256,11 +257,11 @@ export default function Index() {
             </h2>
             <p className="mb-4 text-muted-foreground">
               OneStock es el sistema simple, en español y a precio local para llevar tu negocio:
-              controlá stock, compras, ventas, proveedores y contabilidad desde un solo lugar.
+              controlá stock, compras, ventas, proveedores y reportes desde un solo lugar.
             </p>
             <p className="text-muted-foreground">
-              Con dashboard en tiempo real, movimientos unificados, contabilidad con partida doble
-              e integraciones con Mercado Libre, Tienda Nube y Shopify. Y lo mejor: también funciona
+              Con dashboard en tiempo real, movimientos unificados con transferencias entre depósitos,
+              Kardex exportable e integraciones con Mercado Libre, Tienda Nube y Shopify. Y lo mejor: también funciona
               como <span className="font-semibold text-foreground">app móvil</span> para operar tu negocio desde el celular.
             </p>
           </div>
@@ -330,7 +331,7 @@ export default function Index() {
           <div className="mb-12 text-center">
             <Badge className="mb-3 bg-primary-light text-primary border-primary/20">Roadmap</Badge>
             <h2 className="mb-3 text-3xl font-bold md:text-4xl">Cómo funciona OneStock</h2>
-            <p className="text-muted-foreground">De la carga del catálogo a la contabilidad, todo en un mismo flujo.</p>
+            <p className="text-muted-foreground">De la carga del catálogo a los reportes, todo en un mismo flujo.</p>
           </div>
 
           <div className="relative">
