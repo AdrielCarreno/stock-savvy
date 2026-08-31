@@ -88,20 +88,42 @@ type Plan = {
 };
 
 const plans: Plan[] = [
-  { name: "Inicial", monthly: 34500, desc: "Para comercios y pymes que empiezan a ordenar su stock",
-    features: ["Hasta 500 productos", "1 depósito", "Movimientos ilimitados", "Alertas de bajo stock", "Hasta 2 usuarios", "Soporte por email"] },
-  { name: "Premium", monthly: 58700, desc: "Para negocios que venden por varios canales", highlight: true,
-    features: ["Productos ilimitados", "Hasta 3 depósitos", "Integraciones (Mercado Libre, Tienda Nube, Shopify)", "WhatsApp Business y ARCA", "Reportes avanzados", "Hasta 5 usuarios", "Soporte prioritario"] },
-  { name: "Empresarial", monthly: 87000, desc: "Para distribuidoras y empresas con operación grande",
-    features: ["Todo lo del plan Premium", "Depósitos ilimitados", "Usuarios ilimitados con permisos avanzados", "Integraciones completas", "Reportes personalizados", "Onboarding asistido", "Soporte por WhatsApp dedicado"] },
-  { name: "A medida", monthly: null, custom: true, desc: "¿Necesitás algo distinto? Armamos un plan a la medida de tu operación",
-    features: ["Integraciones a medida", "Volumen y SLA personalizado", "Implementación y migración asistida", "Capacitación para tu equipo", "Facturación corporativa"] },
+  {
+    name: "Inicial",
+    monthly: 34700,
+    desc: "Para comercios y pymes que empiezan a ordenar su stock",
+    features: [
+      "Hasta 500 productos",
+      "Hasta 3 depósitos",
+      "1 usuario",
+      "300 operaciones mensuales",
+      "Alertas de stock",
+      "Carga de proveedores ilimitada",
+      "Soporte por email y WhatsApp",
+      "Integración con ARCA",
+    ],
+  },
+  {
+    name: "Personalizado",
+    monthly: null,
+    custom: true,
+    desc: "Todo lo del plan Inicial, adaptado a la medida de tu operación",
+    features: [
+      "Todo lo del plan Inicial",
+      "Productos ilimitados",
+      "Depósitos ilimitados",
+      "Usuarios ilimitados",
+      "Operaciones ilimitadas",
+      "Reportes avanzados y Kardex",
+      "Transferencias entre depósitos",
+      "Integraciones con Mercado Libre, Tienda Nube, Shopify y POS",
+      "Soporte prioritario",
+    ],
+  },
 ];
 
 const MP_LINKS: Record<string, string> = {
   Inicial: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
-  Premium: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
-  Empresarial: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
 };
 
 const fmtAR = (n: number) => `$${n.toLocaleString("es-AR")}`;
