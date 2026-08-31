@@ -440,7 +440,7 @@ export default function Index() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2 max-w-4xl mx-auto">
             {plans.map((plan) => {
               const price = priceFor(plan);
               const isCustom = plan.custom;
