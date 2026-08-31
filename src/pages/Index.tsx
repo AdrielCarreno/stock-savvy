@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Calculator,
   Truck,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -211,7 +212,7 @@ export default function Index() {
               </span>
             </h1>
             <p className="mb-8 max-w-xl text-lg text-white/80">
-              Stock, movimientos de compra y venta, contabilidad con partida doble y proveedores —
+              Stock, movimientos de compra y venta, transferencias entre depósitos, proveedores y reportes —
               todo en un solo sistema, integrado con tus canales y disponible también como app móvil.
             </p>
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
