@@ -870,6 +870,8 @@ export type Database = {
       }
       sales: {
         Row: {
+          amount_received: number | null
+          change_amount: number | null
           channel: string | null
           company_id: string
           created_at: string
@@ -882,13 +884,18 @@ export type Database = {
           logistics: string | null
           notes: string | null
           payment_method: string | null
+          payments: Json
           reference: string | null
           sale_date: string
+          source: string
           status: string
+          tax: number
           total: number
           updated_at: string
         }
         Insert: {
+          amount_received?: number | null
+          change_amount?: number | null
           channel?: string | null
           company_id: string
           created_at?: string
@@ -901,13 +908,18 @@ export type Database = {
           logistics?: string | null
           notes?: string | null
           payment_method?: string | null
+          payments?: Json
           reference?: string | null
           sale_date?: string
+          source?: string
           status?: string
+          tax?: number
           total?: number
           updated_at?: string
         }
         Update: {
+          amount_received?: number | null
+          change_amount?: number | null
           channel?: string | null
           company_id?: string
           created_at?: string
@@ -920,9 +932,12 @@ export type Database = {
           logistics?: string | null
           notes?: string | null
           payment_method?: string | null
+          payments?: Json
           reference?: string | null
           sale_date?: string
+          source?: string
           status?: string
+          tax?: number
           total?: number
           updated_at?: string
         }
