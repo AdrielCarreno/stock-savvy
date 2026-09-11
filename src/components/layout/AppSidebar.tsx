@@ -11,27 +11,65 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   ShoppingCart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
-const navItems = [
-  { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
-  { title: "Caja (POS)", url: "/app/pos", icon: ShoppingCart },
-  { title: "Productos", url: "/app/products", icon: Package },
-  { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
-  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
-  { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
-  { title: "IA", url: "/app/ai", icon: Sparkles },
-  { title: "Usuarios y Permisos", url: "/app/users", icon: Shield },
-  { title: "Configuración", url: "/app/settings", icon: Settings },
+type NavItem = { title: string; url: string; icon: typeof Package };
+type NavGroup = { label: string; items: NavItem[] };
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Operación",
+    items: [
+      { title: "Caja (POS)", url: "/app/pos", icon: ShoppingCart },
+      { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
+    ],
+  },
+  {
+    label: "Catálogo",
+    items: [
+      { title: "Productos", url: "/app/products", icon: Package },
+      { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
+    ],
+  },
+  {
+    label: "Personas",
+    items: [
+      { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+      { title: "Usuarios y Permisos", url: "/app/users", icon: Shield },
+    ],
+  },
+  {
+    label: "Análisis",
+    items: [
+      { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
+      { title: "Reportes", url: "/app/reports", icon: FileBarChart },
+    ],
+  },
+  {
+    label: "IA",
+    items: [{ title: "Asistente IA", url: "/app/ai", icon: Sparkles }],
+  },
+  {
+    label: "Sistema",
+    items: [
+      { title: "Integraciones", url: "/app/integrations", icon: Plug },
+      { title: "Configuración", url: "/app/settings", icon: Settings },
+    ],
+  },
 ];
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { pathname } = useLocation();
+  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (label: string) =>
+    setClosedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
 
   return (
     <aside
@@ -46,18 +84,40 @@ export function AppSidebar() {
         {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">OneStock</span>}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-2 pt-4">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.url}
-            to={item.url}
-            className={`flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "justify-center" : ""}`}
-            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-          >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed && <span className="truncate">{item.title}</span>}
-          </NavLink>
-        ))}
+      <nav className="flex-1 overflow-y-auto p-2 pt-3">
+        {navGroups.map((group) => {
+          const hasActive = group.items.some((i) => pathname.startsWith(i.url));
+          const open = collapsed || !closedGroups[group.label] || hasActive;
+          return (
+            <div key={group.label} className="mb-1">
+              {!collapsed && (
+                <button
+                  onClick={() => toggleGroup(group.label)}
+                  className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-sidebar-foreground/70 hover:text-sidebar-accent-foreground transition-colors"
+                >
+                  <span>{group.label}</span>
+                  <ChevronDown className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`} />
+                </button>
+              )}
+              {open && (
+                <div className="space-y-0.5">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.url}
+                      to={item.url}
+                      title={item.title}
+                      className={`flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "justify-center" : ""}`}
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span className="truncate">{item.title}</span>}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       <button

@@ -12,14 +12,33 @@ const primaryItems = [
   { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
 ];
 
-const moreItems = [
-  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
-  { title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle },
-  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
-  { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "IA", url: "/app/ai", icon: Sparkles },
-  { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
-  { title: "Configuración", url: "/app/settings", icon: Settings },
+const moreGroups = [
+  {
+    label: "Catálogo",
+    items: [{ title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle }],
+  },
+  {
+    label: "Personas",
+    items: [
+      { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+      { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
+    ],
+  },
+  {
+    label: "Análisis",
+    items: [{ title: "Reportes", url: "/app/reports", icon: FileBarChart }],
+  },
+  {
+    label: "IA",
+    items: [{ title: "Asistente IA", url: "/app/ai", icon: Sparkles }],
+  },
+  {
+    label: "Sistema",
+    items: [
+      { title: "Integraciones", url: "/app/integrations", icon: Plug },
+      { title: "Configuración", url: "/app/settings", icon: Settings },
+    ],
+  },
 ];
 
 export function MobileBottomNav() {
