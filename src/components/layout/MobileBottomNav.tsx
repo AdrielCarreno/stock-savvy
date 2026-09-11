@@ -12,14 +12,33 @@ const primaryItems = [
   { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
 ];
 
-const moreItems = [
-  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
-  { title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle },
-  { title: "Proveedores", url: "/app/suppliers", icon: Truck },
-  { title: "Integraciones", url: "/app/integrations", icon: Plug },
-  { title: "IA", url: "/app/ai", icon: Sparkles },
-  { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
-  { title: "Configuración", url: "/app/settings", icon: Settings },
+const moreGroups = [
+  {
+    label: "Catálogo",
+    items: [{ title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle }],
+  },
+  {
+    label: "Personas",
+    items: [
+      { title: "Proveedores", url: "/app/suppliers", icon: Truck },
+      { title: "Usuarios y permisos", url: "/app/users", icon: Shield },
+    ],
+  },
+  {
+    label: "Análisis",
+    items: [{ title: "Reportes", url: "/app/reports", icon: FileBarChart }],
+  },
+  {
+    label: "IA",
+    items: [{ title: "Asistente IA", url: "/app/ai", icon: Sparkles }],
+  },
+  {
+    label: "Sistema",
+    items: [
+      { title: "Integraciones", url: "/app/integrations", icon: Plug },
+      { title: "Configuración", url: "/app/settings", icon: Settings },
+    ],
+  },
 ];
 
 export function MobileBottomNav() {
@@ -62,15 +81,22 @@ export function MobileBottomNav() {
               <SheetTitle>Más opciones</SheetTitle>
             </SheetHeader>
             <div className="mt-4 space-y-1">
-              {moreItems.map((item) => (
-                <button
-                  key={item.url}
-                  onClick={() => { setOpen(false); navigate(item.url); }}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
-                >
-                  <item.icon className="h-4 w-4 text-muted-foreground" />
-                  {item.title}
-                </button>
+              {moreGroups.map((group) => (
+                <div key={group.label} className="pt-2">
+                  <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {group.label}
+                  </p>
+                  {group.items.map((item) => (
+                    <button
+                      key={item.url}
+                      onClick={() => { setOpen(false); navigate(item.url); }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                    >
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
               ))}
               <button
                 onClick={handleLogout}
