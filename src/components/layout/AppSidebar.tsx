@@ -11,12 +11,14 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  ShoppingCart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 
 const navItems = [
   { title: "Dashboard", url: "/app/dashboard", icon: LayoutDashboard },
+  { title: "Caja (POS)", url: "/app/pos", icon: ShoppingCart },
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Alertas de Stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Proveedores", url: "/app/suppliers", icon: Truck },

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, Truck, Shield, Plug, Settings, FileBarChart, Sparkles, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal, Truck, Shield, Plug, Settings, FileBarChart, Sparkles, LogOut, ShoppingCart } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -7,12 +7,13 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
+  { title: "Caja", url: "/app/pos", icon: ShoppingCart },
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
-  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
 ];
 
 const moreItems = [
+  { title: "Reportes", url: "/app/reports", icon: FileBarChart },
   { title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle },
   { title: "Proveedores", url: "/app/suppliers", icon: Truck },
   { title: "Integraciones", url: "/app/integrations", icon: Plug },
