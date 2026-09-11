@@ -21,6 +21,7 @@ import UsersPermissions from "./pages/app/UsersPermissions";
 import BusinessSettings from "./pages/app/BusinessSettings";
 import Reports from "./pages/app/Reports";
 import AI from "./pages/app/AI";
+import POS from "./pages/app/POS";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="products" element={<Products />} />
+            <Route path="pos" element={<POS />} />
             <Route path="low-stock" element={<LowStock />} />
             <Route path="movements" element={<Movements />} />
             <Route path="suppliers" element={<Suppliers />} />

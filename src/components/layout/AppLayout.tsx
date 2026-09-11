@@ -9,6 +9,7 @@ import { TrialExpiredScreen } from "@/components/auth/TrialExpiredScreen";
 const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
   "/app/products": "Productos",
+  "/app/pos": "Caja (POS)",
   "/app/low-stock": "Alertas de Stock",
   "/app/suppliers": "Proveedores",
   "/app/movements": "Stock y Movimientos",
