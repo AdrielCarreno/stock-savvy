@@ -81,15 +81,22 @@ export function MobileBottomNav() {
               <SheetTitle>Más opciones</SheetTitle>
             </SheetHeader>
             <div className="mt-4 space-y-1">
-              {moreItems.map((item) => (
-                <button
-                  key={item.url}
-                  onClick={() => { setOpen(false); navigate(item.url); }}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
-                >
-                  <item.icon className="h-4 w-4 text-muted-foreground" />
-                  {item.title}
-                </button>
+              {moreGroups.map((group) => (
+                <div key={group.label} className="pt-2">
+                  <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {group.label}
+                  </p>
+                  {group.items.map((item) => (
+                    <button
+                      key={item.url}
+                      onClick={() => { setOpen(false); navigate(item.url); }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                    >
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
               ))}
               <button
                 onClick={handleLogout}
