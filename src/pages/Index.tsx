@@ -122,8 +122,11 @@ const plans: Plan[] = [
   },
 ];
 
-const MP_LINKS: Record<string, string> = {
-  Inicial: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
+const MP_LINKS: Record<string, { mensual: string; anual: string }> = {
+  Inicial: {
+    mensual: "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=a6a2ae80190846abb41a393568f6eab3",
+    anual: "https://mpago.la/2f6DJAK",
+  },
 };
 
 const fmtAR = (n: number) => `$${n.toLocaleString("es-AR")}`;
@@ -500,7 +503,7 @@ export default function Index() {
                       <Button className="w-full" variant="outline">Contactar ventas</Button>
                     </a>
                   ) : (
-                    <a href={MP_LINKS[plan.name]} target="_blank" rel="noopener noreferrer">
+                    <a href={MP_LINKS[plan.name][cycle]} target="_blank" rel="noopener noreferrer">
                       <Button
                         className={`w-full ${plan.highlight ? "gradient-primary shadow-primary text-primary-foreground" : ""}`}
                         variant={plan.highlight ? "default" : "outline"}
