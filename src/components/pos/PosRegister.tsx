@@ -112,8 +112,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
         const nextQuantity = Math.max(1, qty);
         const product = products.find((p) => p.id === id);
         const automaticWholesale = nextQuantity >= WHOLESALE_MIN_QUANTITY && product?.price_wholesale != null;
-        const automaticRetail = nextQuantity < WHOLESALE_MIN_QUANTITY && l.sale_type === "mayorista";
-        const saleType = automaticWholesale ? "mayorista" : automaticRetail ? "minorista" : l.sale_type;
+        const saleType = automaticWholesale ? "mayorista" : l.sale_type;
         return {
           ...l,
           quantity: nextQuantity,
