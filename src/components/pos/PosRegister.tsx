@@ -369,7 +369,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
                         <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="minorista">Minorista</SelectItem>
-                          <SelectItem value="mayorista">Mayorista</SelectItem>
+                          <SelectItem value="mayorista" disabled={products.find((p) => p.id === l.product_id)?.price_wholesale == null}>Mayorista</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
