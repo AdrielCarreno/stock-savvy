@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Barcode, Minus, Plus, Search, ShoppingCart, Trash2, X, Loader2, CreditCard } from "lucide-react";
+import { Barcode, Check, ChevronsUpDown, Minus, Plus, Search, ShoppingCart, Trash2, X, Loader2, CreditCard, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { useProducts } from "@/hooks/useProducts";
 import { usePos, PAYMENT_METHODS, fmtARS, type CartLine, type PaymentSplit } from "@/hooks/usePos";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +18,8 @@ import { toast } from "sonner";
 import type { Product } from "@/types/database";
 
 const priceOf = (p: Product) => Number(p.price_retail ?? p.price ?? 0);
+const wholesalePriceOf = (p: Product) => Number(p.price_wholesale ?? p.price_retail ?? p.price ?? 0);
+const WHOLESALE_MIN_QUANTITY = 10;
 
 export function PosRegister({ onSold }: { onSold?: () => void }) {
   const { products, loading, refresh } = useProducts();
@@ -33,6 +38,11 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   const [saving, setSaving] = useState(false);
   const [payments, setPayments] = useState<PaymentSplit[]>([{ method: "efectivo", amount: 0 }]);
   const [received, setReceived] = useState(0);
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [newCustomerOpen, setNewCustomerOpen] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerEmail, setNewCustomerEmail] = useState("");
+  const [creatingCustomer, setCreatingCustomer] = useState(false);
 
   useEffect(() => {
     supabase.from("customers").select("id, name").order("name").then(({ data }) => setCustomers(data ?? []));
@@ -50,7 +60,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   const paid = payments.reduce((a, p) => a + (Number(p.amount) || 0), 0);
   const change = Math.max(0, received - total);
 
-  const addToCart = (p: Product, qty = 1) => {
+  const addToCart = (p: Product, qty = 1, selectedType: "minorista" | "mayorista" = "minorista") => {
     if (p.current_stock <= 0) {
       toast.error(`${p.name} sin stock disponible`);
       return;
@@ -64,7 +74,15 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           return prev;
         }
         const next = [...prev];
-        next[idx] = { ...line, quantity: line.quantity + qty };
+        const nextQuantity = line.quantity + qty;
+        const automaticWholesale = nextQuantity >= WHOLESALE_MIN_QUANTITY && p.price_wholesale != null;
+        const saleType = automaticWholesale ? "mayorista" : line.sale_type;
+        next[idx] = {
+          ...line,
+          quantity: nextQuantity,
+          sale_type: saleType,
+          unit_price: saleType === "mayorista" ? wholesalePriceOf(p) : priceOf(p),
+        };
         return next;
       }
       return [
@@ -73,10 +91,11 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           product_id: p.id,
           name: p.name,
           sku: p.sku,
-          unit_price: priceOf(p),
+          unit_price: selectedType === "mayorista" ? wholesalePriceOf(p) : priceOf(p),
           quantity: qty,
           stock: p.current_stock,
           discount: 0,
+          sale_type: selectedType,
         },
       ];
     });
@@ -90,12 +109,56 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           toast.error(`Solo hay ${l.stock} unidades disponibles`);
           return { ...l, quantity: l.stock };
         }
-        return { ...l, quantity: Math.max(1, qty) };
+        const nextQuantity = Math.max(1, qty);
+        const product = products.find((p) => p.id === id);
+        const automaticWholesale = nextQuantity >= WHOLESALE_MIN_QUANTITY && product?.price_wholesale != null;
+        const saleType = automaticWholesale ? "mayorista" : l.sale_type;
+        return {
+          ...l,
+          quantity: nextQuantity,
+          sale_type: saleType,
+          unit_price: saleType === "mayorista" && product ? wholesalePriceOf(product) : product ? priceOf(product) : l.unit_price,
+        };
       })
     );
   };
 
   const removeLine = (id: string) => setCart((prev) => prev.filter((l) => l.product_id !== id));
+
+  const setSaleType = (id: string, saleType: "minorista" | "mayorista") => {
+    const product = products.find((p) => p.id === id);
+    if (!product) return;
+    setCart((prev) => prev.map((line) => line.product_id === id ? {
+      ...line,
+      sale_type: saleType,
+      unit_price: saleType === "mayorista" ? wholesalePriceOf(product) : priceOf(product),
+    } : line));
+  };
+
+  const createCustomer = async () => {
+    const name = newCustomerName.trim();
+    if (!name || !profile?.company_id) {
+      toast.error("Ingresá el nombre del cliente");
+      return;
+    }
+    setCreatingCustomer(true);
+    const { data, error } = await supabase.from("customers").insert({
+      company_id: profile.company_id,
+      name,
+      email: newCustomerEmail.trim() || null,
+    }).select("id, name").single();
+    setCreatingCustomer(false);
+    if (error || !data) {
+      toast.error("No se pudo registrar el cliente");
+      return;
+    }
+    setCustomers((current) => [...current, data].sort((a, b) => a.name.localeCompare(b.name)));
+    setCustomerId(data.id);
+    setNewCustomerName("");
+    setNewCustomerEmail("");
+    setNewCustomerOpen(false);
+    toast.success("Cliente registrado");
+  };
 
   const clearCart = () => {
     setCart([]);
@@ -176,7 +239,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
       customer: customers.find((c) => c.id === cust)?.name ?? null,
       date: new Date(),
       reference: (res.sale as { reference?: string } | null)?.reference ?? null,
-      lines: cart.map((l) => ({ name: l.name, quantity: l.quantity, unit_price: l.unit_price })),
+      lines: cart.map((l) => ({ name: l.name, quantity: l.quantity, unit_price: l.unit_price, sale_type: l.sale_type })),
       subtotal,
       discount: discountTotal,
       tax: taxTotal,
@@ -199,10 +262,10 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+    <div className="grid min-h-[calc(100vh-10rem)] gap-4 xl:grid-cols-[minmax(0,0.85fr)_minmax(520px,1.15fr)]">
       {/* Buscador + catálogo */}
       <div className="space-y-3">
-        <div className="rounded-xl border border-border bg-card p-3 shadow-card">
+        <div className="rounded-lg border border-border bg-card p-3 shadow-card">
           <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
             <Barcode className="h-3.5 w-3.5" /> Escaneá el código de barras o buscá por nombre / SKU
           </Label>
@@ -221,26 +284,37 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           <p className="mt-1.5 text-[11px] text-muted-foreground">Enter agrega el producto · F2 cobra · Esc vacía el carrito</p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-3 shadow-card">
+        <div className="rounded-lg border border-border bg-card p-3 shadow-card">
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin" /></div>
           ) : results.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">No se encontraron productos.</p>
           ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="max-h-[calc(100vh-18rem)] space-y-2 overflow-y-auto pr-1">
               {results.map((p) => (
-                <button
+                <Button
                   key={p.id}
                   onClick={() => addToCart(p)}
                   disabled={p.current_stock <= 0}
-                  className="flex min-h-[92px] flex-col justify-between rounded-lg border border-border bg-background p-3 text-left transition-colors hover:border-primary hover:bg-muted disabled:opacity-50"
+                  variant="outline"
+                  className="h-auto min-h-[84px] w-full justify-start rounded-md p-3 text-left hover:border-primary hover:bg-muted"
                 >
-                  <span className="line-clamp-2 text-sm font-medium">{p.name}</span>
-                  <span className="mt-2 flex items-center justify-between gap-2">
-                    <span className="text-sm font-bold text-primary">{fmtARS(priceOf(p))}</span>
-                    {stockBadge(p)}
+                  <span className="flex w-full min-w-0 flex-col gap-2">
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold">{p.name}</span>
+                        <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">
+                          SKU: {p.sku || "—"} · Código: {p.barcode || "—"}
+                        </span>
+                      </span>
+                      {stockBadge(p)}
+                    </span>
+                    <span className="grid grid-cols-2 gap-2 text-xs font-normal">
+                      <span><span className="text-muted-foreground">Minorista</span><strong className="block text-sm text-foreground">{fmtARS(priceOf(p))}</strong></span>
+                      <span><span className="text-muted-foreground">Mayorista</span><strong className="block text-sm text-foreground">{p.price_wholesale != null ? fmtARS(wholesalePriceOf(p)) : "Sin precio"}</strong></span>
+                    </span>
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -248,7 +322,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
       </div>
 
       {/* Carrito */}
-      <div className="flex flex-col rounded-xl border border-border bg-card shadow-card lg:sticky lg:top-4 lg:h-[calc(100vh-8rem)]">
+      <div className="flex min-h-[620px] flex-col rounded-lg border border-border bg-card shadow-card xl:sticky xl:top-4 xl:h-[calc(100vh-8rem)]">
         <div className="flex items-center justify-between border-b border-border p-3">
           <h3 className="flex items-center gap-2 font-semibold"><ShoppingCart className="h-4 w-4 text-primary" /> Carrito ({cart.length})</h3>
           {cart.length > 0 && (
@@ -258,12 +332,12 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           )}
         </div>
 
-        <div className="flex-1 space-y-2 overflow-y-auto p-3">
+        <div className="min-h-[300px] flex-1 space-y-2 overflow-y-auto p-3">
           {cart.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">Escaneá o tocá un producto para comenzar.</p>
           ) : (
             cart.map((l) => (
-              <div key={l.product_id} className="rounded-lg border border-border p-2.5">
+              <div key={l.product_id} className="rounded-md border border-border p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{l.name}</p>
@@ -273,7 +347,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
                     <Trash2 className="h-3.5 w-3.5 text-destructive" />
                   </Button>
                 </div>
-                <div className="mt-2 flex items-center justify-between">
+                <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
                   <div className="flex items-center gap-1">
                     <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => setQty(l.product_id, l.quantity - 1)}>
                       <Minus className="h-3.5 w-3.5" />
@@ -288,8 +362,21 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
                       <Plus className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                  <span className="text-sm font-semibold">{fmtARS(l.unit_price * l.quantity)}</span>
+                  <div className="flex items-end gap-3">
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground">Tipo de venta</Label>
+                      <Select value={l.sale_type} onValueChange={(value: "minorista" | "mayorista") => setSaleType(l.product_id, value)}>
+                        <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="minorista">Minorista</SelectItem>
+                          <SelectItem value="mayorista" disabled={products.find((p) => p.id === l.product_id)?.price_wholesale == null}>Mayorista</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <span className="min-w-24 pb-1 text-right text-sm font-semibold">{fmtARS(l.unit_price * l.quantity)}</span>
+                  </div>
                 </div>
+                {l.sale_type === "mayorista" && <p className="mt-2 text-xs text-muted-foreground">Precio mayorista aplicado: {fmtARS(l.unit_price)} por unidad</p>}
               </div>
             ))
           )}
@@ -311,15 +398,41 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
             </div>
           </div>
 
-          <div>
-            <Label className="text-[11px] text-muted-foreground">Cliente</Label>
-            <Select value={customerId} onValueChange={setCustomerId}>
-              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="final">Consumidor final</SelectItem>
-                {customers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+            <div className="min-w-0">
+              <Label className="text-[11px] text-muted-foreground">Cliente</Label>
+              <Popover open={customerOpen} onOpenChange={setCustomerOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={customerOpen} className="h-9 w-full justify-between font-normal">
+                    <span className="truncate">{customerId === "final" ? "Consumidor final" : customers.find((c) => c.id === customerId)?.name ?? "Elegir cliente"}</span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Buscar cliente o empresa…" />
+                    <CommandList>
+                      <CommandEmpty>No se encontró el cliente.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem value="Consumidor final" onSelect={() => { setCustomerId("final"); setCustomerOpen(false); }}>
+                          <Check className={cn("mr-2 h-4 w-4", customerId === "final" ? "opacity-100" : "opacity-0")} />
+                          Consumidor final
+                        </CommandItem>
+                        {customers.map((c) => (
+                          <CommandItem key={c.id} value={c.name} onSelect={() => { setCustomerId(c.id); setCustomerOpen(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", customerId === c.id ? "opacity-100" : "opacity-0")} />
+                            {c.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <Button size="icon" variant="outline" className="h-9 w-9" onClick={() => setNewCustomerOpen(true)} title="Agregar cliente">
+              <UserPlus className="h-4 w-4" />
+            </Button>
           </div>
 
           <div className="space-y-0.5 pt-1 text-sm">
@@ -399,6 +512,22 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
             <Button variant="outline" onClick={() => setCheckout(false)}>Volver</Button>
             <Button onClick={confirmSale} disabled={saving} className="gap-2">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />} Confirmar e imprimir ticket
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={newCustomerOpen} onOpenChange={setNewCustomerOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Nuevo cliente</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Nombre o razón social</Label><Input value={newCustomerName} onChange={(e) => setNewCustomerName(e.target.value)} placeholder="Ej. Distribuidora Central" /></div>
+            <div><Label>Email (opcional)</Label><Input type="email" value={newCustomerEmail} onChange={(e) => setNewCustomerEmail(e.target.value)} placeholder="compras@empresa.com" /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewCustomerOpen(false)}>Volver</Button>
+            <Button onClick={createCustomer} disabled={creatingCustomer || !newCustomerName.trim()}>
+              {creatingCustomer && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Guardar cliente
             </Button>
           </DialogFooter>
         </DialogContent>
