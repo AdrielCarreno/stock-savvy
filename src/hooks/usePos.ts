@@ -12,6 +12,7 @@ export type CartLine = {
   quantity: number;
   stock: number;
   discount: number; // monto fijo por línea
+  sale_type: "minorista" | "mayorista";
 };
 
 export type PaymentSplit = { method: string; amount: number };
@@ -48,7 +49,11 @@ export function usePos() {
 
   /** Ajusta stock de productos y deja el movimiento en el inventario existente. */
   const applyStock = useCallback(
-    async (items: { product_id: string; quantity: number }[], type: "entrada" | "salida", reason: string) => {
+    async (
+      items: { product_id: string; quantity: number; sale_type?: "minorista" | "mayorista" }[],
+      type: "entrada" | "salida",
+      reason: string
+    ) => {
       if (!companyId || !user?.id) return { error: new Error("No autenticado") };
       const ids = Array.from(new Set(items.map((i) => i.product_id)));
       const { data: prods, error } = await supabase
@@ -79,7 +84,7 @@ export function usePos() {
           type,
           quantity: it.quantity,
           reason,
-          sale_type: "minorista" as const,
+           sale_type: it.sale_type ?? "minorista",
           movement_date: new Date().toISOString(),
         }))
       );
@@ -106,7 +111,7 @@ export function usePos() {
       }
 
       const stockRes = await applyStock(
-        input.lines.map((l) => ({ product_id: l.product_id, quantity: l.quantity })),
+         input.lines.map((l) => ({ product_id: l.product_id, quantity: l.quantity, sale_type: l.sale_type })),
         "salida",
         "Venta POS"
       );

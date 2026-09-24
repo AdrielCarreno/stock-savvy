@@ -9,7 +9,7 @@ export type TicketData = {
   customer?: string | null;
   date: Date;
   reference?: string | null;
-  lines: { name: string; quantity: number; unit_price: number }[];
+  lines: { name: string; quantity: number; unit_price: number; sale_type?: "minorista" | "mayorista" }[];
   subtotal: number;
   discount: number;
   tax: number;
@@ -23,7 +23,7 @@ export function buildTicketHtml(t: TicketData) {
   const rows = t.lines
     .map(
       (l) =>
-        `<tr><td>${esc(l.name)}<br><small>${l.quantity} x ${fmtARS(l.unit_price)}</small></td><td class="r">${fmtARS(
+         `<tr><td>${esc(l.name)}<br><small>${l.quantity} x ${fmtARS(l.unit_price)} · ${l.sale_type === "mayorista" ? "Mayorista" : "Minorista"}</small></td><td class="r">${fmtARS(
           l.quantity * l.unit_price
         )}</td></tr>`
     )
@@ -40,7 +40,8 @@ td{padding:3px 0;vertical-align:top;border-bottom:1px dashed #ddd}
 .row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}
 .total{font-size:15px;font-weight:700;border-top:1px solid #111;margin-top:6px;padding-top:6px}
 small{color:#666}
-@media print{@page{margin:6mm}}
+.screen-only{width:100%;margin-top:16px;padding:10px;border:1px solid #111;background:#fff;font:inherit;cursor:pointer}
+@media print{@page{margin:6mm}.screen-only{display:none}}
 </style></head><body>
 <h1>${esc(t.company)}</h1>
 <div class="muted">Ticket de venta${t.reference ? ` · ${esc(t.reference)}` : ""}</div>
@@ -54,8 +55,9 @@ ${t.tax ? `<div class="row"><span>Impuestos</span><span>${fmtARS(t.tax)}</span><
 ${pays}
 ${t.received != null ? `<div class="row"><span>Recibido</span><span>${fmtARS(t.received)}</span></div>` : ""}
 ${t.change != null ? `<div class="row"><span>Vuelto</span><span>${fmtARS(t.change)}</span></div>` : ""}
-<p class="muted" style="margin-top:14px">¡Gracias por su compra!</p>
-<script>window.onload=function(){window.print()}<\/script>
+ <p class="muted" style="margin-top:14px">¡Gracias por su compra!</p>
+ <button class="screen-only" type="button" onclick="window.close()">Volver a Caja</button>
+ <script>window.onload=function(){window.print()};window.onafterprint=function(){window.close()}<\/script>
 </body></html>`;
 }
 
@@ -64,6 +66,7 @@ export function printTicket(t: TicketData) {
   if (!w) return false;
   w.document.write(buildTicketHtml(t));
   w.document.close();
+  w.focus();
   return true;
 }
 
