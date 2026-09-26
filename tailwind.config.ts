@@ -58,6 +58,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        landing: {
+          paper: "hsl(var(--landing-paper))",
+          ink: "hsl(var(--landing-ink))",
+          line: "hsl(var(--landing-line))",
+          accent: "hsl(var(--landing-accent))",
+          "accent-foreground": "hsl(var(--landing-accent-foreground))",
+          dark: "hsl(var(--landing-dark))",
+          "dark-foreground": "hsl(var(--landing-dark-foreground))",
+          "dark-muted": "hsl(var(--landing-dark-muted))",
+          "dark-line": "hsl(var(--landing-dark-line))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -76,6 +87,8 @@ export default {
       },
       fontFamily: {
         sans: ["'DM Sans'", "system-ui", "sans-serif"],
+        display: ["Georgia", "'Times New Roman'", "serif"],
+        hand: ["'Segoe Print'", "'Bradley Hand'", "cursive"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
       keyframes: {
