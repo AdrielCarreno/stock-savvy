@@ -10,3 +10,10 @@
 - [x] Reemplazar grids repetitivos por bloques alternados, lista funcional y stepper interactivo.
 - [x] Diferenciar precios, rubros y cierre con composiciones propias.
 - [x] Mantener contenido comercial y enlaces sin inventar prueba social.
+
+- [ ] Corregir la imagen rota y las advertencias visuales detectadas en la landing.
+- [ ] Crear el lenguaje visual editorial compartido del área interna.
+- [ ] Aplicar el nuevo diseño a navegación, encabezado y menú móvil.
+- [ ] Rediseñar Dashboard, Caja, Productos, Stock/Movimientos y Alertas.
+- [ ] Rediseñar Proveedores, Usuarios, Reportes, Integraciones, IA y Configuración.
+- [ ] Validar compilación y recorridos visuales autenticados en escritorio y móvil.
