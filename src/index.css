@@ -73,6 +73,12 @@
     --landing-dark-muted: 218 14% 70%;
     --landing-dark-line: 220 20% 22%;
 
+    /* Authenticated workspace */
+    --app-canvas: 40 18% 96%;
+    --app-surface: 40 20% 99%;
+    --app-line: 35 10% 82%;
+    --app-accent: 13 50% 46%;
+
     /* Gradients */
     --gradient-hero: linear-gradient(135deg, hsl(222 47% 9%) 0%, hsl(221 60% 18%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(221 83% 65%) 100%);
@@ -122,6 +128,10 @@
     --landing-dark-foreground: 210 40% 98%;
     --landing-dark-muted: 215 20% 67%;
     --landing-dark-line: 222 30% 16%;
+    --app-canvas: 222 47% 6%;
+    --app-surface: 222 40% 9%;
+    --app-line: 222 24% 20%;
+    --app-accent: 13 54% 55%;
   }
 }
 
@@ -164,5 +174,75 @@
   }
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer components {
+  .app-shell {
+    --background: var(--app-canvas);
+    --card: var(--app-surface);
+    --border: var(--app-line);
+    background-image: linear-gradient(hsl(var(--foreground) / 0.018) 1px, transparent 1px);
+    background-size: 100% 28px;
+  }
+
+  .app-main > * {
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .app-shell .app-main h2 {
+    letter-spacing: 0;
+  }
+
+  .app-shell .shadow-card,
+  .app-shell .shadow-elevated {
+    box-shadow: none;
+  }
+
+  .app-shell .rounded-xl,
+  .app-shell .rounded-2xl {
+    border-radius: 0.375rem;
+  }
+
+  .app-shell .gradient-primary {
+    background: hsl(var(--primary));
+  }
+
+  .app-shell input,
+  .app-shell textarea,
+  .app-shell [role="combobox"] {
+    border-radius: 0.25rem;
+  }
+
+  .app-shell table thead {
+    background: hsl(var(--muted) / 0.55);
+  }
+
+  .app-shell table th {
+    height: 2.75rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+
+  .app-shell table td {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .app-shell .metric-card:nth-child(1) { border-top-color: hsl(var(--primary)); }
+  .app-shell .metric-card:nth-child(2) { border-top-color: hsl(var(--success)); }
+  .app-shell .metric-card:nth-child(3) { border-top-color: hsl(var(--app-accent)); }
+  .app-shell .metric-card:nth-child(4) { border-top-color: hsl(var(--warning)); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-shell *, .app-shell *::before, .app-shell *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

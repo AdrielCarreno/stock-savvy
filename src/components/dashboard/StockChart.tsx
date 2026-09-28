@@ -54,7 +54,7 @@ export function StockChart() {
   }, [movements]);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+    <div className="rounded-sm border border-border bg-card p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-foreground">Movimientos últimos 30 días</h3>

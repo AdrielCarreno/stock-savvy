@@ -58,13 +58,14 @@ export default function UsersPermissions() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-semibold flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Usuarios y Permisos</h2>
-        <p className="text-sm text-muted-foreground">Control de acceso por roles y auditoría de acciones</p>
+      <div className="border-b border-border pb-5">
+        <p className="mb-2 text-[10px] font-semibold uppercase text-primary">Equipo y seguridad</p>
+        <h2 className="flex items-center gap-3 font-display text-3xl font-normal md:text-4xl"><Shield className="h-6 w-6 text-primary" /> Usuarios y Permisos</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Control de acceso por roles y auditoría de acciones</p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-        <h3 className="font-semibold mb-3">Asignar rol</h3>
+      <div className="border-y border-border bg-card p-5 md:p-6">
+        <h3 className="mb-4 font-display text-xl font-normal">Asignar rol</h3>
         <div className="flex flex-col md:flex-row gap-3 md:items-end">
           <div className="flex-1"><Label>Email del usuario</Label><Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="usuario@empresa.com" /></div>
           <div className="w-48"><Label>Rol</Label>

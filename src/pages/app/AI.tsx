@@ -9,22 +9,22 @@ const previews = [
 export default function AI() {
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-8 text-center shadow-card">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary">
-          <Sparkles className="h-7 w-7 text-white" />
+      <div className="relative overflow-hidden border-y border-border bg-card px-6 py-12 text-left md:px-10 md:py-16">
+        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-sm bg-primary text-primary-foreground">
+          <Sparkles className="h-6 w-6" />
         </div>
-        <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+        <span className="inline-block border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
           Próximamente
         </span>
-        <h2 className="mt-3 text-xl font-bold text-foreground md:text-2xl">Inteligencia Artificial</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+        <h2 className="mt-4 max-w-2xl font-display text-3xl font-normal text-foreground md:text-5xl">Inteligencia Artificial</h2>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
           Estamos desarrollando el asistente de OneStock para que tu inventario se gestione solo.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 border-y border-border md:grid-cols-3 md:divide-x md:divide-border">
         {previews.map((p) => (
-          <div key={p.title} className="rounded-xl border border-border bg-card p-5 shadow-card opacity-80">
+          <div key={p.title} className="border-b border-border bg-card p-6 opacity-80 last:border-b-0 md:border-b-0">
             <p.icon className="h-5 w-5 text-primary" />
             <h3 className="mt-3 text-sm font-semibold text-foreground">{p.title}</h3>
             <p className="mt-1 text-xs text-muted-foreground">{p.text}</p>

@@ -27,12 +27,12 @@ export function AppLayout() {
   const title = pageTitles[location.pathname] ?? "OneStock";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="app-shell flex h-screen overflow-hidden bg-background">
       <AppSidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <AppHeader title={title} />
         <main
-          className="flex-1 overflow-y-auto p-4 pb-24 md:p-6 md:pb-6"
+          className="app-main flex-1 overflow-y-auto px-4 pb-24 pt-5 md:px-8 md:pb-8 md:pt-7 xl:px-10"
           style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}
         >
           {isTrialExpired ? <TrialExpiredScreen /> : <Outlet />}
