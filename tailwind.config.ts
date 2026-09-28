@@ -69,6 +69,12 @@ export default {
           "dark-muted": "hsl(var(--landing-dark-muted))",
           "dark-line": "hsl(var(--landing-dark-line))",
         },
+        app: {
+          canvas: "hsl(var(--app-canvas))",
+          surface: "hsl(var(--app-surface))",
+          line: "hsl(var(--app-line))",
+          accent: "hsl(var(--app-accent))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

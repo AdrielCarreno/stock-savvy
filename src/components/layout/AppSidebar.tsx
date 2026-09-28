@@ -15,6 +15,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -74,14 +75,14 @@ export function AppSidebar() {
   return (
     <aside
       className={`relative hidden md:flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ${
-        collapsed ? "w-14" : "w-56"
+        collapsed ? "w-[68px]" : "w-60"
       }`}
     >
-      <div className={`flex h-14 items-center border-b border-sidebar-border px-3 ${collapsed ? "justify-center" : "gap-2 px-4"}`}>
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg gradient-primary">
-          <Package className="h-3.5 w-3.5 text-white" />
+      <div className={`flex h-[72px] items-center border-b border-sidebar-border px-3 ${collapsed ? "justify-center" : "gap-3 px-5"}`}>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
+          <Package className="h-4 w-4" />
         </div>
-        {!collapsed && <span className="text-base font-bold text-sidebar-accent-foreground">OneStock</span>}
+        {!collapsed && <span className="font-display text-xl font-normal text-sidebar-accent-foreground">OneStock</span>}
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2 pt-3">
@@ -89,15 +90,17 @@ export function AppSidebar() {
           const hasActive = group.items.some((i) => pathname.startsWith(i.url));
           const open = collapsed || !closedGroups[group.label] || hasActive;
           return (
-            <div key={group.label} className="mb-1">
+            <div key={group.label} className="mb-3">
               {!collapsed && (
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => toggleGroup(group.label)}
-                  className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-sidebar-foreground/70 hover:text-sidebar-accent-foreground transition-colors"
+                  className="h-7 w-full justify-between px-2.5 text-[10px] font-semibold uppercase text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
                   <span>{group.label}</span>
                   <ChevronDown className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`} />
-                </button>
+                </Button>
               )}
               {open && (
                 <div className="space-y-0.5">
@@ -106,8 +109,8 @@ export function AppSidebar() {
                       key={item.url}
                       to={item.url}
                       title={item.title}
-                      className={`flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "justify-center" : ""}`}
-                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                      className={`flex min-h-10 items-center gap-3 rounded-sm border-l-2 border-transparent px-2.5 py-2 text-[13px] font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "justify-center" : ""}`}
+                      activeClassName="border-sidebar-primary bg-sidebar-accent text-sidebar-accent-foreground"
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       {!collapsed && <span className="truncate">{item.title}</span>}
@@ -120,12 +123,16 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <button
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        aria-label={collapsed ? "Expandir navegación" : "Contraer navegación"}
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-card hover:text-foreground transition-colors"
+        className="absolute -right-3 top-24 h-6 w-6 rounded-full bg-card text-muted-foreground shadow-none hover:text-foreground"
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-      </button>
+      </Button>
 
       <div className={`border-t border-sidebar-border p-3 ${collapsed ? "flex justify-center" : ""}`}>
         {collapsed ? (

@@ -18,14 +18,17 @@ export function AppHeader({ title }: AppHeaderProps) {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-      <h1 className="text-base font-semibold text-foreground">{title}</h1>
+    <header className="app-header flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:h-[72px] md:px-8 xl:px-10">
+      <div className="min-w-0">
+        <p className="hidden text-[10px] font-semibold uppercase text-muted-foreground md:block">Espacio de trabajo</p>
+        <h1 className="truncate font-display text-xl font-normal text-foreground md:text-2xl">{title}</h1>
+      </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          className="h-9 w-9 text-muted-foreground hover:text-foreground"
           aria-label="Notificaciones"
         >
           <Bell className="h-4 w-4" />
@@ -33,7 +36,7 @@ export function AppHeader({ title }: AppHeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          className="h-9 w-9 text-muted-foreground hover:text-foreground"
           aria-label="Configuración de negocio"
           title="Configuración de negocio"
           onClick={() => navigate("/app/settings")}

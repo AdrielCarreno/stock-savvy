@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
@@ -62,8 +63,8 @@ export function MobileBottomNav() {
           <NavLink
             key={item.url}
             to={item.url}
-            className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground transition-colors"
-            activeClassName="text-primary"
+            className="flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 border-transparent py-2 text-[10px] font-medium text-muted-foreground transition-colors"
+            activeClassName="border-primary text-primary"
           >
             <item.icon className="h-5 w-5" />
             <span>{item.title}</span>
@@ -71,10 +72,10 @@ export function MobileBottomNav() {
         ))}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <button className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground">
+            <Button variant="ghost" className="h-14 w-full flex-col gap-0.5 rounded-none py-2 text-[10px] font-medium text-muted-foreground">
               <MoreHorizontal className="h-5 w-5" />
               <span>Más</span>
-            </button>
+            </Button>
           </SheetTrigger>
           <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
             <SheetHeader>
@@ -87,24 +88,26 @@ export function MobileBottomNav() {
                     {group.label}
                   </p>
                   {group.items.map((item) => (
-                    <button
+                    <Button
+                      variant="ghost"
                       key={item.url}
                       onClick={() => { setOpen(false); navigate(item.url); }}
-                      className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                      className="h-11 w-full justify-start gap-3 rounded-sm px-3 text-sm font-medium text-foreground hover:bg-muted"
                     >
                       <item.icon className="h-4 w-4 text-muted-foreground" />
                       {item.title}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ))}
-              <button
+              <Button
+                variant="ghost"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-destructive hover:bg-destructive/10"
+                className="h-11 w-full justify-start gap-3 rounded-sm px-3 text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive"
               >
                 <LogOut className="h-4 w-4" />
                 Cerrar sesión
-              </button>
+              </Button>
             </div>
           </SheetContent>
         </Sheet>

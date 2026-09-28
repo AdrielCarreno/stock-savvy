@@ -33,11 +33,11 @@ export function MetricCard({ title, value, subtitle, icon: Icon, variant = "defa
   const styles = variantStyles[variant];
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-card animate-fade-in">
+    <div className="metric-card border-t-2 border-border bg-card px-4 py-5 animate-fade-in">
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold text-foreground">{value}</p>
+          <p className="mb-2 text-[10px] font-semibold uppercase text-muted-foreground">{title}</p>
+          <p className="font-display text-3xl font-normal text-foreground">{value}</p>
           {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
           {trend && (
             <p className={cn("mt-1 text-xs font-medium", trend.value >= 0 ? "text-success" : "text-destructive")}>
@@ -45,7 +45,7 @@ export function MetricCard({ title, value, subtitle, icon: Icon, variant = "defa
             </p>
           )}
         </div>
-        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", styles.iconBg)}>
+        <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-sm", styles.iconBg)}>
           <Icon className={cn("h-5 w-5", styles.iconColor)} />
         </div>
       </div>
