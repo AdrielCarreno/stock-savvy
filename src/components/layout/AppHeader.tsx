@@ -18,12 +18,12 @@ export function AppHeader({ title }: AppHeaderProps) {
   };
 
   return (
-    <header className="app-header flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:h-[72px] md:px-8 xl:px-10">
-      <div className="min-w-0">
+    <header className="app-header flex min-h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-4 py-2 md:h-[72px] md:px-8 xl:px-10">
+      <div className="min-w-0 flex-1">
         <p className="hidden text-[10px] font-semibold uppercase text-muted-foreground md:block">Espacio de trabajo</p>
-        <h1 className="truncate font-display text-xl font-normal text-foreground md:text-2xl">{title}</h1>
+        <h1 className="break-words font-display text-lg font-normal leading-tight text-foreground md:text-2xl">{title}</h1>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-0 sm:gap-2">
         <ThemeToggle />
         <Button
           variant="ghost"
@@ -43,11 +43,13 @@ export function AppHeader({ title }: AppHeaderProps) {
         >
           <Settings className="h-4 w-4" />
         </Button>
-        <div className="mx-2 h-5 w-px bg-border" />
+        <div className="mx-2 hidden h-5 w-px bg-border sm:block" />
         <Button
           variant="ghost"
           size="sm"
           className="gap-2 text-muted-foreground hover:text-foreground"
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />

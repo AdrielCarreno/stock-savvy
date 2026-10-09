@@ -146,7 +146,7 @@ export default function LowStock() {
       </div>
 
       <Tabs defaultValue="low" className="w-full">
-        <TabsList className="mb-4 flex w-full gap-1 overflow-x-auto whitespace-nowrap md:w-auto md:inline-flex">
+        <TabsList className="mb-4 grid h-auto w-full grid-cols-2 gap-1 md:w-auto md:inline-flex">
           <TabsTrigger value="low" className="gap-1.5 px-3 text-xs md:text-sm">
             <AlertTriangle className="h-3.5 w-3.5" />Bajo stock ({lowStockProducts.length})
           </TabsTrigger>
@@ -175,7 +175,7 @@ export default function LowStock() {
             </div>
           )}
           {lowStockProducts.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border px-4 py-16 text-center text-sm text-muted-foreground">
               Todo en orden: no hay productos por debajo del stock mínimo.
             </div>
           ) : (
@@ -206,7 +206,7 @@ export default function LowStock() {
         {/* Vencimientos */}
         <TabsContent value="expiry" className="mt-0 space-y-3">
           {expiring.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border px-4 py-16 text-center text-sm text-muted-foreground">
               No hay productos con vencimiento próximo. Cargá la fecha en cada producto para activar la alerta.
             </div>
           ) : (
@@ -232,7 +232,7 @@ export default function LowStock() {
         {/* Sin movimiento */}
         <TabsContent value="stale" className="mt-0 space-y-3">
           {stale.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border px-4 py-16 text-center text-sm text-muted-foreground">
               No hay productos estancados: todo el inventario tuvo movimiento en los últimos 30 días.
             </div>
           ) : (
@@ -255,7 +255,7 @@ export default function LowStock() {
         {/* Sobre máximo */}
         <TabsContent value="over" className="mt-0 space-y-3">
           {overStockProducts.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border px-4 py-16 text-center text-sm text-muted-foreground">
               Ningún producto supera su stock máximo configurado.
             </div>
           ) : (

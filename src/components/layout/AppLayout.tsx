@@ -29,11 +29,10 @@ export function AppLayout() {
   return (
     <div className="app-shell flex h-screen overflow-hidden bg-background">
       <AppSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AppHeader title={title} />
         <main
-          className="app-main flex-1 overflow-y-auto px-4 pb-24 pt-5 md:px-8 md:pb-8 md:pt-7 xl:px-10"
-          style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+          className="app-main min-w-0 flex-1 overflow-y-auto px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-8 md:pt-7 xl:px-10"
         >
           {isTrialExpired ? <TrialExpiredScreen /> : <Outlet />}
         </main>

@@ -262,7 +262,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   };
 
   return (
-    <div className="grid min-h-[calc(100vh-10rem)] gap-4 xl:grid-cols-[minmax(0,0.85fr)_minmax(520px,1.15fr)]">
+    <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       {/* Buscador + catálogo */}
       <div className="space-y-3">
         <div className="rounded-lg border border-border bg-card p-3 shadow-card">
@@ -290,14 +290,14 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           ) : results.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">No se encontraron productos.</p>
           ) : (
-            <div className="max-h-[calc(100vh-18rem)] space-y-2 overflow-y-auto pr-1">
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1 xl:max-h-[calc(100dvh-18rem)]">
               {results.map((p) => (
                 <Button
                   key={p.id}
                   onClick={() => addToCart(p)}
                   disabled={p.current_stock <= 0}
                   variant="outline"
-                  className="h-auto min-h-[84px] w-full justify-start rounded-md p-3 text-left hover:border-primary hover:bg-muted"
+                   className="h-auto min-h-[84px] w-full justify-start whitespace-normal rounded-md p-3 text-left hover:border-primary hover:bg-muted"
                 >
                   <span className="flex w-full min-w-0 flex-col gap-2">
                     <span className="flex items-start justify-between gap-3">
@@ -322,7 +322,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
       </div>
 
       {/* Carrito */}
-      <div className="flex min-h-[620px] flex-col rounded-lg border border-border bg-card shadow-card xl:sticky xl:top-4 xl:h-[calc(100vh-8rem)]">
+       <div className="flex min-w-0 flex-col rounded-lg border border-border bg-card shadow-card xl:sticky xl:top-0 xl:h-[clamp(620px,calc(100dvh-12rem),1000px)]">
         <div className="flex items-center justify-between border-b border-border p-3">
           <h3 className="flex items-center gap-2 font-semibold"><ShoppingCart className="h-4 w-4 text-primary" /> Carrito ({cart.length})</h3>
           {cart.length > 0 && (
@@ -332,7 +332,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           )}
         </div>
 
-        <div className="min-h-[300px] flex-1 space-y-2 overflow-y-auto p-3">
+         <div className="min-h-36 max-h-[45dvh] flex-1 space-y-2 overflow-y-auto p-3 xl:min-h-0 xl:max-h-none">
           {cart.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">Escaneá o tocá un producto para comenzar.</p>
           ) : (
