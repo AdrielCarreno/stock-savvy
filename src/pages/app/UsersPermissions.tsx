@@ -60,7 +60,7 @@ export default function UsersPermissions() {
     <div className="space-y-6 animate-fade-in">
       <div className="border-b border-border pb-5">
         <p className="mb-2 text-[10px] font-semibold uppercase text-primary">Equipo y seguridad</p>
-        <h2 className="flex items-center gap-3 font-display text-3xl font-normal md:text-4xl"><Shield className="h-6 w-6 text-primary" /> Usuarios y Permisos</h2>
+        <h2 className="flex items-center gap-3 font-display text-3xl font-normal md:text-4xl"><Shield className="h-6 w-6 shrink-0 text-primary" /> Usuarios y Permisos</h2>
         <p className="mt-2 text-sm text-muted-foreground">Control de acceso por roles y auditoría de acciones</p>
       </div>
 
@@ -68,7 +68,7 @@ export default function UsersPermissions() {
         <h3 className="mb-4 font-display text-xl font-normal">Asignar rol</h3>
         <div className="flex flex-col md:flex-row gap-3 md:items-end">
           <div className="flex-1"><Label>Email del usuario</Label><Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="usuario@empresa.com" /></div>
-          <div className="w-48"><Label>Rol</Label>
+          <div className="w-full md:w-48"><Label>Rol</Label>
             <Select value={role} onValueChange={(v) => setRole(v as Role)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -88,6 +88,22 @@ export default function UsersPermissions() {
         {loading ? <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin" /></div> : roles.length === 0 ? (
           <div className="py-12 text-center text-sm text-muted-foreground">Sin roles asignados aún.</div>
         ) : (
+          <>
+          <div className="divide-y divide-border md:hidden">
+            {roles.map((r) => (
+              <div key={r.id} className="flex items-start justify-between gap-3 p-4">
+                <div className="min-w-0 space-y-2">
+                  <p className="break-all text-sm font-medium">{r.email}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>{r.role}</Badge>
+                    <span className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("es-AR")}</span>
+                  </div>
+                </div>
+                <Button size="icon" variant="ghost" className="shrink-0" aria-label={`Quitar rol de ${r.email}`} title="Quitar rol" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block">
           <Table>
             <TableHeader><TableRow><TableHead>Usuario</TableHead><TableHead>Rol</TableHead><TableHead>Asignado</TableHead><TableHead className="text-right">Acciones</TableHead></TableRow></TableHeader>
             <TableBody>
@@ -101,6 +117,8 @@ export default function UsersPermissions() {
               ))}
             </TableBody>
           </Table>
+          </div>
+          </>
         )}
       </div>
 
@@ -109,6 +127,20 @@ export default function UsersPermissions() {
         {audit.length === 0 ? (
           <div className="py-12 text-center text-sm text-muted-foreground">Sin eventos registrados.</div>
         ) : (
+          <>
+          <div className="divide-y divide-border md:hidden">
+            {audit.map((a) => (
+              <div key={a.id} className="space-y-2 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Badge variant="outline">{a.action}</Badge>
+                  <span className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString("es-AR")}</span>
+                </div>
+                <p className="text-xs">{a.entity ?? "-"}</p>
+                <p className="break-words text-xs text-muted-foreground">{a.detail ? JSON.stringify(a.detail) : "-"}</p>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block">
           <Table>
             <TableHeader><TableRow><TableHead>Fecha</TableHead><TableHead>Acción</TableHead><TableHead>Entidad</TableHead><TableHead>Detalle</TableHead></TableRow></TableHeader>
             <TableBody>
@@ -122,6 +154,8 @@ export default function UsersPermissions() {
               ))}
             </TableBody>
           </Table>
+          </div>
+          </>
         )}
       </div>
     </div>

@@ -117,7 +117,7 @@ export default function BusinessSettings() {
       <div className="rounded-xl border border-border bg-card p-6 shadow-card">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl gradient-primary">
-            <Building2 className="h-6 w-6 text-white" />
+            <Building2 className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">Configuración de negocio</h2>
@@ -295,11 +295,11 @@ export default function BusinessSettings() {
         </div>
       </section>
 
-      <div className="sticky bottom-4 flex justify-end">
+      <div className="sticky bottom-0 flex justify-end border-t border-border bg-card px-4 py-3">
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="gap-2 gradient-primary shadow-primary text-primary-foreground"
+          className="w-full gap-2 gradient-primary text-primary-foreground sm:w-auto"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Guardar cambios

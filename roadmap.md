@@ -16,4 +16,4 @@
 - [x] Aplicar el nuevo diseño a navegación, encabezado y menú móvil.
 - [x] Rediseñar Dashboard, Caja, Productos, Stock/Movimientos y Alertas.
 - [x] Rediseñar Proveedores, Usuarios, Reportes, Integraciones, IA y Configuración.
-- [ ] Validar compilación y recorridos visuales autenticados en escritorio y móvil.
+- [ ] Validar visualmente todas las páginas internas en escritorio y móvil y corregir los problemas detectados.

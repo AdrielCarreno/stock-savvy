@@ -291,7 +291,7 @@ export default function Suppliers() {
                     <Package className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[380px] p-0" align="start">
+                <PopoverContent className="w-[min(380px,90vw)] p-0" align="start">
                   <div className="max-h-72 overflow-y-auto p-2 space-y-1">
                     {products.length === 0 ? (
                       <p className="p-3 text-xs text-muted-foreground text-center">Aún no tenés productos cargados.</p>
