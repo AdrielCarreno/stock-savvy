@@ -76,8 +76,10 @@ const faqs = [
 ];
 
 const plans = [
-  { name: "Inicial", monthly: 34700, desc: "Para el que recién empieza a ordenar el local.", features: ["Hasta 500 productos", "Hasta 3 depósitos", "1 usuario", "300 operaciones mensuales", "Alertas de stock", "Proveedores ilimitados", "Soporte por email y WhatsApp", "Integración con ARCA"] },
-  { name: "Personalizado", monthly: null, desc: "Para operaciones que ya necesitan otra escala.", features: ["Todo lo del plan Inicial", "Productos, depósitos y usuarios ilimitados", "Operaciones ilimitadas", "Reportes avanzados y Kardex", "Transferencias entre depósitos", "Integraciones con e-commerce y POS", "Soporte prioritario"] },
+  { name: "Inicial", monthly: 34700, tag: "Para empezar", desc: "Para el que recién empieza a ordenar el local.", features: ["Hasta 500 productos", "1 depósito", "1 usuario", "300 operaciones mensuales", "Alertas de stock", "Proveedores ilimitados", "Soporte por email y WhatsApp", "Integración con ARCA"] },
+  { name: "Premium", monthly: 56200, tag: "Para crecer", desc: "Más depósitos, más usuarios y ventas online conectadas.", features: ["Todo lo del plan Inicial", "Hasta 2.000 productos", "Hasta 3 depósitos", "Hasta 3 usuarios", "Operaciones ampliadas", "Integración con Mercado Libre", "Integración con Tienda Nube"] },
+  { name: "Empresarial", monthly: 124400, tag: "Para escalar", desc: "Gestión móvil e inteligencia artificial para tu operación.", features: ["Todo lo del plan Premium", "Versión móvil del sistema", "Bot de WhatsApp con IA", "Asistente IA dentro del sistema", "Carga y pedidos automáticos con IA", "Soporte prioritario"] },
+  { name: "A medida", monthly: null, tag: "Personalizado", desc: "Para operaciones que ya necesitan otra escala.", features: ["Todo lo del plan Empresarial", "Productos, depósitos y usuarios ilimitados", "Reportes avanzados y Kardex", "Integraciones a medida", "Acompañamiento dedicado"] },
 ];
 
 const MP_LINKS: Record<string, { mensual: string; anual: string }> = {
@@ -313,13 +315,13 @@ export default function Index() {
                 <Button variant="ghost" className={`rounded-none ${cycle === "anual" ? "bg-landing-ink text-landing-paper hover:bg-landing-ink hover:text-landing-paper" : ""}`} onClick={() => setCycle("anual")}>Anual · −10%</Button>
               </div>
             </div>
-            <div className="mt-14 grid md:grid-cols-2">
+            <div className="mt-14 grid md:grid-cols-2 xl:grid-cols-4">
               {plans.map((plan, index) => {
                 const price = plan.monthly == null ? null : cycle === "anual" ? Math.round(plan.monthly * .9) : plan.monthly;
                 const custom = plan.monthly == null;
                 return (
-                  <article key={plan.name} className={`flex flex-col border border-landing-line p-7 md:p-10 ${index === 0 ? "bg-landing-ink text-landing-paper" : "bg-landing-paper md:my-6"}`}>
-                    <p className={`text-xs font-semibold uppercase ${index === 0 ? "text-primary-glow" : "text-primary"}`}>{index === 0 ? "Para empezar" : "Para crecer"}</p>
+                  <article key={plan.name} className={`flex flex-col border border-landing-line p-7 md:p-10 ${index === 0 ? "bg-landing-ink text-landing-paper" : "bg-landing-paper xl:my-6"}`}>
+                    <p className={`text-xs font-semibold uppercase ${index === 0 ? "text-primary-glow" : "text-primary"}`}>{plan.tag}</p>
                     <h3 className="mt-4 font-display text-4xl">{plan.name}</h3>
                     <p className={`mt-2 text-sm ${index === 0 ? "text-landing-dark-muted" : "text-muted-foreground"}`}>{plan.desc}</p>
                     <div className="my-8 min-h-16">
@@ -327,7 +329,7 @@ export default function Index() {
                     </div>
                     <ul className="mb-8 flex-1 space-y-3">{plan.features.map((item) => <li key={item} className="flex gap-3 text-sm"><Check className={`mt-0.5 h-4 w-4 shrink-0 ${index === 0 ? "text-primary-glow" : "text-primary"}`} />{item}</li>)}</ul>
                     <Button asChild variant={index === 0 ? "secondary" : "outline"} className="h-12 rounded-none">
-                      <a href={custom ? contactWA : MP_LINKS[plan.name][cycle]} target="_blank" rel="noopener noreferrer">{custom ? "Contactar ventas" : "Contratar"}</a>
+                      <a href={custom ? contactWA : (MP_LINKS[plan.name]?.[cycle] ?? contactWA)} target="_blank" rel="noopener noreferrer">{custom ? "Contactar ventas" : MP_LINKS[plan.name] ? "Contratar" : "Consultar"}</a>
                     </Button>
                   </article>
                 );

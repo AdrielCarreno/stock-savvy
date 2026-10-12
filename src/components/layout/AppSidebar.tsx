@@ -26,7 +26,7 @@ const navGroups: NavGroup[] = [
   {
     label: "Operación",
     items: [
-      { title: "Caja (POS)", url: "/app/pos", icon: ShoppingCart },
+      { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
       { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
     ],
   },

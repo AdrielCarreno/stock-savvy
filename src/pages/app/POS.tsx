@@ -50,7 +50,7 @@ export default function POS() {
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex w-full flex-wrap justify-start gap-1 h-auto">
-          <TabsTrigger value="caja">Caja</TabsTrigger>
+          <TabsTrigger value="caja">Clientes</TabsTrigger>
           <TabsTrigger value="historial">Historial</TabsTrigger>
           <TabsTrigger value="cierre">Cierre de caja</TabsTrigger>
         </TabsList>

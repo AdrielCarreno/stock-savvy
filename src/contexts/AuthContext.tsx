@@ -22,7 +22,8 @@ type AuthContextValue = AuthState & {
   signUp: (
     email: string,
     password: string,
-    companyName: string
+    companyName: string,
+    businessType?: string
   ) => Promise<{ error: Error | null; data?: { user: unknown | null; session: unknown | null } | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -116,12 +117,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfileAndCompany]);
 
   const signUp = useCallback(
-    async (email: string, password: string, companyName: string) => {
+    async (email: string, password: string, companyName: string, businessType?: string) => {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { company_name: companyName.trim() || "Mi Empresa" },
+          data: { company_name: companyName.trim() || "Mi Empresa", business_type: businessType?.trim() || null },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });

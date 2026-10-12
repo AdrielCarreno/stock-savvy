@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
-  { title: "Caja", url: "/app/pos", icon: ShoppingCart },
+  { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
   { title: "Productos", url: "/app/products", icon: Package },
   { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
 ];
