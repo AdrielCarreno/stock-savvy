@@ -56,18 +56,34 @@ ${pays}
 ${t.received != null ? `<div class="row"><span>Recibido</span><span>${fmtARS(t.received)}</span></div>` : ""}
 ${t.change != null ? `<div class="row"><span>Vuelto</span><span>${fmtARS(t.change)}</span></div>` : ""}
  <p class="muted" style="margin-top:14px">¡Gracias por su compra!</p>
- <button class="screen-only" type="button" onclick="window.close()">Volver a Caja</button>
- <script>window.onload=function(){window.print()};window.onafterprint=function(){window.close()}<\/script>
 </body></html>`;
 }
 
 export function printTicket(t: TicketData) {
-  const w = window.open("", "_blank", "width=400,height=640");
-  if (!w) return false;
-  w.document.write(buildTicketHtml(t));
-  w.document.close();
-  w.focus();
-  return true;
+  // Imprime desde un iframe oculto: no abre ventanas nuevas y la página actual sigue intacta.
+  try {
+    const frame = document.createElement("iframe");
+    frame.setAttribute("aria-hidden", "true");
+    frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+    document.body.appendChild(frame);
+    const doc = frame.contentWindow?.document;
+    if (!doc || !frame.contentWindow) { frame.remove(); return false; }
+    doc.open();
+    doc.write(buildTicketHtml(t));
+    doc.close();
+    const cleanup = () => setTimeout(() => frame.remove(), 500);
+    setTimeout(() => {
+      try {
+        frame.contentWindow?.addEventListener("afterprint", cleanup);
+        frame.contentWindow?.focus();
+        frame.contentWindow?.print();
+      } catch { /* ignore */ }
+      setTimeout(() => frame.isConnected && frame.remove(), 60000);
+    }, 250);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export type { CartLine };

@@ -10,7 +10,7 @@ import { lovable } from "@/integrations/lovable";
 
 export default function Register() {
   const [showPass, setShowPass] = useState(false);
-  const [form, setForm] = useState({ company: "", email: "", password: "" });
+  const [form, setForm] = useState({ company: "", businessType: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error, data } = await signUp(form.email, form.password, form.company);
+    const { error, data } = await signUp(form.email, form.password, form.company, form.businessType);
     setLoading(false);
     if (error) {
       const msg = error.message?.toLowerCase() || "";
@@ -108,7 +108,7 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="company">Nombre de la empresa</Label>
+              <Label htmlFor="company">Nombre del negocio</Label>
               <Input
                 id="company"
                 name="company"
@@ -118,6 +118,22 @@ export default function Register() {
                 required
                 disabled={loading}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="businessType">Rubro</Label>
+              <Input
+                id="businessType"
+                name="businessType"
+                list="business-types"
+                placeholder="Ej: Ferretería, Almacén, Ropa…"
+                value={form.businessType}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+              <datalist id="business-types">
+                {["Almacén / Supermercado", "Ferretería", "Tienda de ropa", "Distribuidora", "Farmacia", "Librería", "Bazar", "Electrónica", "Repuestos", "Otro"].map((r) => <option key={r} value={r} />)}
+              </datalist>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
