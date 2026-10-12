@@ -6,8 +6,10 @@ export type ExportColumn<T> = {
 };
 
 function escapeCsv(value: string | number | null | undefined): string {
-  const s = value === null || value === undefined ? "" : String(value);
-  if (/[";\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  let s = value === null || value === undefined ? "" : String(value);
+  // Neutraliza fórmulas de planilla en textos (=, +, -, @, tab, CR).
+  if (typeof value !== "number" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  if (/[";\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
 
