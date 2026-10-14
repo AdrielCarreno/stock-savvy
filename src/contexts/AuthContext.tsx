@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
         options: {
           data: { company_name: companyName.trim() || "Mi Empresa", business_type: businessType?.trim() || null },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: "https://onestock.lovable.app/auth/callback",
         },
       });
       return { error: error ?? null, data };
@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: "https://onestock.lovable.app/auth/callback",
     });
     return { error: error ?? null };
   }, []);
