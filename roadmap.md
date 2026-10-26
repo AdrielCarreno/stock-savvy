@@ -18,3 +18,4 @@
 - [x] Rediseñar Proveedores, Usuarios, Reportes, Integraciones, IA y Configuración.
 - [x] Validar visualmente todas las páginas internas en escritorio y móvil y corregir los problemas detectados.
 - [x] Mostrar el botón "Instalar app" solo dentro del área de usuarios, nunca en la landing.
+- [x] Usar las tres fotos de depósito como fondo de la portada y la captura real de Productos en Funcionalidades.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
@@ -25,6 +25,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import warehouse1 from "@/assets/warehouse-1.jpg.asset.json";
+import hero1 from "@/assets/hero-1.jpg.asset.json";
+import hero2 from "@/assets/hero-2.jpg.asset.json";
+import hero3 from "@/assets/hero-3.jpg.asset.json";
+import productosShot from "@/assets/onestock-productos.png.asset.json";
+
+const heroPhotos = [hero1.url, hero2.url, hero3.url];
 
 type BillingCycle = "mensual" | "anual";
 
@@ -153,6 +159,12 @@ export default function Index() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [cycle, setCycle] = useState<BillingCycle>("mensual");
   const [activeStep, setActiveStep] = useState(0);
+  const [heroPhoto, setHeroPhoto] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setHeroPhoto((prev) => (prev + 1) % heroPhotos.length), 5200);
+    return () => clearInterval(id);
+  }, []);
   const contactWA = `https://wa.me/5493516516785?text=${encodeURIComponent("Hola, quiero saber más de OneStock")}`;
 
   return (
@@ -192,6 +204,14 @@ export default function Index() {
 
       <main>
         <section className="relative overflow-hidden px-4 py-16 md:py-24 lg:py-28">
+          <div aria-hidden className="absolute inset-0">
+            {heroPhotos.map((src, index) => (
+              <img key={src} src={src} alt="" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroPhoto === index ? "opacity-100" : "opacity-0"}`} />
+            ))}
+            <div className="absolute inset-0 bg-landing-paper/70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-landing-paper via-landing-paper/85 to-landing-paper/35" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-landing-paper" />
+          </div>
           <div className="container grid max-w-7xl gap-14 lg:grid-cols-12 lg:items-center">
             <div className="relative z-10 lg:col-span-7">
               <p className="mb-6 text-xs font-semibold uppercase text-primary">Inventario claro. Negocio en movimiento.</p>
@@ -207,7 +227,7 @@ export default function Index() {
               </div>
               <p className="mt-5 text-xs text-muted-foreground">7 días gratis · Sin tarjeta · Cancelá cuando quieras</p>
             </div>
-            <div className="relative lg:col-span-5 lg:pl-4">
+            <div className="relative z-10 lg:col-span-5 lg:pl-4">
               <div className="relative rotate-1 transition-transform duration-500 hover:rotate-0"><ProductMockup /></div>
               <div className="absolute -bottom-8 -left-5 -rotate-3 bg-landing-accent px-5 py-4 text-landing-accent-foreground shadow-elevated md:-left-12">
                 <p className="font-hand text-lg">Alertas antes de quedarte sin stock ↗</p>
@@ -248,14 +268,17 @@ export default function Index() {
 
         <section id="features" className="bg-landing-dark px-4 py-24 text-landing-dark-foreground md:py-32">
           <div className="container max-w-7xl">
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-5">
-                <p className="text-xs font-semibold uppercase text-primary-glow">La vista que ordena el día</p>
-                <h2 className="mt-5 font-display text-5xl leading-tight md:text-6xl">Todo el inventario, sin perder el hilo.</h2>
-                <p className="mt-6 max-w-md leading-relaxed text-landing-dark-muted">Valor, rotación, productos críticos y movimientos recientes. Primero lo importante; después, el detalle.</p>
-              </div>
-              <div className="lg:col-span-7"><ProductMockup /></div>
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase text-primary-glow">La vista que ordena el día</p>
+              <h2 className="mt-5 font-display text-5xl leading-tight md:text-6xl">Todo el inventario, sin perder el hilo.</h2>
+              <p className="mt-6 max-w-md leading-relaxed text-landing-dark-muted">Valor, rotación, productos críticos y movimientos recientes. Primero lo importante; después, el detalle.</p>
             </div>
+            <div className="mt-10 border border-landing-dark-line bg-card p-2 shadow-elevated">
+              <div className="overflow-x-auto">
+                <img src={productosShot.url} alt="Pantalla de Productos de OneStock con el catálogo, los precios y el stock" className="h-60 w-[420%] max-w-none object-cover object-[0%_58%] md:h-auto md:w-full" />
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-landing-dark-muted">Vista real de la pantalla de Productos dentro del sistema.<span className="md:hidden"> Deslizá para verla completa.</span></p>
             <div className="mt-20 grid gap-x-12 md:grid-cols-2">
               {features.map((feature) => (
                 <div key={feature.title} className="grid grid-cols-[auto_1fr] gap-4 border-t border-landing-dark-line py-6">
