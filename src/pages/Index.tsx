@@ -208,7 +208,8 @@ export default function Index() {
             {heroPhotos.map((src, index) => (
               <img key={src} src={src} alt="" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroPhoto === index ? "opacity-100" : "opacity-0"}`} />
             ))}
-            <div className="absolute inset-0 bg-landing-paper/85" />
+            <div className="absolute inset-0 bg-landing-paper/70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-landing-paper via-landing-paper/85 to-landing-paper/35" />
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-landing-paper" />
           </div>
           <div className="container grid max-w-7xl gap-14 lg:grid-cols-12 lg:items-center">
