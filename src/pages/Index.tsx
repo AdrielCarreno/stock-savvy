@@ -276,7 +276,9 @@ export default function Index() {
               </div>
               <div className="lg:col-span-7">
                 <div className="border border-landing-dark-line bg-card p-2 shadow-elevated">
-                  <img src={productosShot.url} alt="Pantalla de Productos de OneStock con el catálogo, los precios y el stock" className="w-full" />
+                  <div className="overflow-hidden">
+                    <img src={productosShot.url} alt="Pantalla de Productos de OneStock con el catálogo, los precios y el stock" className="h-60 w-[420%] max-w-none object-cover object-[0%_58%] md:h-auto md:w-full" />
+                  </div>
                 </div>
                 <p className="mt-3 text-xs text-landing-dark-muted">Vista real de la pantalla de Productos dentro del sistema.</p>
               </div>
