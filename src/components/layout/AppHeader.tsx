@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 interface AppHeaderProps {
   title: string;
@@ -24,6 +25,7 @@ export function AppHeader({ title }: AppHeaderProps) {
         <h1 className="break-words font-display text-lg font-normal leading-tight text-foreground md:text-2xl">{title}</h1>
       </div>
       <div className="flex shrink-0 items-center gap-0 sm:gap-2">
+        <InstallAppButton />
         <ThemeToggle />
         <Button
           variant="ghost"

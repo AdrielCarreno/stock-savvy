@@ -25,7 +25,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import warehouse1 from "@/assets/warehouse-1.jpg.asset.json";
-import warehouse2 from "@/assets/warehouse-2.jpg.asset.json";
 
 type BillingCycle = "mensual" | "anual";
 
