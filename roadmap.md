@@ -11,9 +11,10 @@
 - [x] Diferenciar precios, rubros y cierre con composiciones propias.
 - [x] Mantener contenido comercial y enlaces sin inventar prueba social.
 
-- [ ] Corregir la imagen rota y las advertencias visuales detectadas en la landing.
+- [x] Confirmar que la foto de la landing carga en la web publicada (solo falla en el servidor local).
 - [x] Crear el lenguaje visual editorial compartido del área interna.
 - [x] Aplicar el nuevo diseño a navegación, encabezado y menú móvil.
 - [x] Rediseñar Dashboard, Caja, Productos, Stock/Movimientos y Alertas.
 - [x] Rediseñar Proveedores, Usuarios, Reportes, Integraciones, IA y Configuración.
-- [ ] Validar visualmente todas las páginas internas en escritorio y móvil y corregir los problemas detectados.
+- [x] Validar visualmente todas las páginas internas en escritorio y móvil y corregir los problemas detectados.
+- [x] Mostrar el botón "Instalar app" solo dentro del área de usuarios, nunca en la landing.
