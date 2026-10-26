@@ -268,21 +268,17 @@ export default function Index() {
 
         <section id="features" className="bg-landing-dark px-4 py-24 text-landing-dark-foreground md:py-32">
           <div className="container max-w-7xl">
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-5">
-                <p className="text-xs font-semibold uppercase text-primary-glow">La vista que ordena el día</p>
-                <h2 className="mt-5 font-display text-5xl leading-tight md:text-6xl">Todo el inventario, sin perder el hilo.</h2>
-                <p className="mt-6 max-w-md leading-relaxed text-landing-dark-muted">Valor, rotación, productos críticos y movimientos recientes. Primero lo importante; después, el detalle.</p>
-              </div>
-              <div className="lg:col-span-7">
-                <div className="border border-landing-dark-line bg-card p-2 shadow-elevated">
-                  <div className="overflow-hidden">
-                    <img src={productosShot.url} alt="Pantalla de Productos de OneStock con el catálogo, los precios y el stock" className="h-60 w-[420%] max-w-none object-cover object-[0%_58%] md:h-auto md:w-full" />
-                  </div>
-                </div>
-                <p className="mt-3 text-xs text-landing-dark-muted">Vista real de la pantalla de Productos dentro del sistema.</p>
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase text-primary-glow">La vista que ordena el día</p>
+              <h2 className="mt-5 font-display text-5xl leading-tight md:text-6xl">Todo el inventario, sin perder el hilo.</h2>
+              <p className="mt-6 max-w-md leading-relaxed text-landing-dark-muted">Valor, rotación, productos críticos y movimientos recientes. Primero lo importante; después, el detalle.</p>
+            </div>
+            <div className="mt-10 border border-landing-dark-line bg-card p-2 shadow-elevated">
+              <div className="overflow-x-auto">
+                <img src={productosShot.url} alt="Pantalla de Productos de OneStock con el catálogo, los precios y el stock" className="h-60 w-[420%] max-w-none object-cover object-[0%_58%] md:h-auto md:w-full" />
               </div>
             </div>
+            <p className="mt-3 text-xs text-landing-dark-muted">Vista real de la pantalla de Productos dentro del sistema.<span className="md:hidden"> Deslizá para verla completa.</span></p>
             <div className="mt-20 grid gap-x-12 md:grid-cols-2">
               {features.map((feature) => (
                 <div key={feature.title} className="grid grid-cols-[auto_1fr] gap-4 border-t border-landing-dark-line py-6">
