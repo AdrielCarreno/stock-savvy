@@ -87,50 +87,21 @@ export function useStockMovements() {
     }) => {
       if (!companyId || !user?.id) return { error: new Error("No autenticado") };
 
-      const { data: product, error: pErr } = await supabase
-        .from("products")
-        .select("current_stock, name")
-        .eq("id", input.product_id)
-        .maybeSingle();
-      if (pErr || !product) {
-        toast.error("Producto no encontrado");
-        return { error: pErr ?? new Error("not found") };
-      }
-
-      const newStock =
-        input.type === "entrada"
-          ? product.current_stock + input.quantity
-          : product.current_stock - input.quantity;
-
-      if (newStock < 0) {
-        toast.error(`Stock insuficiente. Disponible: ${product.current_stock}`);
-        return { error: new Error("insufficient stock") };
-      }
-
-      const { error: mErr } = await supabase.from("stock_movements").insert({
-        company_id: companyId,
-        product_id: input.product_id,
-        user_id: user.id,
-        type: input.type,
-        quantity: input.quantity,
-        reason: input.reason ?? null,
-        sale_type: input.sale_type ?? null,
-        logistics: input.logistics ?? null,
-        movement_date: input.movement_date ?? new Date().toISOString(),
+      const { data: res, error: rErr } = await (supabase as any).rpc("apply_stock_movement", {
+        p_op_id: crypto.randomUUID(),
+        p_product_id: input.product_id,
+        p_type: input.type,
+        p_quantity: input.quantity,
+        p_reason: input.reason ?? null,
+        p_sale_type: input.sale_type ?? null,
+        p_logistics: input.logistics ?? null,
+        p_movement_date: input.movement_date ?? new Date().toISOString(),
       });
-      if (mErr) {
-        toast.error(friendlyError(mErr, "Error al registrar movimiento"));
-        return { error: mErr };
+      if (rErr || !res) {
+        toast.error(friendlyError(rErr, "Error al registrar movimiento"));
+        return { error: rErr ?? new Error("failed") };
       }
-
-      const { error: uErr } = await supabase
-        .from("products")
-        .update({ current_stock: newStock })
-        .eq("id", input.product_id);
-      if (uErr) {
-        toast.error(friendlyError(uErr, "Error al actualizar stock"));
-        return { error: uErr };
-      }
+      const product = { name: movements.find((m) => m.product_id === input.product_id)?.product_name ?? "producto" };
 
       toast.success(
         input.type === "entrada"
@@ -140,7 +111,7 @@ export function useStockMovements() {
       await fetchMovements();
       return { error: null };
     },
-    [companyId, user?.id, fetchMovements]
+    [companyId, user?.id, fetchMovements, movements]
   );
 
   const updateMovement = useCallback(

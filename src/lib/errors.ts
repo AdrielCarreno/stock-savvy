@@ -15,6 +15,10 @@ export function friendlyError(err: unknown, fallback = "Algo salió mal. Intent�
     case "PGRST116": return "No tenés permisos para esta acción.";
   }
   const msg = e?.message ?? "";
+  // Mensajes de negocio propios (RAISE EXCEPTION en nuestras funciones), seguros para mostrar.
+  if (code === "P0001" && /^(Stock insuficiente|Cantidad inválida|Precio inválido|Producto (no encontrado|inválido)|Cliente inválido|El carrito está vacío|Venta no encontrada|Medio de pago inválido|El total pagado|Solo administradores)/.test(msg)) {
+    return msg;
+  }
   if (/row-level security/i.test(msg)) return "No tenés permisos para esta acción.";
   if (/duplicate key/i.test(msg)) return "Ya existe un registro con esos datos.";
   if (/violates not-null/i.test(msg)) return "Faltan datos obligatorios.";

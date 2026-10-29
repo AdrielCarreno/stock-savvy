@@ -47,60 +47,9 @@ export function usePos() {
   const { profile, user, company } = useAuth();
   const companyId = profile?.company_id ?? company?.id ?? null;
 
-  /** Ajusta stock de productos y deja el movimiento en el inventario existente. */
-  const applyStock = useCallback(
-    async (
-      items: { product_id: string; quantity: number; sale_type?: "minorista" | "mayorista" }[],
-      type: "entrada" | "salida",
-      reason: string
-    ) => {
-      if (!companyId || !user?.id) return { error: new Error("No autenticado") };
-      const ids = Array.from(new Set(items.map((i) => i.product_id)));
-      const { data: prods, error } = await supabase
-        .from("products")
-        .select("id, name, current_stock")
-        .in("id", ids);
-      if (error || !prods) return { error: error ?? new Error("Productos no encontrados") };
-
-      const stockMap = new Map(prods.map((p) => [p.id, { stock: p.current_stock, name: p.name }]));
-      const next = new Map<string, number>();
-      for (const it of items) {
-        const p = stockMap.get(it.product_id);
-        if (!p) return { error: new Error("Producto no encontrado") };
-        const base = next.get(it.product_id) ?? p.stock;
-        const val = type === "entrada" ? base + it.quantity : base - it.quantity;
-        if (val < 0) {
-          toast.error(`Stock insuficiente de ${p.name} (disponible ${p.stock})`);
-          return { error: new Error("insufficient stock") };
-        }
-        next.set(it.product_id, val);
-      }
-
-      const { error: mErr } = await supabase.from("stock_movements").insert(
-        items.map((it) => ({
-          company_id: companyId,
-          product_id: it.product_id,
-          user_id: user.id,
-          type,
-          quantity: it.quantity,
-          reason,
-           sale_type: it.sale_type ?? "minorista",
-          movement_date: new Date().toISOString(),
-        }))
-      );
-      if (mErr) return { error: mErr };
-
-      for (const [id, qty] of next) {
-        const { error: uErr } = await supabase.from("products").update({ current_stock: qty }).eq("id", id);
-        if (uErr) return { error: uErr };
-      }
-      return { error: null };
-    },
-    [companyId, user?.id]
-  );
-
+  /** Registra la venta completa en el servidor en una sola operación (idempotente por opId). */
   const createSale = useCallback(
-    async (input: PosSaleInput) => {
+    async (input: PosSaleInput & { opId?: string }) => {
       if (!companyId || !user?.id) {
         toast.error("No autenticado");
         return { error: new Error("No autenticado"), sale: null };
@@ -109,27 +58,12 @@ export function usePos() {
         toast.error("El carrito está vacío");
         return { error: new Error("empty"), sale: null };
       }
-
-      const stockRes = await applyStock(
-         input.lines.map((l) => ({ product_id: l.product_id, quantity: l.quantity, sale_type: l.sale_type })),
-        "salida",
-        "Venta POS"
-      );
-      if (stockRes.error) {
-        if ((stockRes.error as Error).message !== "insufficient stock") {
-          toast.error(friendlyError(stockRes.error, "Error al descontar stock"));
-        }
-        return { error: stockRes.error, sale: null };
-      }
-
-      const { data: sale, error } = await supabase
-        .from("sales")
-        .insert({
-          company_id: companyId,
+      const opId = input.opId ?? crypto.randomUUID();
+      const { data, error } = await (supabase as any).rpc("create_pos_sale", {
+        p_op_id: opId,
+        p_sale: {
           customer_id: input.customer_id,
           reference: input.reference ?? null,
-          channel: "pos",
-          status: "completada",
           sale_date: new Date().toISOString().slice(0, 10),
           discount: input.discount,
           total: input.total,
@@ -138,67 +72,34 @@ export function usePos() {
           amount_received: input.amount_received,
           change_amount: input.change_amount,
           tax: input.tax,
-          source: "pos",
-          created_by: user.id,
-        } as never)
-        .select("*")
-        .single();
-
-      if (error || !sale) {
-        toast.error(friendlyError(error, "Error al registrar la venta"));
-        return { error: error ?? new Error("insert failed"), sale: null };
-      }
-
-      await supabase.from("sale_items").insert(
-        input.lines.map((l) => ({
-          company_id: companyId,
-          sale_id: (sale as { id: string }).id,
+        },
+        p_lines: input.lines.map((l) => ({
           product_id: l.product_id,
           description: l.name,
           quantity: l.quantity,
           unit_price: l.unit_price,
-          subtotal: l.quantity * l.unit_price - (l.discount || 0),
-        }))
-      );
-
+          sale_type: l.sale_type,
+        })),
+      });
+      if (error || !data) {
+        toast.error(friendlyError(error, "Error al registrar la venta"));
+        return { error: error ?? new Error("insert failed"), sale: null };
+      }
       toast.success("Venta registrada");
-      return { error: null, sale };
+      return { error: null, sale: data };
     },
-    [companyId, user?.id, applyStock]
+    [companyId, user?.id]
   );
 
-  const annulSale = useCallback(
-    async (saleId: string) => {
-      const { data: items, error } = await supabase
-        .from("sale_items")
-        .select("product_id, quantity")
-        .eq("sale_id", saleId);
-      if (error) {
-        toast.error(friendlyError(error, "Error al leer la venta"));
-        return { error };
-      }
-      const valid = (items ?? []).filter((i) => i.product_id) as { product_id: string; quantity: number }[];
-      if (valid.length > 0) {
-        const res = await applyStock(
-          valid.map((i) => ({ product_id: i.product_id, quantity: Number(i.quantity) })),
-          "entrada",
-          "Anulación de venta POS"
-        );
-        if (res.error) {
-          toast.error(friendlyError(res.error, "Error al reponer stock"));
-          return { error: res.error };
-        }
-      }
-      const { error: uErr } = await supabase.from("sales").update({ status: "anulada" }).eq("id", saleId);
-      if (uErr) {
-        toast.error(friendlyError(uErr, "Error al anular la venta"));
-        return { error: uErr };
-      }
-      toast.success("Venta anulada y stock repuesto");
-      return { error: null };
-    },
-    [applyStock]
-  );
+  const annulSale = useCallback(async (saleId: string) => {
+    const { error } = await (supabase as any).rpc("annul_sale", { p_sale_id: saleId });
+    if (error) {
+      toast.error(friendlyError(error, "Error al anular la venta"));
+      return { error };
+    }
+    toast.success("Venta anulada y stock repuesto");
+    return { error: null };
+  }, []);
 
   return { createSale, annulSale };
 }

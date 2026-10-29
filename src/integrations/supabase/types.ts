@@ -140,6 +140,7 @@ export type Database = {
         Row: {
           address: string | null
           balance: number
+          client_op_id: string | null
           company_id: string
           created_at: string
           email: string | null
@@ -149,10 +150,12 @@ export type Database = {
           phone: string | null
           tax_id: string | null
           updated_at: string
+          version: number
         }
         Insert: {
           address?: string | null
           balance?: number
+          client_op_id?: string | null
           company_id: string
           created_at?: string
           email?: string | null
@@ -162,10 +165,12 @@ export type Database = {
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
+          version?: number
         }
         Update: {
           address?: string | null
           balance?: number
+          client_op_id?: string | null
           company_id?: string
           created_at?: string
           email?: string | null
@@ -175,6 +180,7 @@ export type Database = {
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
@@ -623,6 +629,7 @@ export type Database = {
           barcode: string | null
           category: string | null
           client: string | null
+          client_op_id: string | null
           company_id: string
           cost: number | null
           created_at: string
@@ -639,11 +646,13 @@ export type Database = {
           sku: string | null
           unit: string
           updated_at: string
+          version: number
         }
         Insert: {
           barcode?: string | null
           category?: string | null
           client?: string | null
+          client_op_id?: string | null
           company_id: string
           cost?: number | null
           created_at?: string
@@ -660,11 +669,13 @@ export type Database = {
           sku?: string | null
           unit?: string
           updated_at?: string
+          version?: number
         }
         Update: {
           barcode?: string | null
           category?: string | null
           client?: string | null
+          client_op_id?: string | null
           company_id?: string
           cost?: number | null
           created_at?: string
@@ -681,6 +692,7 @@ export type Database = {
           sku?: string | null
           unit?: string
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
@@ -752,6 +764,7 @@ export type Database = {
       }
       purchases: {
         Row: {
+          client_op_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -766,6 +779,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          client_op_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -780,6 +794,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          client_op_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
@@ -873,6 +888,7 @@ export type Database = {
           amount_received: number | null
           change_amount: number | null
           channel: string | null
+          client_op_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -897,6 +913,7 @@ export type Database = {
           amount_received?: number | null
           change_amount?: number | null
           channel?: string | null
+          client_op_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -921,6 +938,7 @@ export type Database = {
           amount_received?: number | null
           change_amount?: number | null
           channel?: string | null
+          client_op_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
@@ -1026,6 +1044,7 @@ export type Database = {
       }
       stock_movements: {
         Row: {
+          client_op_id: string | null
           company_id: string
           created_at: string
           from_warehouse_id: string | null
@@ -1043,6 +1062,7 @@ export type Database = {
           warehouse_id: string | null
         }
         Insert: {
+          client_op_id?: string | null
           company_id: string
           created_at?: string
           from_warehouse_id?: string | null
@@ -1060,6 +1080,7 @@ export type Database = {
           warehouse_id?: string | null
         }
         Update: {
+          client_op_id?: string | null
           company_id?: string
           created_at?: string
           from_warehouse_id?: string | null
@@ -1236,6 +1257,7 @@ export type Database = {
       }
       suppliers: {
         Row: {
+          client_op_id: string | null
           company_id: string
           contact_email: string | null
           contact_name: string | null
@@ -1248,9 +1270,11 @@ export type Database = {
           payment_terms: string | null
           rating: number | null
           updated_at: string
+          version: number
           website: string | null
         }
         Insert: {
+          client_op_id?: string | null
           company_id: string
           contact_email?: string | null
           contact_name?: string | null
@@ -1263,9 +1287,11 @@ export type Database = {
           payment_terms?: string | null
           rating?: number | null
           updated_at?: string
+          version?: number
           website?: string | null
         }
         Update: {
+          client_op_id?: string | null
           company_id?: string
           contact_email?: string | null
           contact_name?: string | null
@@ -1278,6 +1304,7 @@ export type Database = {
           payment_terms?: string | null
           rating?: number | null
           updated_at?: string
+          version?: number
           website?: string | null
         }
         Relationships: [
@@ -1394,6 +1421,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      annul_sale: { Args: { p_sale_id: string }; Returns: Json }
+      apply_stock_movement: {
+        Args: {
+          p_allow_negative?: boolean
+          p_logistics?: string
+          p_movement_date?: string
+          p_op_id: string
+          p_product_id: string
+          p_quantity: number
+          p_reason?: string
+          p_sale_type?: string
+          p_type: string
+        }
+        Returns: Json
+      }
+      can_operate: { Args: never; Returns: boolean }
+      create_pos_sale: {
+        Args: { p_lines: Json; p_op_id: string; p_sale: Json }
+        Returns: Json
+      }
       current_company_id: { Args: never; Returns: string }
       current_company_is_active: { Args: never; Returns: boolean }
       has_role: {
