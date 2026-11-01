@@ -16,7 +16,7 @@ import type { ScanDocument } from "@/lib/scanLocal";
 
 const states = { pending: "Lectura pendiente", review: "Por revisar", confirmed: "Subida pendiente", uploaded: "Guardado en el negocio" };
 
-function DocumentReview({ draft, disabled, confirm, remove }: { draft: ScanDocument; disabled: boolean; confirm: (id: string, text: string, type: ScanDocument["docType"]) => Promise<void>; remove: (id: string) => Promise<void> }) {
+function DocumentReview({ draft, disabled, confirm, remove, read }: { draft: ScanDocument; disabled: boolean; confirm: (id: string, text: string, type: ScanDocument["docType"]) => Promise<void>; remove: (id: string) => Promise<void>; read: (id: string) => Promise<void> }) {
   const [text, setText] = useState(draft.text);
   const [type, setType] = useState(draft.docType);
   const [preview, setPreview] = useState("");
@@ -26,6 +26,7 @@ function DocumentReview({ draft, disabled, confirm, remove }: { draft: ScanDocum
     <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="break-words font-medium">{draft.fileName}</p><p className="text-xs text-muted-foreground">{states[draft.status]}</p></div><div className="flex shrink-0 gap-1"><Button variant="ghost" size="icon" title="Descargar original" aria-label="Descargar original" asChild><a href={preview} download={draft.fileName}><Download className="h-4 w-4" /></a></Button>{draft.status !== "uploaded" && <Button variant="ghost" size="icon" title="Descartar documento local" aria-label="Descartar documento local" disabled={disabled} onClick={() => void remove(draft.id).catch(e => toast.error(friendlyError(e)))}><Trash2 className="h-4 w-4" /></Button>}</div></div>
     {draft.mime.startsWith("image/") ? <img src={preview} alt={draft.fileName} className="max-h-64 w-full object-contain" /> : <a href={preview} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-primary"><FileText className="h-4 w-4" />Abrir PDF</a>}
     {draft.error && <p role="alert" className="text-sm text-destructive">{draft.error}</p>}
+    {draft.status === "pending" && <Button variant="outline" disabled={disabled} onClick={() => void read(draft.id)}>Leer texto</Button>}
     {(draft.status === "pending" || draft.status === "review") && <>
       <Label htmlFor={`type-${draft.id}`}>Tipo de documento</Label><select id={`type-${draft.id}`} value={type} onChange={e => setType(e.target.value as ScanDocument["docType"])} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option>Factura</option><option>Remito</option><option>Comprobante</option></select>
       <Label htmlFor={`text-${draft.id}`}>Texto y datos revisados</Label><Textarea id={`text-${draft.id}`} value={text} onChange={e => setText(e.target.value)} rows={8} />

@@ -12,7 +12,8 @@ export async function recognizeDocument(blob: Blob, onProgress: (progress: numbe
     if (blob.type !== "application/pdf") return (await worker.recognize(blob)).data.text;
     const pdfjs = await import("pdfjs-dist");
     pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-    const pdf = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+    const loadingTask = pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) });
+    const pdf = await loadingTask.promise;
     try {
       const chunks: string[] = [];
       for (let n = 1; n <= pdf.numPages; n++) {
@@ -34,6 +35,6 @@ export async function recognizeDocument(blob: Blob, onProgress: (progress: numbe
         onProgress(n / pdf.numPages);
       }
       return chunks.join("\n\n");
-    } finally { await pdf.destroy(); }
+    } finally { await loadingTask.destroy(); }
   } finally { await worker.terminate(); }
 }

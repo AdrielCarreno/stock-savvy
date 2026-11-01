@@ -67,7 +67,7 @@ export function useScanWorkspace() {
             await db.documents.update(draft.id, { status: "uploaded", error: null });
           }
         } catch (err) {
-          if (dbRef.current === db) await db.documents.update(draft.id, { error: friendlyError(err, "Traitement impossible. Réessayez.").replace("Traitement impossible. Réessayez.", "No se pudo procesar. Reintentá con conexión.") });
+          if (dbRef.current === db) await db.documents.update(draft.id, { error: friendlyError(err, "No se pudo procesar. Reintentá con conexión.") });
         }
         if (dbRef.current === db) await refreshLocal(db);
       }
@@ -109,5 +109,22 @@ export function useScanWorkspace() {
     if (!db || busy) return;
     await db.documents.delete(id); await refreshLocal(db);
   };
-  return { products, documents, online, busy, progress, error, sync, addDocument, confirmDocument, removeDocument };
+  const readDocument = async (id: string) => {
+    const db = dbRef.current;
+    if (!db || active.current) return;
+    const draft = await db.documents.get(id);
+    if (!draft || draft.status !== "pending") return;
+    active.current = true; setBusy(true); setProgress(0);
+    try {
+      const { recognizeDocument } = await import("@/lib/documentOcr");
+      const text = await recognizeDocument(draft.file, setProgress);
+      if (dbRef.current === db) await db.documents.update(id, { text, status: "review", error: null });
+    } catch (err) {
+      if (dbRef.current === db) await db.documents.update(id, { error: friendlyError(err, "La lectura no está disponible sin conexión todavía. El original sigue guardado.") });
+    } finally {
+      active.current = false;
+      if (dbRef.current === db) { setBusy(false); await refreshLocal(db); }
+    }
+  };
+  return { products, documents, online, busy, progress, error, sync, addDocument, confirmDocument, removeDocument, readDocument };
 }

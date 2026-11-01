@@ -14,8 +14,8 @@ export interface ScanDocument {
   confirmedAt?: string;
 }
 export class ScanDatabase extends Dexie {
-  products!: Table<Product, string>;
-  documents!: Table<ScanDocument, string>;
+  declare products: Table<Product, string>;
+  declare documents: Table<ScanDocument, string>;
   constructor(companyId: string, userId: string) {
     super(`onestock_scan_${companyId}_${userId}`);
     this.version(1).stores({ products: "id,barcode,sku", documents: "id,status,createdAt" });
