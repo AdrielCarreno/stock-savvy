@@ -976,6 +976,53 @@ export type Database = {
           },
         ]
       }
+      scan_documents: {
+        Row: {
+          company_id: string
+          confirmed_at: string
+          created_at: string
+          doc_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          reviewed_text: string
+          uploaded_by: string
+        }
+        Insert: {
+          company_id: string
+          confirmed_at: string
+          created_at?: string
+          doc_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          reviewed_text?: string
+          uploaded_by: string
+        }
+        Update: {
+          company_id?: string
+          confirmed_at?: string
+          created_at?: string
+          doc_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          reviewed_text?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scan_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipments: {
         Row: {
           bl_number: string | null
