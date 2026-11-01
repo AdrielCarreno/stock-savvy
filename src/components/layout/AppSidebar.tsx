@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ChevronDown,
   ShoppingCart,
+  ScanLine,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ const navGroups: NavGroup[] = [
     items: [
       { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
       { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
+      { title: "Escanear", url: "/app/scan", icon: ScanLine },
     ],
   },
   {
