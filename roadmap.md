@@ -19,3 +19,9 @@
 - [x] Validar visualmente todas las páginas internas en escritorio y móvil y corregir los problemas detectados.
 - [x] Mostrar el botón "Instalar app" solo dentro del área de usuarios, nunca en la landing.
 - [x] Usar las tres fotos de depósito como fondo de la portada y la captura real de Productos en Funcionalidades.
+
+## Etapa 5 — Escaneo y documentos
+- [ ] Escáner con cámara y búsqueda manual, catálogo local por empresa y usuario.
+- [ ] Entrada/salida y asociación de códigos con confirmación.
+- [ ] Documentos locales, OCR y revisión explícita; subida privada con reintentos.
+- [ ] Pruebas de reglas, persistencia y navegación en escritorio y móvil.

@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { ScanLine } from "lucide-react";
 
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
@@ -14,6 +15,7 @@ const primaryItems = [
 ];
 
 const moreGroups = [
+  { label: "Operación", items: [{ title: "Escanear", url: "/app/scan", icon: ScanLine }] },
   {
     label: "Catálogo",
     items: [{ title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle }],

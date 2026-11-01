@@ -10,6 +10,7 @@ const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
   "/app/products": "Productos",
   "/app/pos": "Clientes",
+  "/app/scan": "Escanear",
   "/app/low-stock": "Alertas de Stock",
   "/app/suppliers": "Proveedores",
   "/app/movements": "Stock y Movimientos",

@@ -8,6 +8,13 @@
       "when": 1793296046067,
       "tag": "0000_offline_stage1_idempotent_rpcs",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793502428218,
+      "tag": "0001_scan_documents_review",
+      "breakpoints": true
     }
   ]
 }
