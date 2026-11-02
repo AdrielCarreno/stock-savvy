@@ -92,17 +92,10 @@ export function useProducts() {
           .maybeSingle();
 
         if (defaultWh && defaultWh.id !== warehouseId) {
-          // Borrar stock del default y crear en el elegido
-          await supabase
-            .from("product_stock")
-            .delete()
-            .eq("product_id", data.id)
-            .eq("warehouse_id", defaultWh.id);
-          await supabase.from("product_stock").insert({
-            company_id: companyId,
-            product_id: data.id,
-            warehouse_id: warehouseId,
-            quantity: input.current_stock,
+          // Mover el stock inicial al depósito elegido (validado en el servidor)
+          await supabase.rpc("place_initial_stock", {
+            p_product_id: data.id,
+            p_warehouse_id: warehouseId,
           });
         }
       }
