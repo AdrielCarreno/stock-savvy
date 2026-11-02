@@ -2,7 +2,7 @@ import { LayoutDashboard, Package, ArrowLeftRight, AlertTriangle, MoreHorizontal
 import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ScanLine } from "lucide-react";
@@ -11,11 +11,10 @@ const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
   { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
   { title: "Productos", url: "/app/products", icon: Package },
-  { title: "Stock", url: "/app/movements", icon: ArrowLeftRight },
 ];
 
 const moreGroups = [
-  { label: "Operación", items: [{ title: "Escanear", url: "/app/scan", icon: ScanLine }] },
+  { label: "Operación", items: [{ title: "Stock y movimientos", url: "/app/movements", icon: ArrowLeftRight }, { title: "Escanear catálogo y documentos", url: "/app/scan", icon: ScanLine }] },
   {
     label: "Catálogo",
     items: [{ title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle }],
@@ -47,6 +46,8 @@ const moreGroups = [
 export function MobileBottomNav() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const scanning = location.pathname === "/app/pos" && new URLSearchParams(location.search).get("scan") === "1";
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -60,8 +61,8 @@ export function MobileBottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="grid grid-cols-5">
-        {primaryItems.map((item) => (
+      <div className="grid grid-cols-5 items-end">
+        {primaryItems.slice(0, 2).map((item) => (
           <NavLink
             key={item.url}
             to={item.url}
@@ -70,6 +71,21 @@ export function MobileBottomNav() {
           >
             <item.icon className="h-5 w-5" />
             <span>{item.title}</span>
+          </NavLink>
+        ))}
+        <Button
+          variant="default"
+          onClick={() => navigate("/app/pos?scan=1")}
+          aria-label="Escanear para vender"
+          aria-current={scanning ? "page" : undefined}
+          title="Escanear para vender"
+          className="relative -top-3 mx-auto h-14 w-14 rounded-full border-4 border-card p-0 shadow-primary"
+        >
+          <ScanLine className="h-6 w-6" />
+        </Button>
+        {primaryItems.slice(2).map((item) => (
+          <NavLink key={item.url} to={item.url} className="flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 border-transparent py-2 text-[10px] font-medium text-muted-foreground transition-colors" activeClassName="border-primary text-primary">
+            <item.icon className="h-5 w-5" /><span>{item.title}</span>
           </NavLink>
         ))}
         <Sheet open={open} onOpenChange={setOpen}>
