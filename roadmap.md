@@ -21,12 +21,14 @@
 - [x] Usar las tres fotos de depósito como fondo de la portada y la captura real de Productos en Funcionalidades.
 
 ## Etapa 5 — Escaneo y documentos
-- [ ] Escáner con cámara y búsqueda manual, catálogo local por empresa y usuario.
-- [ ] Entrada/salida y asociación de códigos con confirmación.
-- [ ] Documentos locales, OCR y revisión explícita; subida privada con reintentos.
-- [ ] Pruebas de reglas, persistencia y navegación en escritorio y móvil.
+- [x] Escáner con cámara y búsqueda manual, catálogo local por empresa y usuario.
+- [x] Entrada/salida y asociación de códigos con confirmación.
+- [x] Documentos locales, OCR y revisión explícita; subida privada con reintentos.
+- [x] Pruebas de reglas y persistencia local.
+- [ ] Verificación real de movimientos, OCR y subida: bloqueada por prueba vencida; cámara física no disponible en el sandbox.
 
 ## Escaneo para cobro móvil
-- [ ] Destacar el escáner en el centro del menú móvil sin perder acceso a Stock.
-- [ ] Agregar lectura por cámara al carrito de Clientes y conectar Escanear con el cobro.
-- [ ] Probar códigos, carrito, navegación y diseño móvil; comprobar cobro si la cuenta permite operar.
+- [x] Destacar el escáner en el centro del menú móvil sin perder acceso a Stock.
+- [x] Agregar lectura por cámara al carrito de Clientes y conectar Escanear con el cobro.
+- [x] Probar códigos y carrito (14 pruebas), navegación autenticada y diseño del menú móvil; compilación correcta.
+- [ ] Comprobar venta real y cámara física: prueba de la cuenta vencida y dispositivo físico no disponible.
