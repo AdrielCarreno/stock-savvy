@@ -97,7 +97,7 @@ export default function Login() {
             </p>
           )}
 
-          <h1 className="mb-2 text-2xl font-bold">Bienvenido de vuelta</h1>
+          <h1 className="mb-2 text-2xl font-bold">Iniciar sesión en OneStock</h1>
           <p className="mb-8 text-sm text-muted-foreground">
             ¿No tenés cuenta?{" "}
             <Link to="/register" className="font-medium text-primary hover:underline">
