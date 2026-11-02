@@ -25,3 +25,8 @@
 - [ ] Entrada/salida y asociación de códigos con confirmación.
 - [ ] Documentos locales, OCR y revisión explícita; subida privada con reintentos.
 - [ ] Pruebas de reglas, persistencia y navegación en escritorio y móvil.
+
+## Escaneo para cobro móvil
+- [ ] Destacar el escáner en el centro del menú móvil sin perder acceso a Stock.
+- [ ] Agregar lectura por cámara al carrito de Clientes y conectar Escanear con el cobro.
+- [ ] Probar códigos, carrito, navegación y diseño móvil; comprobar cobro si la cuenta permite operar.
