@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ScanLine, Upload, Camera, RefreshCw, Trash2, FileText, Download } from "lucide-react";
+import { ScanLine, Upload, Camera, RefreshCw, Trash2, FileText, Download, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +95,9 @@ export default function Scan() {
   return <div className="mx-auto max-w-6xl space-y-6">
     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4"><div><h2 className="font-display text-2xl">Escanear</h2><p className="mt-1 text-sm text-muted-foreground">{workspace.online ? workspace.busy ? `Procesando · ${Math.round(workspace.progress * 100)}%` : "En línea" : "Sin conexión"} · {workspace.products.length} productos en este dispositivo</p></div><Button variant="outline" disabled={!workspace.online || workspace.busy} onClick={() => void workspace.sync()}><RefreshCw className={`mr-2 h-4 w-4 ${workspace.busy ? "animate-spin" : ""}`} />Reintentar / actualizar</Button></div>
     {workspace.error && <p role="alert" className="text-sm text-destructive">{workspace.error}</p>}
+     <div className="flex flex-wrap items-center gap-3 border-b border-border pb-4">
+       <Button className="gap-2" onClick={() => navigate(`/app/pos?scan=1${selected ? `&product=${encodeURIComponent(selected.id)}` : ""}`)}><ShoppingCart className="h-4 w-4" />{selected ? "Agregar a venta en Clientes" : "Escanear para vender"}</Button>
+     </div>
     {!workspace.online && <p className="border-l-2 border-primary pl-3 text-sm text-muted-foreground">Búsqueda con la última copia guardada. Los movimientos y la asociación de códigos requieren conexión. Los documentos quedan en este dispositivo.</p>}
     <Tabs defaultValue="products"><TabsList className="grid w-full grid-cols-2 sm:w-96"><TabsTrigger value="products"><ScanLine className="mr-2 h-4 w-4" />Productos</TabsTrigger><TabsTrigger value="documents"><FileText className="mr-2 h-4 w-4" />Documentos</TabsTrigger></TabsList>
       <TabsContent value="products" className="mt-6"><div className="grid gap-8 lg:grid-cols-2"><section className="min-w-0 space-y-5"><BarcodeCamera onCode={lookup} /><form onSubmit={e => { e.preventDefault(); lookup(code); }} className="space-y-2"><Label htmlFor="scan-code">Código de barras, QR o SKU</Label><div className="flex gap-2"><Input id="scan-code" value={code} onChange={e => { setCode(e.target.value); setSearched(false); }} /><Button type="submit">Buscar</Button></div></form>

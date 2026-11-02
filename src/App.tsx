@@ -56,6 +56,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Index />} />
     <Route path="/login" element={<Login />} />
+    <Route path="/pos" element={<Navigate to="/app/pos?scan=1" replace />} />
     <Route path="/register" element={<Register />} />
     <Route path="/forgot-password" element={<ForgotPassword />} />
     <Route path="/auth/callback" element={<AuthCallback />} />

@@ -5,3 +5,4 @@
 - PWA is manifest-only (no service workers, no offline caching). In standalone/installed mode the landing ("/") must never render: `StandaloneLandingGate` (src/App.tsx + src/lib/standalone.ts) redirects to `/login`, or `/app/dashboard` when a session exists; regular browsers keep seeing the landing.
 - Keep scan catalogs and document drafts in an IndexedDB database scoped by company and authenticated user; clear in-memory state and close it on account changes to prevent cross-account reads.
 - Scanner movements use the transactional stock RPC with a stable operation ID until success; document OCR and uploads never create purchases or mutate product quantities/prices.
+- Camera sales scans resolve exact catalog identifiers into the existing POS cart; use /app/pos?scan=1 for scan mode and consume product handoffs once, so checkout and stock validation remain centralized.

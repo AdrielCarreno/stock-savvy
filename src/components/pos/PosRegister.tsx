@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Barcode, Check, ChevronsUpDown, Minus, Plus, Search, ShoppingCart, Trash2, X, Loader2, CreditCard, UserPlus } from "lucide-react";
+import { Barcode, Check, ChevronsUpDown, Minus, Plus, Search, ShoppingCart, Trash2, X, Loader2, CreditCard, UserPlus, ScanLine } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { BarcodeCamera } from "@/components/operations/BarcodeCamera";
+import { findPosScanProduct } from "@/lib/posScan";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +29,12 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   const { company, profile } = useAuth();
   const { createSale } = usePos();
   const scanRef = useRef<HTMLInputElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const scanning = searchParams.get("scan") === "1";
+  const incomingProduct = searchParams.get("product");
+  const importedProduct = useRef<string | null>(null);
+  const [lastScan, setLastScan] = useState("");
+  const lastCameraCode = useRef("");
 
   const [scan, setScan] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -100,6 +109,37 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
       ];
     });
   };
+
+  const scanForSale = (code: string) => {
+    try {
+      const product = findPosScanProduct(products, code);
+      addToCart(product);
+      setLastScan(`${product.name} · ${code}`);
+      setScan("");
+    } catch (error) {
+      setLastScan("");
+      toast.error(error instanceof Error ? error.message : "No se pudo leer el producto");
+    }
+  };
+
+  const cameraScanForSale = (code: string) => {
+    if (checkout || saving || loading || lastCameraCode.current === code) return;
+    lastCameraCode.current = code;
+    scanForSale(code);
+  };
+
+  useEffect(() => {
+    if (loading || !incomingProduct || importedProduct.current === incomingProduct) return;
+    importedProduct.current = incomingProduct;
+    const product = products.find(p => p.id === incomingProduct);
+    if (product) addToCart(product);
+    else toast.error("El producto ya no está disponible en el catálogo.");
+    const next = new URLSearchParams(searchParams);
+    next.delete("product");
+    setSearchParams(next, { replace: true });
+    // Consume the handoff once, after the real catalog loads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomingProduct, loading, products]);
 
   const setQty = (id: string, qty: number) => {
     setCart((prev) =>
@@ -265,6 +305,19 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
     <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       {/* Buscador + catálogo */}
       <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+          <h3 className="font-display text-xl">{scanning ? "Escanear venta" : "Productos"}</h3>
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => {
+            const next = new URLSearchParams(searchParams);
+            if (scanning) next.delete("scan"); else next.set("scan", "1");
+            setSearchParams(next, { replace: true });
+          }}><ScanLine className="h-4 w-4" />{scanning ? "Ver catálogo" : "Escanear"}</Button>
+        </div>
+        {scanning && !checkout && <section className="space-y-3">
+          <BarcodeCamera onCode={cameraScanForSale} />
+          {lastScan && <p role="status" className="break-words text-sm text-muted-foreground">Última lectura: {lastScan}</p>}
+          {lastScan && <Button variant="outline" size="sm" onClick={() => { lastCameraCode.current = ""; setLastScan(""); }}>Escanear otra unidad</Button>}
+        </section>}
         <div className="rounded-lg border border-border bg-card p-3 shadow-card">
           <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
             <Barcode className="h-3.5 w-3.5" /> Escaneá el código de barras o buscá por nombre / SKU
@@ -276,7 +329,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
               autoFocus
               value={scan}
               onChange={(e) => setScan(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleScanEnter()}
+              onKeyDown={(e) => e.key === "Enter" && (scanning ? scanForSale(scan) : handleScanEnter())}
               placeholder="Escanear o buscar producto…"
               className="h-12 pl-9 text-base"
             />
@@ -284,7 +337,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
           <p className="mt-1.5 text-[11px] text-muted-foreground">Enter agrega el producto · F2 cobra · Esc vacía el carrito</p>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-3 shadow-card">
+        <div className={cn("rounded-lg border border-border bg-card p-3 shadow-card", scanning && "hidden")}>
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-5 w-5 animate-spin" /></div>
           ) : results.length === 0 ? (
