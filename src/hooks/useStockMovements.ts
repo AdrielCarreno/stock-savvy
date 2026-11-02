@@ -223,70 +223,17 @@ export function useStockMovements() {
         return { error: new Error("invalid qty") };
       }
 
-      const { data: origin, error: oErr } = await supabase
-        .from("product_stock")
-        .select("id, quantity")
-        .eq("product_id", input.product_id)
-        .eq("warehouse_id", input.from_warehouse_id)
-        .maybeSingle();
-      if (oErr) {
-        toast.error(friendlyError(oErr, "Error al leer stock de origen"));
-        return { error: oErr };
-      }
-      if (!origin || origin.quantity < input.quantity) {
-        toast.error(`Stock insuficiente en el depósito de origen (${origin?.quantity ?? 0})`);
-        return { error: new Error("insufficient") };
-      }
-
-      const { data: dest, error: dErr } = await supabase
-        .from("product_stock")
-        .select("id, quantity")
-        .eq("product_id", input.product_id)
-        .eq("warehouse_id", input.to_warehouse_id)
-        .maybeSingle();
-      if (dErr) {
-        toast.error(friendlyError(dErr, "Error al leer stock de destino"));
-        return { error: dErr };
-      }
-
-      const { error: upErr } = await supabase
-        .from("product_stock")
-        .update({ quantity: origin.quantity - input.quantity })
-        .eq("id", origin.id);
-      if (upErr) {
-        toast.error(friendlyError(upErr, "Error al descontar stock"));
-        return { error: upErr };
-      }
-
-      const destErr = dest
-        ? (await supabase
-            .from("product_stock")
-            .update({ quantity: dest.quantity + input.quantity })
-            .eq("id", dest.id)).error
-        : (await supabase.from("product_stock").insert({
-            company_id: companyId,
-            product_id: input.product_id,
-            warehouse_id: input.to_warehouse_id,
-            quantity: input.quantity,
-          })).error;
-      if (destErr) {
-        // revertir origen
-        await supabase.from("product_stock").update({ quantity: origin.quantity }).eq("id", origin.id);
-        toast.error(friendlyError(destErr, "Error al acreditar stock"));
-        return { error: destErr };
-      }
-
-      await supabase.from("stock_movements").insert({
-        company_id: companyId,
-        product_id: input.product_id,
-        user_id: user.id,
-        type: "salida",
-        quantity: input.quantity,
-        reason: input.reason ?? "Transferencia entre depósitos",
-        from_warehouse_id: input.from_warehouse_id,
-        to_warehouse_id: input.to_warehouse_id,
-        movement_date: new Date().toISOString(),
+      const { error: tErr } = await supabase.rpc("transfer_stock", {
+        p_product_id: input.product_id,
+        p_from: input.from_warehouse_id,
+        p_to: input.to_warehouse_id,
+        p_quantity: input.quantity,
+        p_reason: input.reason ?? undefined,
       });
+      if (tErr) {
+        toast.error(friendlyError(tErr, "Error al transferir stock"));
+        return { error: tErr };
+      }
 
       toast.success("Transferencia registrada");
       await fetchMovements();
