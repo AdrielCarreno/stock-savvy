@@ -34,6 +34,7 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
   const incomingProduct = searchParams.get("product");
   const importedProduct = useRef<string | null>(null);
   const [lastScan, setLastScan] = useState("");
+  const lastCameraCode = useRef("");
 
   const [scan, setScan] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -119,6 +120,12 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
       setLastScan("");
       toast.error(error instanceof Error ? error.message : "No se pudo leer el producto");
     }
+  };
+
+  const cameraScanForSale = (code: string) => {
+    if (checkout || saving || loading || lastCameraCode.current === code) return;
+    lastCameraCode.current = code;
+    scanForSale(code);
   };
 
   useEffect(() => {
@@ -306,9 +313,10 @@ export function PosRegister({ onSold }: { onSold?: () => void }) {
             setSearchParams(next, { replace: true });
           }}><ScanLine className="h-4 w-4" />{scanning ? "Ver catálogo" : "Escanear"}</Button>
         </div>
-        {scanning && <section className="space-y-3">
-          <BarcodeCamera onCode={scanForSale} />
+        {scanning && !checkout && <section className="space-y-3">
+          <BarcodeCamera onCode={cameraScanForSale} />
           {lastScan && <p role="status" className="break-words text-sm text-muted-foreground">Última lectura: {lastScan}</p>}
+          {lastScan && <Button variant="outline" size="sm" onClick={() => { lastCameraCode.current = ""; setLastScan(""); }}>Escanear otra unidad</Button>}
         </section>}
         <div className="rounded-lg border border-border bg-card p-3 shadow-card">
           <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
