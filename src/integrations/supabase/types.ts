@@ -1498,6 +1498,20 @@ export type Database = {
         Returns: boolean
       }
       is_company_admin: { Args: never; Returns: boolean }
+      place_initial_stock: {
+        Args: { p_product_id: string; p_warehouse_id: string }
+        Returns: Json
+      }
+      transfer_stock: {
+        Args: {
+          p_from: string
+          p_product_id: string
+          p_quantity: number
+          p_reason?: string
+          p_to: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       account_type: "activo" | "pasivo" | "patrimonio" | "ingreso" | "gasto"
