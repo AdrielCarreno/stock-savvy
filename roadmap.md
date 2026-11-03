@@ -1,5 +1,11 @@
 # Roadmap
 
+## Facturación electrónica ARCA
+- [x] Auditar arquitectura, aislamiento y compatibilidad del SDK; preparar el plan previo a cambios importantes.
+- [ ] Implementar configuración fiscal, persistencia y servicio seguro tras aprobar el plan; depende del entorno de ejecución verificado.
+- [ ] Integrar emisión, conciliación, notas de crédito, ventas existentes, PDF e historial.
+- [ ] Validar seguridad y casos fiscales exclusivamente en homologación; requiere credenciales ARCA del comercio.
+
 - [x] Cambiar el catálogo de Caja a una lista vertical con datos comerciales completos.
 - [x] Aplicar y permitir elegir precios minoristas o mayoristas desde 10 unidades.
 - [x] Ampliar el espacio visible del carrito para compras grandes.
