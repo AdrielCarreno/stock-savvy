@@ -11,6 +11,7 @@ const pageTitles: Record<string, string> = {
   "/app/products": "Productos",
   "/app/pos": "Clientes",
   "/app/scan": "Escanear",
+  "/app/invoicing": "Facturación",
   "/app/low-stock": "Alertas de Stock",
   "/app/suppliers": "Proveedores",
   "/app/movements": "Stock y Movimientos",

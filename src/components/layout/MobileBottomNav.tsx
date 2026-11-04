@@ -14,7 +14,7 @@ const primaryItems = [
 ];
 
 const moreGroups = [
-  { label: "Operación", items: [{ title: "Stock y movimientos", url: "/app/movements", icon: ArrowLeftRight }, { title: "Escanear catálogo y documentos", url: "/app/scan", icon: ScanLine }] },
+  { label: "Operación", items: [{ title: "Stock y movimientos", url: "/app/movements", icon: ArrowLeftRight }, { title: "Escanear catálogo y documentos", url: "/app/scan", icon: ScanLine }, { title: "Facturación", url: "/app/invoicing", icon: FileText }] },
   {
     label: "Catálogo",
     items: [{ title: "Alertas de stock", url: "/app/low-stock", icon: AlertTriangle }],
