@@ -26,6 +26,7 @@ import Reports from "./pages/app/Reports";
 import AI from "./pages/app/AI";
 import POS from "./pages/app/POS";
 import Scan from "./pages/app/Scan";
+import Invoicing from "./pages/app/Invoicing";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const AppRoutes = () => (
       <Route path="products" element={<Products />} />
       <Route path="pos" element={<POS />} />
       <Route path="scan" element={<Scan />} />
+      <Route path="invoicing" element={<Invoicing />} />
       <Route path="low-stock" element={<LowStock />} />
       <Route path="movements" element={<Movements />} />
       <Route path="suppliers" element={<Suppliers />} />

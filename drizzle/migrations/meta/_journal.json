@@ -22,6 +22,13 @@
       "when": 1793590549054,
       "tag": "0002_lock_product_stock_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793806313732,
+      "tag": "0003_fiscal_invoicing_foundation",
+      "breakpoints": true
     }
   ]
 }

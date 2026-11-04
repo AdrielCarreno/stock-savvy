@@ -300,6 +300,281 @@ export type Database = {
           },
         ]
       }
+      fiscal_invoice_events: {
+        Row: {
+          company_id: string
+          created_at: string
+          detail: Json | null
+          event: string
+          id: string
+          invoice_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          detail?: Json | null
+          event: string
+          id?: string
+          invoice_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          detail?: Json | null
+          event?: string
+          id?: string
+          invoice_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_invoice_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoice_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fiscal_invoice_items: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string
+          discount: number
+          id: string
+          invoice_id: string
+          iva_amount: number
+          iva_rate: number
+          net_amount: number
+          product_id: string | null
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description: string
+          discount?: number
+          id?: string
+          invoice_id: string
+          iva_amount: number
+          iva_rate: number
+          net_amount: number
+          product_id?: string | null
+          quantity: number
+          unit_price: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string
+          discount?: number
+          id?: string
+          invoice_id?: string
+          iva_amount?: number
+          iva_rate?: number
+          net_amount?: number
+          product_id?: string | null
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_invoice_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoice_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fiscal_invoices: {
+        Row: {
+          cae: string | null
+          cae_due: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          environment: string
+          error_message: string | null
+          exempt_amount: number
+          id: string
+          iva_amount: number
+          net_amount: number
+          number: number | null
+          op_id: string
+          receiver_doc: string | null
+          receiver_iva_condition: string
+          receiver_name: string | null
+          related_invoice_id: string | null
+          sale_id: string | null
+          sales_point: number
+          snapshot: Json
+          status: string
+          total: number
+          updated_at: string
+          voucher_type: string
+        }
+        Insert: {
+          cae?: string | null
+          cae_due?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          environment?: string
+          error_message?: string | null
+          exempt_amount?: number
+          id?: string
+          iva_amount?: number
+          net_amount?: number
+          number?: number | null
+          op_id?: string
+          receiver_doc?: string | null
+          receiver_iva_condition?: string
+          receiver_name?: string | null
+          related_invoice_id?: string | null
+          sale_id?: string | null
+          sales_point: number
+          snapshot?: Json
+          status?: string
+          total?: number
+          updated_at?: string
+          voucher_type: string
+        }
+        Update: {
+          cae?: string | null
+          cae_due?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          environment?: string
+          error_message?: string | null
+          exempt_amount?: number
+          id?: string
+          iva_amount?: number
+          net_amount?: number
+          number?: number | null
+          op_id?: string
+          receiver_doc?: string | null
+          receiver_iva_condition?: string
+          receiver_name?: string | null
+          related_invoice_id?: string | null
+          sale_id?: string | null
+          sales_point?: number
+          snapshot?: Json
+          status?: string
+          total?: number
+          updated_at?: string
+          voucher_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoices_related_invoice_id_fkey"
+            columns: ["related_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_invoices_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fiscal_settings: {
+        Row: {
+          activity_start: string | null
+          company_id: string
+          connection_status: string
+          created_at: string
+          cuit: string
+          environment: string
+          fiscal_address: string | null
+          iibb: string | null
+          iva_condition: string
+          legal_name: string
+          sales_point: number
+          updated_at: string
+        }
+        Insert: {
+          activity_start?: string | null
+          company_id: string
+          connection_status?: string
+          created_at?: string
+          cuit: string
+          environment?: string
+          fiscal_address?: string | null
+          iibb?: string | null
+          iva_condition: string
+          legal_name: string
+          sales_point?: number
+          updated_at?: string
+        }
+        Update: {
+          activity_start?: string | null
+          company_id?: string
+          connection_status?: string
+          created_at?: string
+          cuit?: string
+          environment?: string
+          fiscal_address?: string | null
+          iibb?: string | null
+          iva_condition?: string
+          legal_name?: string
+          sales_point?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       imports: {
         Row: {
           code: string
@@ -1483,6 +1758,7 @@ export type Database = {
         }
         Returns: Json
       }
+      can_manage_fiscal: { Args: never; Returns: boolean }
       can_operate: { Args: never; Returns: boolean }
       create_pos_sale: {
         Args: { p_lines: Json; p_op_id: string; p_sale: Json }
@@ -1498,6 +1774,7 @@ export type Database = {
         Returns: boolean
       }
       is_company_admin: { Args: never; Returns: boolean }
+      is_fiscal_admin: { Args: never; Returns: boolean }
       place_initial_stock: {
         Args: { p_product_id: string; p_warehouse_id: string }
         Returns: Json

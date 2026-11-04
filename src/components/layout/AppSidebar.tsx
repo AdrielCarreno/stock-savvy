@@ -30,6 +30,7 @@ const navGroups: NavGroup[] = [
       { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
       { title: "Stock y Movimientos", url: "/app/movements", icon: ArrowLeftRight },
       { title: "Escanear", url: "/app/scan", icon: ScanLine },
+      { title: "Facturación", url: "/app/invoicing", icon: FileText },
     ],
   },
   {
