@@ -2,8 +2,9 @@
 
 ## Facturación electrónica ARCA
 - [x] Auditar arquitectura, aislamiento y compatibilidad del SDK; preparar el plan previo a cambios importantes.
-- [ ] Implementar configuración fiscal, persistencia y servicio seguro tras aprobar el plan; depende del entorno de ejecución verificado.
-- [ ] Integrar emisión, conciliación, notas de crédito, ventas existentes, PDF e historial.
+- [x] Implementar configuración fiscal, persistencia y pantalla Facturación (modo homologación fijo).
+- [ ] Servicio externo ARCA (Node.js 22): bloqueado — requiere alojamiento fuera de OneStock y certificado de homologación del comercio.
+- [ ] (bloqueado por el servicio externo) Integrar emisión, conciliación, notas de crédito, ventas existentes, PDF e historial.
 - [ ] Validar seguridad y casos fiscales exclusivamente en homologación; requiere credenciales ARCA del comercio.
 
 - [x] Cambiar el catálogo de Caja a una lista vertical con datos comerciales completos.
