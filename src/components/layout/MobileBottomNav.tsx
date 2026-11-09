@@ -9,7 +9,7 @@ import { ScanLine, FileText } from "lucide-react";
 
 const primaryItems = [
   { title: "Inicio", url: "/app/dashboard", icon: LayoutDashboard },
-  { title: "Clientes", url: "/app/pos", icon: ShoppingCart },
+  { title: "Sistema caja", url: "/app/pos", icon: ShoppingCart },
   { title: "Productos", url: "/app/products", icon: Package },
 ];
 
