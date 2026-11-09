@@ -3,6 +3,7 @@ import { Plus, Search, Filter, Edit2, Trash2, AlertTriangle, Loader2, Upload, Wa
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImportProductsDialog } from "@/components/products/ImportProductsDialog";
 import { ProductDetailDialog } from "@/components/products/ProductDetailDialog";
+import { ProductImageCell } from "@/components/products/ProductImageCell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -383,6 +384,7 @@ export default function Products() {
                     aria-label="Seleccionar todos"
                   />
                 </th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Imagen</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Producto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">SKU</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
@@ -419,6 +421,15 @@ export default function Products() {
                           checked={selectedIds.has(p.id)}
                           onCheckedChange={() => toggleSelect(p.id)}
                           aria-label={`Seleccionar ${p.name}`}
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <ProductImageCell
+                          productId={p.id}
+                          companyId={p.company_id}
+                          name={p.name}
+                          value={(p as any).image_url}
+                          onSaved={(path) => updateProduct(p.id, { image_url: path })}
                         />
                       </td>
                       <td className="px-4 py-3">

@@ -21,6 +21,7 @@ export type ProductInput = {
   price_retail?: number | null;
   cost: number | null;
   description?: string | null;
+  image_url?: string | null;
 };
 
 
