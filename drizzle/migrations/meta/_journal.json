@@ -36,6 +36,13 @@
       "when": 1794254405576,
       "tag": "0004_product_images_and_lifetime_access",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794255012924,
+      "tag": "0005_server_derived_sale_totals",
+      "breakpoints": true
     }
   ]
 }
