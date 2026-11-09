@@ -912,6 +912,7 @@ export type Database = {
           description: string | null
           expiry_date: string | null
           id: string
+          image_url: string | null
           max_stock: number
           min_stock: number
           name: string
@@ -935,6 +936,7 @@ export type Database = {
           description?: string | null
           expiry_date?: string | null
           id?: string
+          image_url?: string | null
           max_stock?: number
           min_stock?: number
           name: string
@@ -958,6 +960,7 @@ export type Database = {
           description?: string | null
           expiry_date?: string | null
           id?: string
+          image_url?: string | null
           max_stock?: number
           min_stock?: number
           name?: string
