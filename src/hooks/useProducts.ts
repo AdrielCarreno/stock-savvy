@@ -73,6 +73,7 @@ export function useProducts() {
           price_retail: input.price_retail ?? null,
           cost: input.cost,
           description: input.description ?? null,
+          image_url: input.image_url ?? null,
         })
         .select("id")
         .maybeSingle();
@@ -149,6 +150,7 @@ export function useProducts() {
           price_retail: input.price_retail ?? null,
           cost: input.cost,
           description: input.description ?? null,
+          image_url: input.image_url ?? null,
         }));
         const { error, data } = await supabase.from("products").insert(chunk).select("id");
         if (error) {
