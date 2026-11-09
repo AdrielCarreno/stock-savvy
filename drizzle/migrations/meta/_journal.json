@@ -29,6 +29,13 @@
       "when": 1793806313732,
       "tag": "0003_fiscal_invoicing_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794254405576,
+      "tag": "0004_product_images_and_lifetime_access",
+      "breakpoints": true
     }
   ]
 }

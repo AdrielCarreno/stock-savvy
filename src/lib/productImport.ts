@@ -69,6 +69,10 @@ const HEADER_MAP: Record<string, Field> = {
   descripcion: "description",
   descripción: "description",
   description: "description",
+  imagen: "image_url",
+  foto: "image_url",
+  "url imagen": "image_url",
+  image: "image_url",
   cliente: "client",
   client: "client",
 };
@@ -116,6 +120,7 @@ export async function parseFile(file: File): Promise<ParseResult> {
       else if (field === "category") data.category = val ? String(val) : null;
       else if (field === "client") data.client = val ? String(val) : null;
       else if (field === "unit") data.unit = val ? String(val) : "unidad";
+      else if (field === "image_url") data.image_url = val && /^https?:\/\//i.test(String(val)) ? String(val) : null;
       else if (field === "description") data.description = val ? String(val) : null;
       else if (field === "current_stock") data.current_stock = Math.max(0, Math.floor(toNumber(val) ?? 0));
       else if (field === "min_stock") data.min_stock = Math.max(0, Math.floor(toNumber(val) ?? 0));
@@ -151,11 +156,12 @@ export async function parseFile(file: File): Promise<ParseResult> {
 }
 
 // Template columns match exactly the visible headers of the Products table
-// (excluding "Acciones"): Producto, SKU, Categoría, Depósito, P. Costo,
+// (excluding "Acciones"): Imagen (URL opcional), Producto, SKU, Categoría, Depósito, P. Costo,
 // P. Mayorista, P. Minorista, Stock, Mín.
 export function downloadTemplate() {
   const data = [
     {
+      "Imagen": "https://ejemplo.com/aceite.jpg",
       "Producto": "Aceite Girasol 1.5L",
       "SKU": "ACE-001",
       "Categoría": "Aceites",
@@ -167,6 +173,7 @@ export function downloadTemplate() {
       "Mín.": 10,
     },
     {
+      "Imagen": "",
       "Producto": "Harina 000 1kg",
       "SKU": "HAR-001",
       "Categoría": "Harinas",
@@ -179,7 +186,7 @@ export function downloadTemplate() {
     },
   ];
   const ws = XLSX.utils.json_to_sheet(data, {
-    header: ["Producto", "SKU", "Categoría", "Depósito", "P. Costo", "P. Mayorista", "P. Minorista", "Stock", "Mín."],
+    header: ["Imagen", "Producto", "SKU", "Categoría", "Depósito", "P. Costo", "P. Mayorista", "P. Minorista", "Stock", "Mín."],
   });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Productos");
