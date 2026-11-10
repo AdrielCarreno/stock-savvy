@@ -1,135 +1,104 @@
-# Integración OneStock ↔ Bakhome: diagnóstico y arquitectura propuesta
+# Integración OneStock ↔ Bakhome
 
-## Alcance y estado
-Primera etapa de análisis, sin implementación. Se revisaron el código de OneStock y las definiciones reales de tablas, políticas, índices, funciones y triggers mediante consultas de solo lectura. No se cambiaron código funcional, datos, permisos, secretos ni servicios.
+## Alcance y verificación
+**Diagnóstico y propuesta únicamente; implementación pendiente de aprobación.** Se revisaron el código de OneStock y las definiciones reales de tablas, RLS, índices, funciones y triggers mediante consultas de solo lectura. No se modificaron código funcional, datos, permisos, secretos ni servicios.
 
-Bakhome no pudo inspeccionarse: no apareció como proyecto accesible al intentar `Bakhome` y buscar `Backhome`. Esto no demuestra que no exista. Su esquema, administración, pagos y mecanismos actuales de webhooks están **sin verificar**. El contrato de ese lado es propuesto, no una integración ya disponible.
+Bakhome no apareció como proyecto accesible al intentar `Bakhome` y buscar `Backhome`. No significa que no exista: su catálogo, pedidos, pagos y administración están **sin verificar**. Los endpoints de ese lado son una propuesta.
 
 ## Diagnóstico técnico de OneStock
-
-| Área | Base existente y resultado |
+| Área | Tablas y situación actual |
 |---|---|
-| Aplicación | React + Vite, Lovable Cloud, empresas en `companies`, membresía en `users.company_id`, roles en `user_roles`. |
-| Integraciones | `/app/integrations` muestra plataformas y abre WhatsApp. No persiste conexiones ni sincroniza. No se encontraron Edge Functions de integración en el repositorio ni tablas de conexiones, pedidos externos, inbox u outbox en el esquema consultado. |
-| Productos | `products`: UUID, empresa, nombre, SKU, barcode, categoría, descripción, imagen, precios general/minorista/mayorista, stock total, mínimos y máximos. `version` y `updated_at` permiten detectar cambios; SKU tiene índice **no único**. |
-| Inventario | `product_stock`: producto, depósito, cantidad y `reserved`; unicidad producto/depósito. `warehouses` identifica depósitos; `product_variants` tiene stock separado. |
-| Movimientos | `stock_movements`: entrada/salida/ajuste, cantidad, empresa, usuario, depósito/origen/destino, fecha y operación del cliente. Historial protegido contra edición/borrado desde el cliente. |
-| Ventas | `sales` + `sale_items`: cliente, canal, estado, descuentos, impuestos, cobros, total y origen. `client_op_id` único para ventas. No hay ciclo específico de pedidos online, reservas ni pagos externos. |
-| Clientes | `customers`: identidad/contacto, CUIT, dirección, saldo, empresa, versión y operación. No hay identificador externo ni unicidad por email. |
-| Seguridad | RLS por empresa y suscripción activa. Las funciones actuales dependen de `auth.uid()` y `current_company_id()`; no son una API para tiendas. |
+| Empresa y acceso | `companies`, `users.company_id`, `user_roles`. RLS por empresa y suscripción activa. |
+| Productos | `products`: nombre, UUID, SKU/barcode, descripción, categoría, imagen, precios general/minorista/mayorista, stock, `version`, `updated_at`. SKU no es único. |
+| Inventario | `product_stock`: producto/depósito, `quantity`, `reserved`; unicidad producto/depósito. `warehouses` y `product_variants` con existencias separadas. |
+| Movimientos | `stock_movements`: empresa, producto, usuario obligatorio, tipo, cantidad, depósitos, fechas, operación idempotente. Historial protegido contra edición/borrado. |
+| Ventas | `sales` + `sale_items`: cliente, canal, origen, estado, cobros, descuento, impuesto, total y operación única. Sin ciclo de pedidos externos o pagos de tienda. |
+| Clientes | `customers`: identidad/contacto, CUIT, dirección, saldo, empresa y versión; sin identificador externo. |
+| Integraciones | `/app/integrations` solo muestra plataformas y abre WhatsApp. No hay conexiones persistidas ni tablas de pedidos externos/inbox/outbox en el esquema consultado. No se encontraron funciones de integración en el repositorio. |
 
-### Riesgos comprobados en las rutas actuales
-- `create_pos_sale` registra venta, líneas y salidas en una transacción; bloquea productos y rechaza stock insuficiente. `apply_stock_movement` y `annul_sale` también son transaccionales. Es una base aprovechable, no suficiente por sí sola.
-- POS y movimientos actualizan `products.current_stock`; transferencias actualizan `product_stock`. Los triggers revisados no mantienen ambos valores sincronizados tras cada venta/movimiento. **Puede existir divergencia**; no se midió ni corrigió inventario real.
-- `reserved` existe, pero POS no lo descuenta de disponibilidad. Reservar online sin adaptar caja permitiría vender unidades ya comprometidas.
-- El formulario `Sales.tsx` descuenta movimientos, luego inserta venta y líneas en llamadas separadas. Puede dejar stock descontado sin venta si falla una llamada. No debe reutilizarse para pedidos externos.
-- Los índices de operación actuales ayudan contra duplicados, pero no guardan hash de solicitud ni resultado de integración; una carrera con la misma operación requiere bloqueo/recuperación específica.
-- Las cantidades de POS se convierten a enteros. Unidades fraccionarias y variantes necesitan reglas explícitas antes de publicarse.
-- Los cobros aceptados por el servidor no coinciden completamente con los códigos mostrados por POS. Bakhome necesitará un adaptador de pagos validado, no copiar códigos libremente.
-- Imágenes privadas no pueden publicarse compartiendo rutas internas o enlaces temporales como si fueran permanentes.
+### Riesgos comprobados
+- `create_pos_sale`, `apply_stock_movement` y `annul_sale` son transaccionales y aprovechan bloqueos. Sin embargo, las ventas/movimientos actualizan `products.current_stock`, y transferencias actualizan `product_stock`; los triggers revisados **no mantienen ambos sincronizados**. Puede existir divergencia; no se midieron ni corrigieron existencias reales.
+- POS no considera `reserved`: agregar reservas online sin adaptar caja permitiría vender unidades comprometidas.
+- `Sales.tsx` descuenta movimientos y luego guarda venta/líneas en llamadas separadas: no reutilizar ese flujo para pedidos online.
+- Las funciones actuales dependen de `auth.uid()` y de la empresa del usuario. Una tienda no puede usarlas como si fuera un empleado.
+- Idempotencia actual no conserva hash y resultado por conexión; requiere protección ante reintentos concurrentes. Cantidades POS son enteras; códigos de pagos del cliente y servidor no coinciden completamente.
+- SKU duplicado, variantes con stock independiente e imágenes privadas necesitan tratamiento explícito.
 
 ## Arquitectura propuesta
-
-Dos aplicaciones y dos bases independientes. No compartir claves administrativas, sesiones de usuarios ni acceso directo a tablas entre aplicaciones.
+**Dos bases independientes; OneStock es la autoridad de inventario.** No compartir claves administrativas ni sesiones de empleados; comunicación exclusivamente por APIs privadas en Edge Functions de Lovable Cloud.
 
 ```text
-OneStock: catálogo y disponibilidad autoritativos
-  cambio local → outbox transaccional → emisor Edge Function
-                      ↓ webhook HTTPS firmado
-Bakhome: copia para exhibición → inbox → actualiza catálogo
-  checkout → API privada OneStock → reserva validada
-  pago verificado → outbox → webhook OneStock → venta transaccional
-OneStock: venta + salida + liberación de reserva + outbox
-                      ↓ webhook de existencias/estado
-Bakhome: actualiza copia y confirma estado del pedido
+OneStock: cambio de producto/precio/stock
+  → outbox transaccional → webhook firmado → inbox Bakhome → copia de catálogo
+Bakhome: checkout → API OneStock → reserva validada
+  → pago comprobado → outbox → webhook firmado → inbox OneStock
+OneStock: transacción venta + salida + reserva + evento
+  → webhook firmado → Bakhome actualiza disponibilidad y pedido
 ```
 
-Los webhooks aquí son **eventos comerciales de las apps**, no los Eventos & Hooks del workspace Lovable, que notifican creación/publicación de proyectos.
+Son webhooks de eventos comerciales propios; **no** los Eventos & Hooks del workspace Lovable, destinados a actividad de proyectos.
 
-### Vinculación segura de tienda y empresa
-1. Administrador de OneStock autenticado inicia la vinculación. El servidor obtiene su empresa y valida rol en `user_roles`; no confía en empresa o rol enviados desde el navegador.
-2. Genera autorización de uso único, de vida corta y ligada a esa empresa. El administrador de Bakhome autenticado la canjea mediante su servidor; se valida también la propiedad de la tienda.
-3. Confirmación final en OneStock muestra la tienda y alcance. El vínculo conserva tienda externa inmutable, empresa, depósitos habilitados, política de precios y estado. Propuesta inicial: una tienda pertenece a una sola empresa y un vínculo Bakhome activo por empresa; ampliable posteriormente.
-4. Credenciales por conexión y dirección, rotables/revocables. Claves privadas compartidas cifradas en almacenamiento solo de servidor con clave maestra en secretos de Cloud; los valores nunca aparecen en logs, Excel ni almacenamiento del navegador. La autorización de canje no concede acceso permanente por sí sola.
-5. Firmar llamadas y webhooks con Standard Webhooks sobre cuerpo original, ID y timestamp; comprobar ventana temporal, firma y deduplicación persistente. Las consultas de lectura usan POST con cuerpo firmado. CORS no es autenticación.
-6. Resolver `company_id` **desde la conexión verificada**, nunca desde el payload. Cada consulta y vínculo producto/cliente/pedido valida esa empresa. Funciones de integración solo ejecutables por el servidor, con privilegios mínimos y búsqueda de esquema fija; no simular sesiones de empleados.
-7. Destinos HTTPS previamente registrados y verificados, sin URLs arbitrarias en eventos; bloquear direcciones privadas/locales, redirecciones y SSRF. Límites de tamaño, tasa y lotes; validar todos los datos.
+### Vinculación y seguridad
+1. Administrador autenticado de OneStock inicia autorización de uso único y corta duración. El servidor obtiene su empresa y rol de `user_roles`, nunca del formulario.
+2. Administrador autenticado de Bakhome autoriza su tienda y su servidor canjea la autorización. Confirmación final en OneStock mostrando identidad, depósitos y alcance.
+3. Vínculo tienda→empresa inmutable. Propuesta piloto: una tienda pertenece a una empresa y un vínculo Bakhome activo por empresa; ampliable luego.
+4. Credenciales por vínculo/dirección, cifradas solo en servidor con clave maestra en secretos de Cloud; rotación y revocación. Nunca entregar claves administrativas, persistir credenciales en navegador ni registrarlas en logs.
+5. APIs y webhooks firmados mediante Standard Webhooks sobre cuerpo original, ID y timestamp; ventana temporal, deduplicación persistente y límites de tamaño/tasa. Lecturas mediante POST con cuerpo firmado. CORS no sustituye autenticación.
+6. Resolver empresa desde la conexión verificada y validar empresa de cada producto/cliente/depósito. RPCs de integración solo ejecutables por servidor, con privilegios mínimos y esquema fijo. No simular sesiones humanas.
+7. Destinos HTTPS verificados y registrados, sin URLs arbitrarias por evento; bloquear redes privadas/locales, redirecciones y SSRF. No vincular por email ni otorgar acceso por el correo con plan de por vida.
 
-No pedir certificados ARCA ni claves de Cloud: esta conexión no requiere facturación fiscal. No inferir vínculo ni permisos por email, incluso si el comercio tiene acceso de por vida.
+## Detalles técnicos: endpoints v1 propuestos
+Nombres lógicos de Edge Functions, no rutas `/api/` ni servicios ya disponibles.
 
-## Contrato técnico propuesto: endpoints v1
-Nombres lógicos de Edge Functions; no son rutas ya implementadas ni `/api/...`.
-
-| App | Endpoint / acción | Uso |
+| App | Endpoint / acciones | Finalidad |
 |---|---|---|
-| OneStock | `ecommerce-link` / iniciar, confirmar, revocar, rotar | Gestión con sesión y rol administrador. |
-| OneStock | `ecommerce-pair` / canjear | Autorización de uso único, verificación mutua de servidores. |
-| OneStock | `ecommerce-catalog` / snapshot, changes | POST firmado: catálogo paginado, disponibilidad absoluta, precios, versiones y bajas. |
-| OneStock | `ecommerce-orders` / reserve, release, status | Reserva sin venta, liberación y consulta para resolver tiempos de espera inciertos. |
-| OneStock | `ecommerce-webhook` | Recibe pedido creado, pago verificado, cancelación y solicitud de devolución. Persiste inbox antes de responder. |
-| OneStock | `ecommerce-dispatch` | Worker interno autenticado: entregas/reintentos y conciliación; no abierto al público. |
-| Bakhome | `onestock-link` | Vinculación desde su administración, canje y almacenamiento seguro. |
-| Bakhome | `onestock-webhook` | Recibe productos, precios, disponibilidad y estado de pedidos con firma. |
-| Bakhome | `onestock-orders` | Servidor de checkout llama a reservas; publica eventos a partir de pagos comprobados. |
-| Bakhome | `onestock-dispatch` | Entrega durable de eventos de pedidos y pagos. |
+| OneStock | `ecommerce-link`: iniciar/confirmar/revocar/rotar | Administración con sesión y rol validados. |
+| OneStock | `ecommerce-pair`: canjear | Vinculación de uso único y verificación de ambos servidores. |
+| OneStock | `ecommerce-catalog`: snapshot/changes | Catálogo paginado, precios, existencias absolutas, versiones y bajas. |
+| OneStock | `ecommerce-orders`: reserve/release/status | Reservar antes del cobro, liberar y conciliar respuestas inciertas. |
+| OneStock | `ecommerce-webhook` | Recibir pedidos, pagos verificados, cancelaciones/devoluciones; inbox durable. |
+| OneStock | `ecommerce-dispatch` | Worker interno autenticado para entregas/reintentos. |
+| Bakhome | `onestock-link`, `onestock-webhook` | Autorizar vínculo y recibir catálogo/stock/estados firmados. |
+| Bakhome | `onestock-orders`, `onestock-dispatch` | Checkout servidor, pagos comprobados y entrega durable de eventos. |
 
-Envelope: `schema_version`, `event_id`, `connection_id`, `type`, `occurred_at`, identificador externo, versión y payload mínimo. Escrituras: clave idempotente obligatoria + hash del contenido. Misma clave/contenido devuelve el resultado existente; misma clave/contenido diferente produce conflicto. `202` significa recibido de forma durable, **no venta confirmada**; `status` informa el resultado. Conflictos de stock/precio: `409`; datos inválidos: `400`; firma inválida: `401/403`; límites: `429`.
+Contrato: `schema_version`, `event_id`, `connection_id`, `type`, `occurred_at`, ID externo, versión y payload mínimo. Escrituras con clave idempotente estable + hash: misma clave/cuerpo devuelve resultado existente; cuerpo diferente da conflicto. `202` confirma recepción durable, **no venta completada**; consultar estado. Datos inválidos `400`, autenticación `401/403`, stock/precio/conflicto `409`, límites `429`.
 
-## Productos, precios, existencias y clientes
-- OneStock → Bakhome: productos seleccionados, SKU/barcode, descripción, imágenes autorizadas, precio de venta y disponibilidad. Por defecto minorista con fallback al general, ARS e importes en centavos; impuestos, descuentos, envío y promociones deben acordarse antes de activar cobros. No exportar costos, saldo de clientes ni campos internos.
-- Identidad mediante tabla de correspondencia UUID OneStock ↔ ID externo. SKU sirve para proponer coincidencias iniciales, no para vincular automáticamente si falta o está duplicado. La primera carga permite revisar diferencias; no sobrescribe ni borra el catálogo de Bakhome sin aprobación.
-- Bakhome → OneStock: pedidos, pagos comprobados y clientes asociados. OneStock → Bakhome: aceptación, rechazo y cambios comerciales pertinentes. No copiar todos los clientes a la tienda ni sincronizar saldos; no crear cuentas Auth por una compra. Identidad del cliente por conexión + ID externo; coincidencias por email/CUIT requieren revisión para evitar fusiones incorrectas.
-- Elegir depósitos vendibles; antes de producción conciliar stock por depósito y total. Mantener una sola verdad de inventario dentro de OneStock: movimientos, POS, edición/importación y anulaciones deben usar operaciones transaccionales que mantengan ambos valores y respeten reservas.
-- Disponible = `max(0, suma de cantidades de depósitos habilitados − reservas activas en esos depósitos)`. Stock físico no baja al reservar. POS debe consumir solo unidades no reservadas; al pagar se transforma la reserva en salida una vez.
-- Enviar **valores absolutos** con secuencia monotónica, no decrementos repetibles. Inbox ignora versiones antiguas. Outbox transaccional captura también cambios de caja, importaciones y ajustes, no depende de la pestaña abierta.
-- Snapshot inicial con cursor/ marca de agua consistente; reproducir cambios posteriores sin pérdidas. Secuencia durable asignada respetando el orden de confirmación o estrategia de solapamiento/deduplicación que evite saltarse transacciones concurrentes. Bajas mediante tombstones; reconciliación periódica corrige eventos perdidos y detecta divergencias, no es la vía principal.
-- Copia de imágenes mediante endpoint autorizado o medios publicados con consentimiento; jamás volver público el bucket privado completo. Variantes y unidades fraccionarias quedan fuera del primer piloto hasta validar ambos modelos; bloquear su publicación en lugar de degradarlas silenciosamente.
+## Sincronización y propiedad de datos
+- OneStock→Bakhome: productos seleccionados, descripción, imagen autorizada, identificadores, precio y disponibilidad. Propuesta: minorista con fallback al general, ARS, cálculo en centavos. Impuestos, promociones, envío y medios de pago requieren contrato antes de activar cobros. No exportar costos ni campos internos.
+- UUID OneStock↔ID externo mediante correspondencias por conexión. SKU solo propone coincidencias; revisar faltantes/duplicados. Carga inicial revisada, sin sobrescribir/borrar Bakhome automáticamente.
+- Bakhome→OneStock: pedidos, pagos comprobados y clientes de esas compras. OneStock devuelve estados y cambios pertinentes. Identidad cliente por ID externo, no fusión automática por email/CUIT; no copiar saldos ni todo el padrón, ni crear usuarios Auth por compras.
+- Antes de activar: conciliar total/depósitos y centralizar ajustes, importaciones, POS, anulaciones y ventas en operaciones que mantengan inventario coherente y reservas.
+- Disponible = `max(0, cantidades de depósitos habilitados − reservas activas)`. Reservar no reduce físico; cobrar transforma reserva en salida. Caja debe respetar esas reservas.
+- Enviar cantidades absolutas con secuencia monotónica; ignorar versiones antiguas. Outbox creada en la transacción local, también para importaciones/borrados, sin depender de navegador abierto.
+- Snapshot con marca de agua consistente y cambios posteriores; cursor que no pierda transacciones concurrentes, mediante orden de confirmación o solapamiento/deduplicación. Bajas con tombstones y conciliación periódica como respaldo, no mecanismo principal.
+- Transferir imágenes mediante acceso autorizado o publicación consentida; no abrir el bucket privado ni tratar enlaces temporales como permanentes. Bloquear variantes/unidades fraccionarias del piloto hasta validar modelos.
 
-## Flujo de pedido, pago y venta online
-1. Bakhome calcula checkout en servidor con el catálogo autorizado y solicita reserva con ID externo de pedido e idempotencia estable. OneStock valida vínculo activo, producto/precio/empresa/cantidades y bloquea filas en orden determinista.
-2. Una transacción crea pedido externo y reserva o rechaza el pedido completo. No hay venta ni salida en este paso. Reserva con expiración configurable y asignación por depósito.
-3. Bakhome comprueba el pago con su proveedor en servidor, no con el éxito mostrado en el navegador. Publica evento durable con ID de pago, moneda, importe y versión del pedido; OneStock valida importe contra la reserva/snapshot aceptado.
-4. OneStock bloquea pedido, reserva e inventario y **en una única transacción** deduplica pago/pedido, vincula cliente, crea `sales` y `sale_items`, registra salidas, reduce físico y reservas, actualiza total y estado, guarda respuesta idempotente y genera eventos de salida. `source='ecommerce'`, canal Bakhome; no volver a llamar a salida de stock por separado.
-5. Si la respuesta se pierde, Bakhome consulta `status` o reintenta con la misma clave. Nunca crea una venta alternativa para resolver un timeout. Las ventas online deben figurar en reportes y su historial específico, sin confundirse con el cierre de caja presencial.
-6. Cancelación antes de pagar libera la reserva una vez. Expiración y pago simultáneos comparten el mismo bloqueo. Pago tardío intenta recuperar stock atómicamente; si no alcanza, queda en incidencia para devolución/gestión, sin stock negativo ni venta ficticia.
-7. Reembolso financiero no repone stock automáticamente: devolución de mercadería confirmada genera entrada una vez, total o parcial. Cancelaciones de ventas confirmadas siguen política explícita y no usan libremente `annul_sale` de POS.
-8. Si no hay conexión durante checkout, no prometer disponibilidad ni confirmar la compra. Si se corta tras el pago, conservar el evento y consultar/reintentar; mostrar pedido pendiente de confirmación. Sin transacción distribuida, pagos/reservas requieren compensación y conciliación.
+## Venta online y descuento correcto
+1. Checkout servidor solicita reserva con ID de pedido estable. OneStock verifica conexión activa, empresa, precios, cantidades y depósitos; bloquea inventario en orden determinista y reserva todo o rechaza todo.
+2. Bakhome verifica pago con su proveedor en servidor, nunca por el éxito del navegador; envía evento durable con ID de pago, moneda, importe y versión. OneStock compara con el snapshot aceptado.
+3. Una transacción bloquea pedido/reserva/inventario, deduplica pago, vincula cliente, crea `sales`/`sale_items`, registra salidas, reduce físico/reservas, guarda resultado y outbox. Origen `ecommerce`, canal Bakhome. **No ejecutar una salida adicional** después.
+4. Timeout: consultar estado o reintentar la misma operación; nunca crear venta alternativa. Mostrar ventas online en historial/reportes, separadas del cierre de caja presencial.
+5. Cancelación sin pago libera una vez. Expiración y pago comparten bloqueo; pago tardío intenta recuperar disponibilidad atómicamente. Si no alcanza: incidencia y compensación, sin inventario negativo ni venta ficticia.
+6. Reembolso no repone mercadería automáticamente. Devolución física confirmada genera entrada idempotente, completa o parcial; no reutilizar libremente anulación POS.
+7. Sin conexión no prometer disponibilidad ni confirmar checkout. Si ya se pagó, conservar evento y mostrar pedido pendiente. No existe transacción distribuida: hacen falta conciliación y compensación.
 
-## Cambios necesarios después de aprobar
-Tablas aditivas propuestas en ambas apps donde corresponda:
-- `ecommerce_connections`, autorizaciones de vinculación y credenciales cifradas: empresa/tienda, alcances, depósitos, política, estado y rotación.
-- `ecommerce_product_links` y `ecommerce_customer_links`: identidades externas por conexión con unicidad y vínculos de la misma empresa.
-- `ecommerce_orders`, líneas y reservas: snapshot de precio, pago externo, venta asociada, estado, expiración y asignación de inventario.
-- `ecommerce_inbox`, `ecommerce_outbox`, entregas/intentos: ID de evento/operación, hash, resultado, secuencia, estado, próximos intentos y error sanitizado. Claves únicas por conexión + evento/pedido/pago y transiciones bloqueadas.
-- Agregar procedencia comercial de movimientos; `stock_movements.user_id` es obligatorio y referencia `users`, por lo que se necesita actor de integración explícito sin fingir un empleado. Propuesta: usuario nullable para operaciones de servicio con `actor_type/connection_id`, conservando usuarios reales para operaciones humanas.
-- RPCs privadas de reservar, confirmar venta, liberar y devolver; adaptar operaciones existentes a inventario coherente y reservas. Revisar triggers de precios y pagos para actor de servicio: validación servidor explícita, no privilegios de administrador artificiales.
-- RLS + GRANT por tabla. Credenciales y cola modificables solo por servidor; administradores ven configuración/errores sanitizados de su empresa. Sin lectura anónima ni SQL arbitrario en endpoints.
-- Worker programado durable en Cloud mediante mecanismo soportado a validar al implementar; reintentos exponenciales con jitter y `Retry-After`, límite, cola de incidencias, reintento manual seguro y conciliación. Edge Functions no deben mantener procesos permanentes ni confiar en tareas posteriores a la respuesta para durabilidad.
-- Pantalla Bakhome en Integraciones: vincular, revisar correspondencias, elegir depósitos/precio, iniciar snapshot, ver última sincronización/pendientes/errores, pausar y revocar. Pausa/revocación bloquea nuevas reservas; pedidos ya pagados necesitan resolución operativa explícita. Logs con IDs técnicos, sin claves ni datos personales completos.
+## Cambios necesarios tras aprobación
+- Tablas aditivas: conexiones/autorizaciones/credenciales cifradas, correspondencias producto/cliente, pedidos/líneas/reservas, inbox/outbox/entregas. Unicidad conexión+evento/pedido/pago, hash/resultados y transiciones bloqueadas.
+- Procedencia de movimientos para actor de integración: el usuario actual es obligatorio. Proponer usuario nullable para servicio con actor/conexión explícitos; preservar autores reales en operaciones humanas.
+- RPCs privadas reservar/confirmar/liberar/devolver y adaptación de inventario existente. Validación de precios/pagos para servicio sin atribuirle privilegios ficticios de administrador.
+- RLS y GRANT por tabla; credenciales y escritura de colas solo servidor. Administradores ven configuración e incidencias sanitizadas de su empresa.
+- Worker durable programado en Cloud, mecanismo soportado a validar al implementar; backoff exponencial, jitter, `Retry-After`, límites, cola de incidencias y reintento manual seguro. No depender de procesos permanentes o tareas efímeras tras responder.
+- Integraciones: vincular Bakhome, revisar productos, depósitos/precio, iniciar carga, última sincronización, pendientes/errores, pausar/revocar. Bloquear nuevas reservas al revocar; resolver pagos pendientes explícitamente. Sin cambios de planes/precios ni facturación ARCA; facturar no vuelve a descontar stock.
 
-## Riesgos y condiciones de aprobación
-**Prioridad alta:** divergencia de inventario, reservas ignoradas por POS, acceso cruzado por credenciales de servicio, ventas duplicadas y pagos cobrados sin disponibilidad. Se mitigan con transacciones, identidad de conexión, exclusión/uniqueness, máquina de estados y conciliación.
+## Etapas y pruebas
+1. Validar arquitectura de Bakhome con acceso de lectura o esquema/checkout exportados sin secretos; sus cambios requieren su propio proyecto.
+2. Conciliar inventario y adaptar transacciones/reservas con regresión POS.
+3. Implementar contrato, vinculación, seguridad y colas en ambas apps.
+4. Piloto catálogo/precio/stock con productos revisados; después reservas/ventas en pruebas.
 
-**También:** eventos fuera de orden, borrados durante snapshot, promociones/envío/IVA distintos, imágenes privadas, límites/costos de Cloud, catálogo grande, claves comprometidas, datos de clientes y baja de suscripción. Validar cadencia y volúmenes con mediciones; no prometer sincronización instantánea ni exactamente una entrega.
+Aceptación: aislamiento entre empresas; firma/replay/revocación; pago duplicado concurrente produce una venta/salida; mismo ID con otro cuerpo da conflicto; caja y tienda por última unidad; rollback completo; timeout recuperable; eventos fuera de orden; snapshot con cambios/bajas; pago tardío y reserva expirada; devolución parcial/duplicada; cortes y reintentos; precio/moneda/cantidades manipulados; imágenes privadas. Finalmente compra de prueba real en Bakhome→venta visible OneStock→stock actualizado en ambas, más POS/reportes. **No ejecutado en este análisis.**
 
-No cambiar precios, planes ni otorgar permisos comerciales por esta conexión. Mantener facturación ARCA separada: emitir factura sobre una venta existente nunca descuenta stock nuevamente.
-
-## Implementación por etapas tras aprobación
-1. Acceder al código de Bakhome mediante su proyecto compartido o revisar su esquema exportado sin secretos; confirmar IDs, variantes, checkout, pagos, moneda, devoluciones y autorización de tienda.
-2. Conciliar inventario y adaptar transacciones de OneStock para depósitos/reservas, con pruebas de regresión de caja y movimientos.
-3. Implementar vinculación, autenticación, tablas/colas y contrato v1 en ambas apps; los cambios de Bakhome requieren su propio proyecto, no se aplican desde un snapshot de solo lectura.
-4. Piloto catálogo/precios/disponibilidad con productos seleccionados, carga inicial revisada y conciliación.
-5. Habilitar reservas y ventas online en entorno de prueba; ampliar solo tras resultados satisfactorios y autorización.
-
-### Pruebas de aceptación obligatorias
-- Tienda A no lee/escribe productos, clientes, pedidos ni errores de empresa B; credencial revocada/expirada, firma adulterada y replay rechazados.
-- Dos eventos de pago y reintentos concurrentes producen una venta y una salida; payload cambiado con misma clave da conflicto.
-- Caja y tienda compiten por la última unidad: solo una puede consumirla; cantidad/total/depósito/reserva permanecen coherentes.
-- Fallo entre líneas de pedido revierte venta, cliente relacionado, movimientos y stock; timeout se resuelve consultando el mismo pedido.
-- Versiones antiguas no sobrescriben nuevas; snapshot con cambios/bajas concurrentes no pierde productos; reconciliación detecta diferencia.
-- Pago posterior a expiración, cancelación duplicada, devolución parcial, desconexión/reconexión y reintento tras incidencia se resuelven sin doble reposición.
-- Precio/moneda/pago/cantidades manipulados rechazados; no publicar costo, bucket privado ni claves.
-- Recorrido real desde compra de prueba en Bakhome hasta venta visible en OneStock y stock actualizado en ambas apps, más regresión POS/reportes. **No ejecutado en esta etapa de análisis.**
+Riesgos prioritarios: stock divergente, sobreventa, acceso cruzado, duplicados y pagos sin disponibilidad. También costos/límites de Cloud, volúmenes, claves comprometidas y datos personales. No prometer entrega única o sincronización instantánea.
 
 ## Próximo paso
-Aprobar esta arquitectura y facilitar el enlace o nombre exacto del proyecto Bakhome con acceso de lectura, o su esquema y flujo de pedidos exportados sin credenciales. No hace falta enviar secretos en el chat. La aprobación permite implementar por etapas, no activar ventas reales antes de las pruebas.
+Aprobar el plan y facilitar enlace/nombre exacto del proyecto Bakhome con acceso de lectura, o esquema y flujo de pedidos sin credenciales. No enviar secretos al chat. No activar ventas reales antes de pruebas y autorización.
