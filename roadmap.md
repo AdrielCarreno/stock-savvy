@@ -1,5 +1,9 @@
 # Roadmap
 
+## Integración e-commerce Bakhome
+- [x] Auditar OneStock y preparar diagnóstico, contrato de conexión, sincronización y riesgos sin implementar.
+- [ ] Implementar conexión y pruebas: pendiente de aprobación del plan y de acceso al proyecto Bakhome para validar su catálogo, pedidos y pagos.
+
 ## Facturación electrónica ARCA
 - [x] Auditar arquitectura, aislamiento y compatibilidad del SDK; preparar el plan previo a cambios importantes.
 - [x] Implementar configuración fiscal, persistencia y pantalla Facturación (modo homologación fijo).
